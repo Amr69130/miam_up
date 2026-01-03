@@ -51,10 +51,17 @@ class Utilisateur
     #[ORM\OneToMany(targetEntity: Paiement::class, mappedBy: 'utilisateur')]
     private Collection $paiements;
 
+    /**
+     * @var Collection<int, Evenement>
+     */
+    #[ORM\ManyToMany(targetEntity: Evenement::class, mappedBy: 'utilisateurs')]
+    private Collection $evenements;
+
     public function __construct()
     {
         $this->role = new ArrayCollection();
         $this->paiements = new ArrayCollection();
+        $this->evenements = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -207,6 +214,33 @@ class Utilisateur
             if ($paiement->getUtilisateur() === $this) {
                 $paiement->setUtilisateur(null);
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Evenement>
+     */
+    public function getEvenements(): Collection
+    {
+        return $this->evenements;
+    }
+
+    public function addEvenement(Evenement $evenement): static
+    {
+        if (!$this->evenements->contains($evenement)) {
+            $this->evenements->add($evenement);
+            $evenement->addUtilisateur($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEvenement(Evenement $evenement): static
+    {
+        if ($this->evenements->removeElement($evenement)) {
+            $evenement->removeUtilisateur($this);
         }
 
         return $this;
