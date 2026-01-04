@@ -55,9 +55,37 @@ class Restaurant
     #[ORM\OneToMany(targetEntity: Evenement::class, mappedBy: 'restaurant')]
     private Collection $evenements;
 
+    /**
+     * @var Collection<int, Specialite>
+     */
+    #[ORM\ManyToMany(targetEntity: Specialite::class, inversedBy: 'restaurants')]
+    private Collection $specialite;
+
+    /**
+     * @var Collection<int, Amenagement>
+     */
+    #[ORM\ManyToMany(targetEntity: Amenagement::class, inversedBy: 'restaurants')]
+    private Collection $amenagements;
+
+    /**
+     * @var Collection<int, Regime>
+     */
+    #[ORM\ManyToMany(targetEntity: Regime::class, inversedBy: 'restaurants')]
+    private Collection $regimes;
+
+    /**
+     * @var Collection<int, Type>
+     */
+    #[ORM\ManyToMany(targetEntity: Type::class, inversedBy: 'restaurants')]
+    private Collection $type;
+
     public function __construct()
     {
         $this->evenements = new ArrayCollection();
+        $this->specialite = new ArrayCollection();
+        $this->amenagements = new ArrayCollection();
+        $this->regimes = new ArrayCollection();
+        $this->type = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -223,6 +251,102 @@ class Restaurant
                 $evenement->setRestaurant(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Specialite>
+     */
+    public function getSpecialite(): Collection
+    {
+        return $this->specialite;
+    }
+
+    public function addSpecialite(Specialite $specialite): static
+    {
+        if (!$this->specialite->contains($specialite)) {
+            $this->specialite->add($specialite);
+        }
+
+        return $this;
+    }
+
+    public function removeSpecialite(Specialite $specialite): static
+    {
+        $this->specialite->removeElement($specialite);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Amenagement>
+     */
+    public function getAmenagements(): Collection
+    {
+        return $this->amenagements;
+    }
+
+    public function addAmenagement(Amenagement $amenagement): static
+    {
+        if (!$this->amenagements->contains($amenagement)) {
+            $this->amenagements->add($amenagement);
+        }
+
+        return $this;
+    }
+
+    public function removeAmenagement(Amenagement $amenagement): static
+    {
+        $this->amenagements->removeElement($amenagement);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Regime>
+     */
+    public function getRegimes(): Collection
+    {
+        return $this->regimes;
+    }
+
+    public function addRegime(Regime $regime): static
+    {
+        if (!$this->regimes->contains($regime)) {
+            $this->regimes->add($regime);
+        }
+
+        return $this;
+    }
+
+    public function removeRegime(Regime $regime): static
+    {
+        $this->regimes->removeElement($regime);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Type>
+     */
+    public function getType(): Collection
+    {
+        return $this->type;
+    }
+
+    public function addType(Type $type): static
+    {
+        if (!$this->type->contains($type)) {
+            $this->type->add($type);
+        }
+
+        return $this;
+    }
+
+    public function removeType(Type $type): static
+    {
+        $this->type->removeElement($type);
 
         return $this;
     }
