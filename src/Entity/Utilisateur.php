@@ -57,11 +57,25 @@ class Utilisateur
     #[ORM\ManyToMany(targetEntity: Evenement::class, mappedBy: 'utilisateurs')]
     private Collection $evenements;
 
+    /**
+     * @var Collection<int, Conversation>
+     */
+    #[ORM\ManyToMany(targetEntity: Conversation::class, mappedBy: 'membres')]
+    private Collection $conversations;
+
+    /**
+     * @var Collection<int, Message>
+     */
+    #[ORM\OneToMany(targetEntity: Message::class, mappedBy: 'expediteur')]
+    private Collection $messages_envoyes;
+
     public function __construct()
     {
         $this->role = new ArrayCollection();
         $this->paiements = new ArrayCollection();
         $this->evenements = new ArrayCollection();
+        $this->conversations = new ArrayCollection();
+        $this->messages_envoyes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -241,6 +255,63 @@ class Utilisateur
     {
         if ($this->evenements->removeElement($evenement)) {
             $evenement->removeUtilisateur($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Conversation>
+     */
+    public function getConversations(): Collection
+    {
+        return $this->conversations;
+    }
+
+    public function addConversation(Conversation $conversation): static
+    {
+        if (!$this->conversations->contains($conversation)) {
+            $this->conversations->add($conversation);
+            $conversation->addMembre($this);
+        }
+
+        return $this;
+    }
+
+    public function removeConversation(Conversation $conversation): static
+    {
+        if ($this->conversations->removeElement($conversation)) {
+            $conversation->removeMembre($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Message>
+     */
+    public function getMessagesEnvoyes(): Collection
+    {
+        return $this->messages_envoyes;
+    }
+
+    public function addMessagesEnvoye(Message $messagesEnvoye): static
+    {
+        if (!$this->messages_envoyes->contains($messagesEnvoye)) {
+            $this->messages_envoyes->add($messagesEnvoye);
+            $messagesEnvoye->setExpediteur($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMessagesEnvoye(Message $messagesEnvoye): static
+    {
+        if ($this->messages_envoyes->removeElement($messagesEnvoye)) {
+            // set the owning side to null (unless already changed)
+            if ($messagesEnvoye->getExpediteur() === $this) {
+                $messagesEnvoye->setExpediteur(null);
+            }
         }
 
         return $this;
