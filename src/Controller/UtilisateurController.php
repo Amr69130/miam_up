@@ -33,4 +33,23 @@ class UtilisateurController extends AbstractController
 
         return $this->render('utilisateur/register.html.twig');
     }
+
+    #[Route('/connexion', name: 'app_utilisateur_login', methods: ['GET', 'POST'])]
+    public function login(Request $request, UtilisateurRepository $utilisateurRepository): Response
+    {
+        if ($request->isMethod('POST')) {
+            $email = $request->request->get('email');
+            // TODO: Implémenter la vraie authentification avec Security Bundle
+            $utilisateur = $utilisateurRepository->findOneBy(['emailUtilisateur' => $email]);
+            
+            if ($utilisateur) {
+                $this->addFlash('success', 'Connexion réussie !');
+                return $this->redirectToRoute('app_utilisateur_login');
+            } else {
+                $this->addFlash('error', 'Email non trouvé.');
+            }
+        }
+
+        return $this->render('utilisateur/login.html.twig');
+    }
 }
