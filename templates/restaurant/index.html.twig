@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste des restaurants{% endblock %}
+
+{% block body %}
+<h1>Restaurants disponibles</h1>
+<ul>
+{% for restaurant in restaurants %}
+ <li>
+ <strong>{{ restaurant.nomRestaurant }}</strong> - {{ restaurant.adresseRestaurant }}
+ {% if restaurant.numTelRestaurant %} - Tel: {{ restaurant.numTelRestaurant }}{% endif %}
+ </li>
+{% else %}
+ <li>Aucun restaurant trouvé</li>
+{% endfor %}
+</ul>
+{% endblock %}
