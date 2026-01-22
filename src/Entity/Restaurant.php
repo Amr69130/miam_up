@@ -34,8 +34,7 @@ class Restaurant
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $site_web = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $coord_gps = null;
+
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $logo = null;
@@ -78,6 +77,12 @@ class Restaurant
      */
     #[ORM\ManyToMany(targetEntity: Type::class, inversedBy: 'restaurants')]
     private Collection $type;
+
+    #[ORM\Column(nullable: true)]
+    private ?float $latitude = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?float $longitude = null;
 
     public function __construct()
     {
@@ -165,17 +170,7 @@ class Restaurant
         return $this;
     }
 
-    public function getCoordGps(): ?string
-    {
-        return $this->coord_gps;
-    }
 
-    public function setCoordGps(?string $coord_gps): static
-    {
-        $this->coord_gps = $coord_gps;
-
-        return $this;
-    }
 
     public function getLogo(): ?string
     {
@@ -347,6 +342,30 @@ class Restaurant
     public function removeType(Type $type): static
     {
         $this->type->removeElement($type);
+
+        return $this;
+    }
+
+    public function getLatitude(): ?float
+    {
+        return $this->latitude;
+    }
+
+    public function setLatitude(?float $latitude): static
+    {
+        $this->latitude = $latitude;
+
+        return $this;
+    }
+
+    public function getLongitude(): ?float
+    {
+        return $this->longitude;
+    }
+
+    public function setLongitude(?float $longitude): static
+    {
+        $this->longitude = $longitude;
 
         return $this;
     }
