@@ -1,0 +1,3 @@
+workers:
+    tailwind:
+        cmd: ['php', 'bin/console', 'tailwind:build', '--watch']
