@@ -103,6 +103,8 @@ class AppFixtures extends Fixture
             $user->setNumUtilisateur($faker->numberBetween(1000, 9999));
             $user->setEmailUtilisateur($faker->email);
             $user->setPseudoUtilisateur(strtolower($user->getPrenomUtilisateur()).$faker->numberBetween(1,99));
+            $user->setLatitude($faker->latitude(42.0, 51.0));
+            $user->setLongitude($faker->longitude(-4.0, 8.0));
             $user->addRole($roleUser);
             $manager->persist($user);
             $utilisateurs[] = $user;
