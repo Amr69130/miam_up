@@ -13,12 +13,21 @@ use App\Entity\Amenagement;
 use App\Entity\Type;
 use App\Entity\Conversation;
 use App\Entity\Message;
+use App\Service\GeocodingService;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Faker\Factory;
 
 class AppFixtures extends Fixture
 {
+    private $geoService;
+
+    // Le constructeur permet à Symfony d'injecter ton service automatiquement
+    public function __construct(GeocodingService $geoService)
+    {
+        $this->geoService = $geoService;
+    }
+
     public function load(ObjectManager $manager): void
     {
         $faker = Factory::create('fr_FR');
@@ -75,14 +84,12 @@ class AppFixtures extends Fixture
             $resto->setNomRestaurant($faker->company);
             $resto->setAdresseRestaurant($faker->address);
             $resto->setNumTelRestaurant($faker->phoneNumber);
-            $resto->setSiret($faker->numerify('##############')); // 14 chiffres pour un SIRET
+            $resto->setSiret($faker->numerify('##############'));
             $resto->setDescriptionRestaurant($faker->text(200));
 
-            // AJOUT DES COORDONNÉES GPS (Générées par Faker)
-            $resto->setLatitude($faker->latitude(42.0, 51.0));  // Latitude moyenne France
-            $resto->setLongitude($faker->longitude(-4.0, 8.0)); // Longitude moyenne France
+            $resto->setLatitude($faker->latitude(42.0, 51.0));
+            $resto->setLongitude($faker->longitude(-4.0, 8.0));
 
-            // Plusieurs spécialités, régimes, aménagements, types
             foreach ($faker->randomElements($specialites, rand(1, 3)) as $s) $resto->addSpecialite($s);
             foreach ($faker->randomElements($regimes, rand(1, 3)) as $r) $resto->addRegime($r);
             foreach ($faker->randomElements($amenagements, rand(1, 3)) as $a) $resto->addAmenagement($a);
@@ -129,7 +136,6 @@ class AppFixtures extends Fixture
             $evenement->setNombrePlaces($faker->numberBetween(10, 50));
             $evenement->setRestaurant($restaurants[array_rand($restaurants)]);
 
-            // Participants multiples
             foreach ($faker->randomElements($utilisateurs, rand(2, 6)) as $u) {
                 $evenement->addUtilisateur($u);
             }
@@ -154,14 +160,12 @@ class AppFixtures extends Fixture
             $conv->setNomConversation('Discussion '.$i);
             $conv->setDateCreation($faker->dateTimeThisYear);
 
-            // 3 à 6 membres aléatoires
             foreach ($faker->randomElements($utilisateurs, rand(3,6)) as $u) {
                 $conv->addMembre($u);
             }
 
             $manager->persist($conv);
 
-            // 3 à 7 messages par conversation
             for ($j = 0; $j < rand(3,7); $j++) {
                 $msg = new Message();
                 $msg->setConversation($conv);
