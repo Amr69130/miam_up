@@ -75,8 +75,12 @@ class AppFixtures extends Fixture
             $resto->setNomRestaurant($faker->company);
             $resto->setAdresseRestaurant($faker->address);
             $resto->setNumTelRestaurant($faker->phoneNumber);
-            $resto->setSiret($faker->numerify('###########'));
+            $resto->setSiret($faker->numerify('##############')); // 14 chiffres pour un SIRET
             $resto->setDescriptionRestaurant($faker->text(200));
+
+            // AJOUT DES COORDONNÉES GPS (Générées par Faker)
+            $resto->setLatitude($faker->latitude(42.0, 51.0));  // Latitude moyenne France
+            $resto->setLongitude($faker->longitude(-4.0, 8.0)); // Longitude moyenne France
 
             // Plusieurs spécialités, régimes, aménagements, types
             foreach ($faker->randomElements($specialites, rand(1, 3)) as $s) $resto->addSpecialite($s);
@@ -99,6 +103,8 @@ class AppFixtures extends Fixture
             $user->setNumUtilisateur($faker->numberBetween(1000, 9999));
             $user->setEmailUtilisateur($faker->email);
             $user->setPseudoUtilisateur(strtolower($user->getPrenomUtilisateur()).$faker->numberBetween(1,99));
+            $user->setLatitude($faker->latitude(42.0, 51.0));
+            $user->setLongitude($faker->longitude(-4.0, 8.0));
             $user->addRole($roleUser);
             $manager->persist($user);
             $utilisateurs[] = $user;
