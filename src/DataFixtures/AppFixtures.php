@@ -81,14 +81,16 @@ class AppFixtures extends Fixture
         $restaurants = [];
         for ($i = 0; $i < 7; $i++) {
             $resto = new Restaurant();
-            $resto->setNomRestaurant($faker->company);
-            $resto->setAdresseRestaurant($faker->address);
+            // Utilisation de unique() pour éviter les erreurs de doublons SIRET/Nom
+            $resto->setNomRestaurant($faker->unique()->company);
+
+            // MODIFICATION ICI : On aide l'API à trouver l'adresse
+            $resto->setAdresseRestaurant($faker->streetAddress . ", Lyon");
             $resto->setNumTelRestaurant($faker->phoneNumber);
-            $resto->setSiret($faker->numerify('##############'));
+            $resto->setSiret($faker->unique()->numerify('##############'));
             $resto->setDescriptionRestaurant($faker->text(200));
 
-            $resto->setLatitude($faker->latitude(42.0, 51.0));
-            $resto->setLongitude($faker->longitude(-4.0, 8.0));
+
 
             foreach ($faker->randomElements($specialites, rand(1, 3)) as $s) $resto->addSpecialite($s);
             foreach ($faker->randomElements($regimes, rand(1, 3)) as $r) $resto->addRegime($r);
@@ -108,10 +110,13 @@ class AppFixtures extends Fixture
             $user->setNomUtilisateur($faker->lastName);
             $user->setPrenomUtilisateur($prenoms[$i]);
             $user->setNumUtilisateur($faker->numberBetween(1000, 9999));
-            $user->setEmailUtilisateur($faker->email);
-            $user->setPseudoUtilisateur(strtolower($user->getPrenomUtilisateur()).$faker->numberBetween(1,99));
-            $user->setLatitude($faker->latitude(42.0, 51.0));
-            $user->setLongitude($faker->longitude(-4.0, 8.0));
+            $user->setEmailUtilisateur($faker->unique()->email);
+            $user->setPseudoUtilisateur(strtolower($user->getPrenomUtilisateur()).$faker->unique()->numberBetween(1,99));
+
+            // ICI : On centre les users sur Lyon pour qu'ils soient proches des restos
+            $user->setLatitude($faker->latitude(45.72, 45.78));
+            $user->setLongitude($faker->longitude(4.80, 4.86));
+
             $user->addRole($roleUser);
             $manager->persist($user);
             $utilisateurs[] = $user;
