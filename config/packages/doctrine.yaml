@@ -17,6 +17,14 @@ doctrine:
         identity_generation_preferences:
             Doctrine\DBAL\Platforms\PostgreSQLPlatform: identity
         auto_mapping: true
+        dql:
+            # Ici, j'ajoute les fonctions mathématiques nécessaires au calcul de la distance
+            # (Formule de Haversine) qui vont permettre la recherche de proximité via Doctrine.
+            numeric_functions:
+                acos: DoctrineExtensions\Query\Mysql\Acos
+                cos: DoctrineExtensions\Query\Mysql\Cos
+                sin: DoctrineExtensions\Query\Mysql\Sin
+                radians: DoctrineExtensions\Query\Mysql\Radians
         mappings:
             App:
                 type: attribute

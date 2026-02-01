@@ -40,4 +40,26 @@ class RestaurantRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+    /**
+     * Retourne les restaurants situés dans un rayon de $radius kilomètres
+     */
+    public function findNearby(float $lat, float $lng, int $radius = 10): array
+    {
+        return $this->createQueryBuilder('r')
+            ->select('r')
+            // Application directe de la formule de Haversine (voir schéma en Phase 3)
+            // 6371 représente le rayon moyen de la Terre en kilomètres
+            ->addSelect(
+                '(6371 * acos(cos(radians(:lat)) * cos(radians(r.latitude)) * cos(radians(r.longitude) - radians(:lng)) + sin(radians(:lat)) * sin(radians(r.latitude)))) AS distance'
+            )
+            ->setParameter('lat', $lat)
+            ->setParameter('lng', $lng)
+            ->setParameter('radius', $radius)
+            // On filtre pour ne garder que les restos dans le rayon
+            ->having('distance <= :radius')
+            // On trie du plus proche au plus loin
+            ->orderBy('distance', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }
