@@ -84,13 +84,15 @@ class AppFixtures extends Fixture
             // Utilisation de unique() pour éviter les erreurs de doublons SIRET/Nom
             $resto->setNomRestaurant($faker->unique()->company);
 
-            // MODIFICATION ICI : On aide l'API à trouver l'adresse
+            //  ICI : On aide l'API à trouver l'adresse
             $resto->setAdresseRestaurant($faker->streetAddress . ", Lyon");
+
+            // PLUS DE SET LAT ET SET LONG ICI :
+            // La géolocalisation est désormais gérée automatiquement par le RestaurantListener via l'adresse ci-dessus.
+
             $resto->setNumTelRestaurant($faker->phoneNumber);
             $resto->setSiret($faker->unique()->numerify('##############'));
             $resto->setDescriptionRestaurant($faker->text(200));
-
-
 
             foreach ($faker->randomElements($specialites, rand(1, 3)) as $s) $resto->addSpecialite($s);
             foreach ($faker->randomElements($regimes, rand(1, 3)) as $r) $resto->addRegime($r);
