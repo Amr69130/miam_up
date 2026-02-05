@@ -3,6 +3,8 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Restaurant;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
+use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
@@ -39,4 +41,12 @@ class RestaurantCrudController extends AbstractCrudController
                 ->setFormTypeOptions(['by_reference' => false]),
         ];
     }
+    public function configureFilters(Filters $filters): Filters
+    {
+        return $filters
+            ->add('nom_restaurant')
+            ->add('specialite')
+            ->add('note_consommateurs');
+    }
+    
 }

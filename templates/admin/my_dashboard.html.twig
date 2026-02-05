@@ -1,0 +1,18 @@
+{% extends '@EasyAdmin/page/content.html.twig' %}
+
+{% block content_title %}Bienvenue sur le Panel Miam Up{% endblock %}
+
+{% block main %}
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card bg-primary text-white mb-4">
+                <div class="card-body"><h5>{{ total_restaurants }} Restaurants</h5></div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-success text-white mb-4">
+                <div class="card-body"><h5>{{ total_events }} Événements à venir</h5></div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
