@@ -1,0 +1,19 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Carte Miam'Up{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {# Charge le CSS compilé pour map_app #}
+    {{ encore_entry_link_tags('map_app') }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {# Charge le JS compilé pour map_app #}
+    {{ encore_entry_script_tags('map_app') }}
+{% endblock %}
+
+{% block body %}
+    <div id="react-map-root" data-items="{{ restaurants_json }}"></div>
+{% endblock %}
