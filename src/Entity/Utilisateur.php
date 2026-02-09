@@ -6,9 +6,11 @@ use App\Repository\UtilisateurRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UtilisateurRepository::class)]
-class Utilisateur
+class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -38,6 +40,9 @@ class Utilisateur
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $noteUtilisateur = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $password = null;
 
     /**
      * @var Collection<int, Role>
@@ -83,6 +88,56 @@ class Utilisateur
         $this->conversations = new ArrayCollection();
         $this->messages_envoyes = new ArrayCollection();
     }
+
+    // ========== Méthodes requises par UserInterface ==========
+
+    /**
+     * Identifiant unique utilisé pour l'authentification (email)
+     */
+    public function getUserIdentifier(): string
+    {
+        return (string) $this->emailUtilisateur;
+    }
+
+    /**
+     * Retourne les rôles de l'utilisateur
+     */
+    public function getRoles(): array
+    {
+        $roles = [];
+        foreach ($this->role as $role) {
+            $roles[] = 'ROLE_' . strtoupper($role->getNomRole());
+        }
+        // Chaque utilisateur a au moins ROLE_USER
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
+    }
+
+    /**
+     * Retourne le mot de passe hashé
+     */
+    public function getPassword(): ?string
+    {
+        return $this->password;
+    }
+
+    public function setPassword(string $password): static
+    {
+        $this->password = $password;
+
+        return $this;
+    }
+
+    /**
+     * Efface les données sensibles temporaires
+     */
+    public function eraseCredentials(): void
+    {
+        // Si tu stockes des données sensibles temporaires, efface-les ici
+    }
+
+    // ========== Getters / Setters existants ==========
 
     public function getId(): ?int
     {

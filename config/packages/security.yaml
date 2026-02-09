@@ -5,27 +5,43 @@ security:
 
     # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
     providers:
-        users_in_memory: { memory: null }
+        app_user_provider:
+            entity:
+                class: App\Entity\Utilisateur
+                property: emailUtilisateur
 
     firewalls:
         dev:
-            # Ensure dev tools and static assets are always allowed
             pattern: ^/(_profiler|_wdt|assets|build)/
             security: false
         main:
             lazy: true
-            provider: users_in_memory
+            provider: app_user_provider
+            form_login:
+                login_path: app_utilisateur_login
+                check_path: app_utilisateur_login
+                username_parameter: _username
+                password_parameter: _password
+                default_target_path: app_home
+                enable_csrf: true
+            logout:
+                path: app_logout
+                target: app_utilisateur_login
+            remember_me:
+                secret: '%kernel.secret%'
+                lifetime: 604800
+                path: /
 
-            # Activate different ways to authenticate:
-            # https://symfony.com/doc/current/security.html#the-firewall
+    # Hiérarchie des rôles
+    role_hierarchy:
+        ROLE_ADMIN: ROLE_USER
 
-            # https://symfony.com/doc/current/security/impersonating_user.html
-            # switch_user: true
-
-    # Note: Only the *first* matching rule is applied
+    # Contrôle d'accès
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+        - { path: ^/$, roles: PUBLIC_ACCESS }
+        - { path: ^/utilisateur/connexion, roles: PUBLIC_ACCESS }
+        - { path: ^/utilisateur/inscription, roles: PUBLIC_ACCESS }
+        - { path: ^/admin, roles: ROLE_ADMIN }
 
 when@test:
     security:

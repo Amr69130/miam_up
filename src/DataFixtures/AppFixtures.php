@@ -17,14 +17,16 @@ use App\Service\GeocodingService;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Faker\Factory;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AppFixtures extends Fixture
 {
     private $geoService;
 
-    // Le constructeur permet à Symfony d'injecter ton service automatiquement
-    public function __construct(GeocodingService $geoService)
-    {
+    public function __construct(
+        GeocodingService $geoService,
+        private UserPasswordHasherInterface $passwordHasher
+    ) {
         $this->geoService = $geoService;
     }
 
@@ -115,9 +117,13 @@ class AppFixtures extends Fixture
             $user->setEmailUtilisateur($faker->unique()->email);
             $user->setPseudoUtilisateur(strtolower($user->getPrenomUtilisateur()).$faker->unique()->numberBetween(1,99));
 
-            // ICI : On centre les users sur Lyon pour qu'ils soient proches des restos
+            // Géolocalisation centrée sur Lyon
             $user->setLatitude($faker->latitude(45.72, 45.78));
             $user->setLongitude($faker->longitude(4.80, 4.86));
+            
+            // Hasher le mot de passe (mot de passe par défaut : "password")
+            $hashedPassword = $this->passwordHasher->hashPassword($user, 'password');
+            $user->setPassword($hashedPassword);
 
             $user->addRole($roleUser);
             $manager->persist($user);
@@ -129,9 +135,15 @@ class AppFixtures extends Fixture
         $admin->setNomUtilisateur('Admin');
         $admin->setPrenomUtilisateur('Super');
         $admin->setNumUtilisateur(0);
-        $admin->setEmailUtilisateur('admin@example.com');
+        $admin->setEmailUtilisateur('admin@miamup.com');
         $admin->setPseudoUtilisateur('admin');
+        
+        // Hasher le mot de passe admin (mot de passe : "admin123")
+        $hashedPassword = $this->passwordHasher->hashPassword($admin, 'admin123');
+        $admin->setPassword($hashedPassword);
+        
         $admin->addRole($roleAdmin);
+        $admin->addRole($roleUser);
         $manager->persist($admin);
         $utilisateurs[] = $admin;
 

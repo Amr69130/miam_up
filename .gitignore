@@ -1,5 +1,4 @@
-
-###> symfony/framework-bundle ###
+﻿###> symfony/framework-bundle ###
 /.env.local
 /.env.local.php
 /.env.*.local
@@ -25,3 +24,15 @@
 npm-debug.log
 yarn-error.log
 ###< symfony/webpack-encore-bundle ###
+
+###> custom ignores ###
+# Fichiers de développement local
+/MEMO.txt
+/TODO.md
+/MEMOIRE_DEVELOPPEMENT.md
+/previews/
+composer.phar
+
+# IDE
+/.idea/
+###< custom ignores ###
