@@ -16,9 +16,14 @@ use App\Entity\Message;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Faker\Factory;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AppFixtures extends Fixture
 {
+    public function __construct(
+        private UserPasswordHasherInterface $passwordHasher
+    ) {}
+
     public function load(ObjectManager $manager): void
     {
         $faker = Factory::create('fr_FR');
@@ -105,6 +110,11 @@ class AppFixtures extends Fixture
             $user->setPseudoUtilisateur(strtolower($user->getPrenomUtilisateur()).$faker->numberBetween(1,99));
             $user->setLatitude($faker->latitude(42.0, 51.0));
             $user->setLongitude($faker->longitude(-4.0, 8.0));
+            
+            // Hasher le mot de passe (mot de passe par défaut : "password")
+            $hashedPassword = $this->passwordHasher->hashPassword($user, 'password');
+            $user->setPassword($hashedPassword);
+            
             $user->addRole($roleUser);
             $manager->persist($user);
             $utilisateurs[] = $user;
@@ -115,9 +125,15 @@ class AppFixtures extends Fixture
         $admin->setNomUtilisateur('Admin');
         $admin->setPrenomUtilisateur('Super');
         $admin->setNumUtilisateur(0);
-        $admin->setEmailUtilisateur('admin@example.com');
+        $admin->setEmailUtilisateur('admin@miamup.com');
         $admin->setPseudoUtilisateur('admin');
+        
+        // Hasher le mot de passe admin (mot de passe : "admin123")
+        $hashedPassword = $this->passwordHasher->hashPassword($admin, 'admin123');
+        $admin->setPassword($hashedPassword);
+        
         $admin->addRole($roleAdmin);
+        $admin->addRole($roleUser);
         $manager->persist($admin);
         $utilisateurs[] = $admin;
 
