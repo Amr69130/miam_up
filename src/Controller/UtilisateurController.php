@@ -49,6 +49,11 @@ class UtilisateurController extends AbstractController
                 $errors[] = 'Le mot de passe doit contenir au moins 8 caractères.';
             }
 
+            // Validation mot de passe fort : majuscule, minuscule, chiffre, symbole
+            if (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/', $password)) {
+                $errors[] = 'Le mot de passe doit contenir au moins une majuscule, une minuscule, un chiffre et un caractère spécial (@$!%*?&).';
+            }
+
             if ($password !== $passwordConfirm) {
                 $errors[] = 'Les mots de passe ne correspondent pas.';
             }
