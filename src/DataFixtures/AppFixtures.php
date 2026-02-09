@@ -138,8 +138,8 @@ class AppFixtures extends Fixture
         $admin->setEmailUtilisateur('admin@miamup.com');
         $admin->setPseudoUtilisateur('admin');
         
-        // Hasher le mot de passe admin (mot de passe : "admin123")
-        $hashedPassword = $this->passwordHasher->hashPassword($admin, 'admin123');
+        // Hasher le mot de passe admin (mot de passe : "Admin123!")
+        $hashedPassword = $this->passwordHasher->hashPassword($admin, 'Admin123!');
         $admin->setPassword($hashedPassword);
         
         $admin->addRole($roleAdmin);

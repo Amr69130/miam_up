@@ -22,7 +22,7 @@ security:
                 check_path: app_utilisateur_login
                 username_parameter: _username
                 password_parameter: _password
-                default_target_path: app_home
+                success_handler: App\Security\LoginSuccessHandler
                 enable_csrf: true
             logout:
                 path: app_logout
@@ -41,7 +41,7 @@ security:
         - { path: ^/$, roles: PUBLIC_ACCESS }
         - { path: ^/utilisateur/connexion, roles: PUBLIC_ACCESS }
         - { path: ^/utilisateur/inscription, roles: PUBLIC_ACCESS }
-        - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: ^/admin, roles: PUBLIC_ACCESS }
 
 when@test:
     security:

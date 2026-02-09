@@ -62,6 +62,9 @@ Encore
     // uncomment if you use TypeScript
     //.enableTypeScriptLoader()
 
+    // enables PostCSS (required for Tailwind CSS)
+    .enablePostCssLoader()
+
     // uncomment if you use React
     .enableReactPreset()
 
