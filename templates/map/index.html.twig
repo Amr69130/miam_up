@@ -5,13 +5,13 @@
 {% block stylesheets %}
     {{ parent() }}
     {# Charge le CSS compilé pour map_app #}
-    {{ encore_entry_link_tags('map_app') }}
+    {{ encore_entry_link_tags('app') }}
 {% endblock %}
 
 {% block javascripts %}
     {{ parent() }}
     {# Charge le JS compilé pour map_app #}
-    {{ encore_entry_script_tags('map_app') }}
+    {{ encore_entry_script_tags('app') }}
 {% endblock %}
 
 {% block body %}
