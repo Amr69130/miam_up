@@ -12,7 +12,6 @@
   </component>
   <component name="PhpIncludePathManager">
     <include_path>
-      <path value="$PROJECT_DIR$/vendor/beberlei/doctrineextensions" />
       <path value="$PROJECT_DIR$/vendor/composer" />
       <path value="$PROJECT_DIR$/vendor/doctrine/collections" />
       <path value="$PROJECT_DIR$/vendor/doctrine/data-fixtures" />
@@ -150,6 +149,7 @@
       <path value="$PROJECT_DIR$/vendor/symfony/uid" />
       <path value="$PROJECT_DIR$/vendor/symfony/polyfill-uuid" />
       <path value="$PROJECT_DIR$/vendor/easycorp/easyadmin-bundle" />
+      <path value="$PROJECT_DIR$/vendor/symfonycasts/tailwind-bundle" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="8.2" />
