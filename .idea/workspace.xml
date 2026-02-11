@@ -2,10 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="4adfbc82-5e6b-4430-ba82-986500cbb3ad" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/php.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/php.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/config/reference.php" beforeDir="false" afterPath="$PROJECT_DIR$/config/reference.php" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/map/index.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/map/index.html.twig" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -218,7 +215,7 @@
       <workItem from="1770640424974" duration="105000" />
       <workItem from="1770640531609" duration="5057000" />
       <workItem from="1770710935320" duration="3046000" />
-      <workItem from="1770828497813" duration="1672000" />
+      <workItem from="1770828497813" duration="3001000" />
     </task>
     <servers />
   </component>
