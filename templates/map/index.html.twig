@@ -30,30 +30,38 @@
 
                 <span class="hidden md:block text-gray-300">|</span>
 
-                {# 1.2 : Bouton "Autour de moi" #}
-                <button id="btn-geoloc"
-                        class="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-bold py-2.5 px-6 rounded-full transition-all active:scale-95 shadow-md whitespace-nowrap">
+                {# Contrôleur Stimulus #}
+                <div data-controller="search-location">
 
-                    {# 1.2 : Icône Cible (ID ajouté pour le JS plus tard) #}
-                    <svg id="icon-target" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
+                    {# 1.2 : Bouton avec ACTION de clic et TARGET bouton #}
+                    <button data-search-location-target="button"
+                            data-action="click->search-location#findMe"
+                            id="btn-geoloc"
+                            class="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-bold py-2.5 px-6 rounded-full transition-all active:scale-95 shadow-md whitespace-nowrap">
 
-                    {# 1.3 : Spinner (masqué par défaut) #}
-                    <svg id="icon-spinner" class="hidden animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
+                        {# TARGET icône cible #}
+                        <svg data-search-location-target="iconTarget" id="icon-target" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
 
-                    <span id="btn-text">Autour de moi</span>
-                </button>
+                        {# TARGET spinner #}
+                        <svg data-search-location-target="iconSpinner" id="icon-spinner" class="hidden animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+
+                        {# TARGET texte #}
+                        <span data-search-location-target="label" id="btn-text">Autour de moi</span>
+                    </button>
+
+                    {# TARGET message d'erreur/info #}
+                    <div data-search-location-target="message" id="geoloc-message" class="hidden mt-2 p-2 text-sm rounded-md border"></div>
+
+                </div>
             </div>
 
-            {# 1.3 : Zone de notification (Toasts/Alertes) #}
-            <div id="geoloc-message" class="hidden mt-4 inline-block px-4 py-2 rounded-lg text-sm font-medium border transition-all">
-                {# Texte injecté dynamiquement #}
-            </div>
+
         </div>
 
         {# Point d'entrée de ta carte React #}
