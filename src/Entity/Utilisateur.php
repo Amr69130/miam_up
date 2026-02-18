@@ -23,9 +23,6 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255)]
     private ?string $prenomUtilisateur = null;
 
-    #[ORM\Column]
-    private ?int $numUtilisateur = null;
-
     #[ORM\Column(length: 255)]
     private ?string $emailUtilisateur = null;
 
@@ -168,17 +165,6 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getNumUtilisateur(): ?int
-    {
-        return $this->numUtilisateur;
-    }
-
-    public function setNumUtilisateur(int $numUtilisateur): static
-    {
-        $this->numUtilisateur = $numUtilisateur;
-
-        return $this;
-    }
 
     public function getEmailUtilisateur(): ?string
     {
