@@ -3,7 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="4adfbc82-5e6b-4430-ba82-986500cbb3ad" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/map/index.html.twig" beforeDir="false" afterPath="$PROJECT_DIR$/templates/map/index.html.twig" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/controllers/search-location_controller.js" beforeDir="false" afterPath="$PROJECT_DIR$/assets/controllers/search-location_controller.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -13,6 +13,14 @@
   <component name="ComposerSettings" synchronizationState="SYNCHRONIZE">
     <pharConfigPath>$PROJECT_DIR$/composer.json</pharConfigPath>
     <execution />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="PHP File" />
+        <option value="JavaScript File" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
@@ -215,7 +223,9 @@
       <workItem from="1770640424974" duration="105000" />
       <workItem from="1770640531609" duration="5057000" />
       <workItem from="1770710935320" duration="3046000" />
-      <workItem from="1770828497813" duration="3001000" />
+      <workItem from="1770828497813" duration="4820000" />
+      <workItem from="1770880106421" duration="37000" />
+      <workItem from="1771321612954" duration="8651000" />
     </task>
     <servers />
   </component>
