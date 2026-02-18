@@ -35,7 +35,10 @@ const MapComponent = ({ magasins }) => {
                 >
                     <Popup>
                         <b>{magasin.nom}</b> <br />
-                        Super resto !
+                        {magasin.description} <br />
+                        <a href={magasin.site_web} target="_blank" rel="noopener noreferrer">Site Web</a> <br />
+                        Note: {magasin.note}
+                        <img src={magasin.logo} alt={`${magasin.nom} logo`} style={{ width: '100px', marginTop: '10px' }} />
                     </Popup>
                 </Marker>
             ))}

@@ -23,7 +23,10 @@ class MapController extends AbstractController
                     'nom' => $resto->getNomRestaurant(),
                     'lat' => $resto->getLatitude(),
                     'lng' => $resto->getLongitude(),
-
+                    'description' => $resto->getDescriptionRestaurant(),
+                    'logo' => $resto->getLogo(),
+                    'site_web' => $resto->getSiteWeb(),
+                    'note' => $resto->getNoteConsommateurs()
                 ];
             }
         }
