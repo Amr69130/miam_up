@@ -10,9 +10,6 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class GoogleController extends AbstractController
 {
-    /**
-     * Redirige l'utilisateur vers Google pour autorisation
-     */
     #[Route('/connect/google', name: 'connect_google_start')]
     public function connectAction(ClientRegistry $clientRegistry): RedirectResponse
     {
@@ -22,18 +19,15 @@ class GoogleController extends AbstractController
                 'openid',
                 'email',
                 'profile',
-            ], []);
+            ], [
+                // Force l'affichage de l'écran de sélection de compte Google à chaque fois
+                'prompt' => 'select_account',
+            ]);
     }
 
-    /**
-     * Google redirige vers cette URL après autorisation
-     * L'authenticator intercepte cette route (voir security.yaml)
-     */
     #[Route('/connect/google/check', name: 'connect_google_check')]
     public function connectCheckAction(Request $request): RedirectResponse
     {
-        // Cette méthode ne sera jamais exécutée car l'authenticator intercepte la route
-        // Si on arrive ici, c'est qu'il y a eu un problème
         $this->addFlash('error', 'Une erreur est survenue lors de la connexion avec Google.');
         return $this->redirectToRoute('app_utilisateur_login');
     }
