@@ -29,14 +29,49 @@ export default class extends Controller {
     handleSuccess(position) {
         const { latitude, longitude } = position.coords;
 
-        // On envoie le "SMS" (l'événement)
+        // On garde l'événement pour la carte
         const event = new CustomEvent("location-updated", {
             detail: { lat: latitude, lng: longitude }
         });
         window.dispatchEvent(event);
 
-        this.showMessage("Position trouvée !", "success");
-        this.setLoading(false);
+        // --- NOUVEAU : POINT 3.2 ---
+        // On appelle la fonction qui va chercher les restaurants sur le serveur
+        this.fetchRestaurants(latitude, longitude);
+
+        this.showMessage("Position trouvée ! Chargement des restaurants...", "success");
+    }
+
+
+    fetchRestaurants(lat, lng) {
+        // [3.2.1] URL Dynamique
+        const url = `/api/restaurants/search?lat=${lat}&lng=${lng}`;
+
+        // [3.2.2] Appel Asynchrone
+        fetch(url)
+            .then(response => {
+                if (!response.ok) throw new Error("Erreur serveur");
+                return response.json(); // [3.2.3] Traitement JSON
+            })
+            .then(restaurants => {
+                console.log("Liste des restos reçue :", restaurants);
+
+                const event = new CustomEvent("restaurants-updated", {
+                    detail: { restaurants: restaurants }
+                });
+                window.dispatchEvent(event);
+
+                // On arrête le chargement ici une fois que les données sont là
+                this.setLoading(false);
+                this.showMessage(`${restaurants.length} restaurants trouvés autour de vous !`, "success");
+
+                // Ici on ajoutera plus tard le point 3.3 pour mettre à jour l'interface
+            })
+            .catch(error => {
+                console.error("Erreur :", error);
+                this.showMessage("Impossible de charger les restaurants.", "error");
+                this.setLoading(false);
+            });
     }
 
     // --- GESTION DES ERREURS 2.2 (Permissions & Réseau) ---
