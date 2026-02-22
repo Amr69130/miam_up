@@ -29,6 +29,12 @@ class Amenagement
         $this->restaurants = new ArrayCollection();
     }
 
+    // Cette méthode permet à EasyAdmin d'afficher le texte dans le formulaire
+    public function __toString(): string
+    {
+        return $this->nom_amenagement ?? '';
+    }
+
     public function getId(): ?int
     {
         return $this->id;
