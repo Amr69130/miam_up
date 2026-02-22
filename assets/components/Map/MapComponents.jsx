@@ -29,7 +29,7 @@ const LocationHandler = ({ setUserPos }) => {
 
             setUserPos([lat, lng]);
 
-            map.flyTo([lat, lng], 15, {
+            map.flyTo([lat, lng], 13.5, {
                 animate: true,
                 duration: 1.5
             });
@@ -44,11 +44,24 @@ const LocationHandler = ({ setUserPos }) => {
     return null;
 };
 
-const MapComponent = ({ magasins }) => {
+const MapComponent = ({ magasins: magasinsInitiaux }) => {
+    // MODIFICATION ICI : On utilise un state pour pouvoir mettre à jour la liste
+    const [listeMagasins, setListeMagasins] = useState(magasinsInitiaux);
     const [userPos, setUserPos] = useState(null);
 
-    const center = magasins.length > 0
-        ? [magasins[0].lat, magasins[0].lng]
+    // MODIFICATION ICI : On écoute l'événement de mise à jour des restos
+    useEffect(() => {
+        const handleRestaurantsUpdate = (event) => {
+            console.log("🚀 Mise à jour des magasins avec distances :", event.detail.restaurants);
+            setListeMagasins(event.detail.restaurants);
+        };
+
+        window.addEventListener('restaurants-updated', handleRestaurantsUpdate);
+        return () => window.removeEventListener('restaurants-updated', handleRestaurantsUpdate);
+    }, []);
+
+    const center = listeMagasins.length > 0
+        ? [listeMagasins[0].lat, listeMagasins[0].lng]
         : [48.8566, 2.3522];
 
     return (
@@ -77,14 +90,43 @@ const MapComponent = ({ magasins }) => {
                 </Marker>
             )}
 
-            {magasins.map((magasin, index) => (
+            {/* On boucle sur listeMagasins au lieu de magasins */}
+            {listeMagasins.map((magasin, index) => (
                 <Marker
                     key={index}
                     position={[magasin.lat, magasin.lng]}
                 >
                     <Popup>
-                        <b>{magasin.nom}</b> <br />
-                        Super resto !
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', minWidth: '150px' }}>
+                            {/* 1. NOM DU RESTO */}
+                            <b style={{ fontSize: '1.1rem', color: '#1f2937' }}>{magasin.nom}</b>
+
+                            {/* 2. DISTANCE */}
+                            <span style={{ color: '#4f46e5', fontWeight: '600', fontSize: '0.9rem' }}>
+                                📍 {(magasin.distance_km !== undefined && magasin.distance_km !== null)
+                                ? `à ${Number(magasin.distance_km).toFixed(1)} km`
+                                : 'Distance non calculée'
+                            }
+                            </span>
+
+                            {/* 3. BOUTON POUR TON COLLEGUE */}
+                            <button
+                                onClick={() => console.log("ID envoyé à la card :", magasin.id)}
+                                style={{
+                                    marginTop: '5px',
+                                    backgroundColor: '#4f46e5',
+                                    color: 'white',
+                                    border: 'none',
+                                    padding: '8px',
+                                    borderRadius: '4px',
+                                    cursor: 'pointer',
+                                    textAlign: 'center',
+                                    fontSize: '0.8rem'
+                                }}
+                            >
+                                Voir détails
+                            </button>
+                        </div>
                     </Popup>
                 </Marker>
             ))}
