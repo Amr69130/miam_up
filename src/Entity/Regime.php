@@ -29,6 +29,11 @@ class Regime
         $this->restaurants = new ArrayCollection();
     }
 
+    public function __toString(): string
+    {
+        return $this->nom_regime ?? '';
+    }
+
     public function getId(): ?int
     {
         return $this->id;

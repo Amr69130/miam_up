@@ -29,6 +29,12 @@ class Type
         $this->restaurants = new ArrayCollection();
     }
 
+    // Cette méthode règle ton erreur "Object of class App\Entity\Type could not be converted to string"
+    public function __toString(): string
+    {
+        return $this->nom_type ?? '';
+    }
+
     public function getId(): ?int
     {
         return $this->id;

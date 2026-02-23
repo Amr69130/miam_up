@@ -13,7 +13,6 @@ use App\Entity\Amenagement;
 use App\Entity\Type;
 use App\Entity\Conversation;
 use App\Entity\Message;
-use App\Service\GeocodingService;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Faker\Factory;
@@ -21,14 +20,9 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AppFixtures extends Fixture
 {
-    private $geoService;
-
     public function __construct(
-        GeocodingService $geoService,
         private UserPasswordHasherInterface $passwordHasher
-    ) {
-        $this->geoService = $geoService;
-    }
+    ) {}
 
     public function load(ObjectManager $manager): void
     {
@@ -79,27 +73,44 @@ class AppFixtures extends Fixture
             $types[] = $type;
         }
 
-        // --- Restaurants ---
+        // --- Restaurants fixes pour tests AUTOUR DE MOI (2 par zone) ---
+        $restaurantsData = [
+            // ECULLY - Sauvegarde
+            ['nom'=>'EcullyTacos', 'adresse'=>'20 Avenue des sources, 69130 Écully', 'lat'=>45.7777, 'lng'=>4.7795],
+            ['nom'=>'EcullyPizza', 'adresse'=>'480 Avenue Ben Gourion, 69009 Lyon', 'lat'=>45.78828, 'lng'=>4.78720],
+
+            // LYON 9 - École
+            ['nom'=>'Lyon9Tacos', 'adresse'=>'43 Rue du Sergent Michel Berthet, 69009 Lyon', 'lat'=>45.7809, 'lng'=>4.8049],
+            ['nom'=>'Lyon9Pizza', 'adresse'=>'30 Rue du Sergent Michel Berthet, 69009 Lyon', 'lat'=>45.7813, 'lng'=>4.8038],
+
+            // RILLIEUX - Les Alagniers
+            ['nom'=>'RilleuxTacos', 'adresse'=>'8 Avenue des Nations, 69140 Rillieux-la-Pape', 'lat'=>45.8270, 'lng'=>4.8990],
+            ['nom'=>'RilleuxPizza', 'adresse'=>'20 Avenue des Nations, 69140 Rillieux-la-Pape', 'lat'=>45.8250, 'lng'=>4.9040],
+
+            // LYON 8 - Mermoz / Etats-Unis
+            ['nom'=>'Lyon8Tacos', 'adresse'=>'120 Avenue Paul Santy, 69008 Lyon', 'lat'=>45.7286, 'lng'=>4.8743],
+            ['nom'=>'Lyon8Pizza', 'adresse'=>'130 Avenue Paul Santy, 69008 Lyon', 'lat'=>45.7285, 'lng'=>4.8766],
+
+            // Villette-de-Vienne
+            ['nom'=>'VilletteTacos', 'adresse'=>'30 rue des Serventières, 38200 Villette‑de‑Vienne', 'lat'=>45.5894, 'lng'=>4.9150],
+            ['nom'=>'VilettePizza', 'adresse'=>'147 route de Marennes, 38200 Villette‑de‑Vienne', 'lat'=>45.5920, 'lng'=>4.9170],
+        ];
+
         $restaurants = [];
-        for ($i = 0; $i < 7; $i++) {
+        foreach ($restaurantsData as $data) {
             $resto = new Restaurant();
-            // Utilisation de unique() pour éviter les erreurs de doublons SIRET/Nom
-            $resto->setNomRestaurant($faker->unique()->company);
-
-            //  ICI : On aide l'API à trouver l'adresse
-            $resto->setAdresseRestaurant($faker->streetAddress . ", Lyon");
-
-            // PLUS DE SET LAT ET SET LONG ICI :
-            // La géolocalisation est désormais gérée automatiquement par le RestaurantListener via l'adresse ci-dessus.
-
+            $resto->setNomRestaurant($data['nom']);
+            $resto->setAdresseRestaurant($data['adresse']);
+            $resto->setLatitude($data['lat']);
+            $resto->setLongitude($data['lng']);
             $resto->setNumTelRestaurant($faker->phoneNumber);
-            $resto->setSiret($faker->unique()->numerify('##############'));
-            $resto->setDescriptionRestaurant($faker->text(200));
-
-            foreach ($faker->randomElements($specialites, rand(1, 3)) as $s) $resto->addSpecialite($s);
-            foreach ($faker->randomElements($regimes, rand(1, 3)) as $r) $resto->addRegime($r);
-            foreach ($faker->randomElements($amenagements, rand(1, 3)) as $a) $resto->addAmenagement($a);
-            foreach ($faker->randomElements($types, rand(1, 3)) as $t) $resto->addType($t);
+            $resto->setSiret($faker->numerify('##############'));
+            $resto->setDescriptionRestaurant('Restaurant test pour ' . $data['nom']);
+            // Relations aléatoires
+            foreach ($faker->randomElements($specialites, rand(1,3)) as $s) $resto->addSpecialite($s);
+            foreach ($faker->randomElements($regimes, rand(1,3)) as $r) $resto->addRegime($r);
+            foreach ($faker->randomElements($amenagements, rand(1,3)) as $a) $resto->addAmenagement($a);
+            foreach ($faker->randomElements($types, rand(1,3)) as $t) $resto->addType($t);
 
             $manager->persist($resto);
             $restaurants[] = $resto;
@@ -116,32 +127,23 @@ class AppFixtures extends Fixture
             $user->setNumUtilisateur($faker->numberBetween(1000, 9999));
             $user->setEmailUtilisateur($faker->unique()->email);
             $user->setPseudoUtilisateur(strtolower($user->getPrenomUtilisateur()).$faker->unique()->numberBetween(1,99));
-
-            // Géolocalisation centrée sur Lyon
             $user->setLatitude($faker->latitude(45.72, 45.78));
             $user->setLongitude($faker->longitude(4.80, 4.86));
-            
-            // Hasher le mot de passe (mot de passe par défaut : "password")
             $hashedPassword = $this->passwordHasher->hashPassword($user, 'password');
             $user->setPassword($hashedPassword);
-
             $user->addRole($roleUser);
             $manager->persist($user);
             $utilisateurs[] = $user;
         }
 
-        // --- Admin unique ---
+        // --- Admin ---
         $admin = new Utilisateur();
         $admin->setNomUtilisateur('Admin');
         $admin->setPrenomUtilisateur('Super');
         $admin->setNumUtilisateur(0);
         $admin->setEmailUtilisateur('admin@miamup.com');
         $admin->setPseudoUtilisateur('admin');
-        
-        // Hasher le mot de passe admin (mot de passe : "Admin123!")
-        $hashedPassword = $this->passwordHasher->hashPassword($admin, 'Admin123!');
-        $admin->setPassword($hashedPassword);
-        
+        $admin->setPassword($this->passwordHasher->hashPassword($admin, 'Admin123!'));
         $admin->addRole($roleAdmin);
         $admin->addRole($roleUser);
         $manager->persist($admin);
@@ -152,13 +154,9 @@ class AppFixtures extends Fixture
             $evenement = new Evenement();
             $evenement->setDateEvenement($faker->dateTimeThisYear);
             $evenement->setDescriptionEvenement($faker->sentence);
-            $evenement->setNombrePlaces($faker->numberBetween(10, 50));
+            $evenement->setNombrePlaces($faker->numberBetween(10,50));
             $evenement->setRestaurant($restaurants[array_rand($restaurants)]);
-
-            foreach ($faker->randomElements($utilisateurs, rand(2, 6)) as $u) {
-                $evenement->addUtilisateur($u);
-            }
-
+            foreach ($faker->randomElements($utilisateurs, rand(2,6)) as $u) $evenement->addUtilisateur($u);
             $manager->persist($evenement);
         }
 
@@ -167,7 +165,7 @@ class AppFixtures extends Fixture
             $paiement = new Paiement();
             $paiement->setDatePaiement($faker->dateTimeThisYear);
             $paiement->setIdTransaction($faker->uuid);
-            $paiement->setMontant($faker->numberBetween(10, 200));
+            $paiement->setMontant($faker->numberBetween(10,200));
             $paiement->setStatusPaiement($faker->randomElement(['En attente','Payé','Annulé']));
             $paiement->setUtilisateur($user);
             $manager->persist($paiement);
@@ -178,13 +176,8 @@ class AppFixtures extends Fixture
             $conv = new Conversation();
             $conv->setNomConversation('Discussion '.$i);
             $conv->setDateCreation($faker->dateTimeThisYear);
-
-            foreach ($faker->randomElements($utilisateurs, rand(3,6)) as $u) {
-                $conv->addMembre($u);
-            }
-
+            foreach ($faker->randomElements($utilisateurs, rand(3,6)) as $u) $conv->addMembre($u);
             $manager->persist($conv);
-
             for ($j = 0; $j < rand(3,7); $j++) {
                 $msg = new Message();
                 $msg->setConversation($conv);
@@ -195,8 +188,6 @@ class AppFixtures extends Fixture
                 $manager->persist($msg);
             }
         }
-
-
 
         $manager->flush();
     }

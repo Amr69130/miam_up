@@ -25,15 +25,17 @@ class RestaurantSearchController extends AbstractController
         // On prépare un tableau simple pour éviter les boucles infinies (Circular Reference)
         $data = [];
         foreach ($restaurants as $result) {
-            // Le résultat de findNearby contient l'objet resto à l'index [0]
-            // et la distance à l'index "distance"
+            // On extrait l'objet restaurant (index 0) et la valeur distance
             $restaurant = $result[0];
-            $distance = $result['distance'];
+            $distance = $result['distance'] ?? null; // Utilisation de l'opérateur de coalescence pour éviter les erreurs
 
             $data[] = [
-                'nom' => $restaurant->getNomRestaurant(),
-                'adresse' => $restaurant->getAdresseRestaurant(),
-                'distance_km' => round($distance, 2)
+                'id'          => $restaurant->getId(), // INDISPENSABLE pour la Card de ton collègue
+                'nom'         => $restaurant->getNomRestaurant(),
+                'adresse'     => $restaurant->getAdresseRestaurant(),
+                'lat'         => (float)$restaurant->getLatitude(),
+                'lng'         => (float)$restaurant->getLongitude(),
+                'distance_km' => ($distance !== null) ? round((float)$distance, 2) : null
             ];
         }
         return new JsonResponse($data);

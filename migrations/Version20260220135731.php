@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20260205134550 extends AbstractMigration
+final class Version20260220135731 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -33,8 +33,10 @@ final class Version20260205134550 extends AbstractMigration
         $this->addSql('CREATE TABLE restaurant_amenagement (restaurant_id INT NOT NULL, amenagement_id INT NOT NULL, INDEX IDX_1E8E6E3BB1E7706E (restaurant_id), INDEX IDX_1E8E6E3B4CCE776B (amenagement_id), PRIMARY KEY(restaurant_id, amenagement_id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE restaurant_regime (restaurant_id INT NOT NULL, regime_id INT NOT NULL, INDEX IDX_5B18B58DB1E7706E (restaurant_id), INDEX IDX_5B18B58D35E7D534 (regime_id), PRIMARY KEY(restaurant_id, regime_id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE restaurant_type (restaurant_id INT NOT NULL, type_id INT NOT NULL, INDEX IDX_4EC8C74DB1E7706E (restaurant_id), INDEX IDX_4EC8C74DC54C8C93 (type_id), PRIMARY KEY(restaurant_id, type_id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE role (id INT AUTO_INCREMENT NOT NULL, nom_role VARCHAR(255) NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE specialite (id INT AUTO_INCREMENT NOT NULL, nom_specialite VARCHAR(255) NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE type (id INT AUTO_INCREMENT NOT NULL, nom_type VARCHAR(255) NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE utilisateur (id INT AUTO_INCREMENT NOT NULL, nom_utilisateur VARCHAR(255) NOT NULL, prenom_utilisateur VARCHAR(255) NOT NULL, email_utilisateur VARCHAR(255) NOT NULL, pseudo_utilisateur VARCHAR(255) NOT NULL, photo_profil VARCHAR(255) DEFAULT NULL, description_utilisateur VARCHAR(255) DEFAULT NULL, note_utilisateur VARCHAR(255) DEFAULT NULL, password VARCHAR(255) NOT NULL, num_utilisateur INT DEFAULT NULL, latitude DOUBLE PRECISION DEFAULT NULL, longitude DOUBLE PRECISION DEFAULT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE utilisateur_role (utilisateur_id INT NOT NULL, role_id INT NOT NULL, INDEX IDX_9EE8E650FB88E14F (utilisateur_id), INDEX IDX_9EE8E650D60322AC (role_id), PRIMARY KEY(utilisateur_id, role_id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE messenger_messages (id BIGINT AUTO_INCREMENT NOT NULL, body LONGTEXT NOT NULL, headers LONGTEXT NOT NULL, queue_name VARCHAR(190) NOT NULL, created_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', available_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', delivered_at DATETIME DEFAULT NULL COMMENT \'(DC2Type:datetime_immutable)\', INDEX IDX_75EA56E0FB7336F0 (queue_name), INDEX IDX_75EA56E0E3BD61CE (available_at), INDEX IDX_75EA56E016BA31DB (delivered_at), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('ALTER TABLE conversation_utilisateur ADD CONSTRAINT FK_F3031EC39AC0396 FOREIGN KEY (conversation_id) REFERENCES conversation (id) ON DELETE CASCADE');
@@ -55,7 +57,6 @@ final class Version20260205134550 extends AbstractMigration
         $this->addSql('ALTER TABLE restaurant_type ADD CONSTRAINT FK_4EC8C74DC54C8C93 FOREIGN KEY (type_id) REFERENCES type (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE utilisateur_role ADD CONSTRAINT FK_9EE8E650FB88E14F FOREIGN KEY (utilisateur_id) REFERENCES utilisateur (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE utilisateur_role ADD CONSTRAINT FK_9EE8E650D60322AC FOREIGN KEY (role_id) REFERENCES role (id) ON DELETE CASCADE');
-        $this->addSql('ALTER TABLE utilisateur ADD latitude DOUBLE PRECISION DEFAULT NULL, ADD longitude DOUBLE PRECISION DEFAULT NULL');
     }
 
     public function down(Schema $schema): void
@@ -92,10 +93,11 @@ final class Version20260205134550 extends AbstractMigration
         $this->addSql('DROP TABLE restaurant_amenagement');
         $this->addSql('DROP TABLE restaurant_regime');
         $this->addSql('DROP TABLE restaurant_type');
+        $this->addSql('DROP TABLE role');
         $this->addSql('DROP TABLE specialite');
         $this->addSql('DROP TABLE type');
+        $this->addSql('DROP TABLE utilisateur');
         $this->addSql('DROP TABLE utilisateur_role');
         $this->addSql('DROP TABLE messenger_messages');
-        $this->addSql('ALTER TABLE utilisateur DROP latitude, DROP longitude');
     }
 }

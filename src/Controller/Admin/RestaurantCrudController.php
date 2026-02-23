@@ -3,15 +3,13 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Restaurant;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
-use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\UrlField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\TelephoneField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\NumberField;
 
 class RestaurantCrudController extends AbstractCrudController
 {
@@ -23,30 +21,39 @@ class RestaurantCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         return [
-            IdField::new('id')->hideOnForm(), // On cache l'ID dans le formulaire de création
-            TextField::new('nom_restaurant', 'Nom de l\'établissement'),
-            TextField::new('adresse_restaurant', 'Adresse'),
-            TelephoneField::new('num_tel_restaurant', 'Téléphone'),
+            // Identifiant (caché dans le formulaire)
+            IdField::new('id')->hideOnForm(),
+
+            // CHAMP OBLIGATOIRE (Le seul en 'NO' dans ton Workbench)
+            TextField::new('nomRestaurant', 'Nom du restaurant'),
+
+            // CHAMPS FACULTATIFS (En 'YES' dans ton Workbench)
+            TextField::new('adresseRestaurant', 'Adresse postale'),
+            TextField::new('siret', 'Numéro SIRET'),
+            TextField::new('numTelRestaurant', 'Téléphone'),
+            TextField::new('siteWeb', 'Site internet'),
             
-            // Pour le logo, on lui dit d'aller chercher dans le dossier public
-            ImageField::new('logo')
+            // CONFIGURATION DU LOGO
+            // Assure-toi que le dossier public/uploads/logos existe !
+            ImageField::new('logo', 'Logo du restaurant')
                 ->setBasePath('uploads/logos')
                 ->setUploadDir('public/uploads/logos')
+                ->setUploadedFileNamePattern('[randomhash].[extension]')
                 ->setRequired(false),
 
-            UrlField::new('site_web', 'Site internet'),
-            
-            // La magie d'EasyAdmin : affiche les spécialités sous forme de badges
-            AssociationField::new('specialite', 'Spécialités')
-                ->setFormTypeOptions(['by_reference' => false]),
+            // DESCRIPTION (Format texte riche)
+            TextEditorField::new('descriptionRestaurant', 'Description'),
+
+            // RELATIONS (ManyToMany)
+            // Note : On utilise 'specialite' sans le 's' car c'est le nom de la propriété dans ton entité
+            AssociationField::new('specialite', 'Spécialités culinaires'),
+            AssociationField::new('type', 'Types d\'établissement'),
+            AssociationField::new('regimes', 'Régimes alimentaires'),
+            AssociationField::new('amenagements', 'Aménagements dispo'),
+
+            // GÉOLOCALISATION
+            NumberField::new('latitude')->hideOnIndex(),
+            NumberField::new('longitude')->hideOnIndex(),
         ];
     }
-    public function configureFilters(Filters $filters): Filters
-    {
-        return $filters
-            ->add('nom_restaurant')
-            ->add('specialite')
-            ->add('note_consommateurs');
-    }
-    
 }
