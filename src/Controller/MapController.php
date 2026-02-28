@@ -27,7 +27,6 @@ class MapController extends AbstractController
                 ];
             }
         }
-
         return $this->render('map/index.html.twig', [
             'restaurants_json' => json_encode($restaurantsData)
         ]);
