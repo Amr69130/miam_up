@@ -1,112 +1,688 @@
+{# NOTE IMPORTANTE POUR LANCER LA PAGE EN LOCALHOST
+- lancer la requete : "php -S localhost:8000 -t public" dans un premier TERMINAL
+- Lancer la requete : "npm run watch" dans un deuxieme TERMINE en simultané pour avoir l'affichage du CSS
+
+ #}
+
 {% extends 'base.html.twig' %}
 
 {% block title %}Accueil - Miam Up{% endblock %}
 
 {% block body %}
-<div class="min-h-screen bg-gray-50">
+<div class="min-h-screen bg-[#F8F8F8]">
 
     {# Navbar #}
-    <nav class="bg-white shadow-sm border-b border-gray-200">
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 {# Logo #}
-                <a href="{{ path('app_home') }}" class="flex items-center gap-2 text-xl font-bold text-slate-900">
-                    🍽️ Miam Up
+                <a href="#" class="flex items-center gap-2">
+                    <img src="{{ asset('images/logo-miamup.png') }}" alt="Logo Miam Up" class="h-10 w-auto object-contain">
                 </a>
 
-                {# Navigation #}
-                <div class="flex items-center gap-4">
+                {# Navigation centrale #}
+                <div class="hidden md:flex items-center gap-8">
+                    <a href="#map-section" class="flex items-center gap-1 text-[#00A9A5] font-medium transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0121 18.382V7.618a1 1 0 01-.553-.894L15 7m0 13V7"></path>
+                        </svg>
+                        Explorer la carte
+                    </a>
+                    <a href="#restaurants" class="text-[#4A4A4A] hover:text-[#00A9A5] font-medium transition-colors">Restaurants</a>
+                    <a href="#evenements" class="text-[#4A4A4A] hover:text-[#00A9A5] font-medium transition-colors">Événements</a>
+                    <a href="#communaute" class="text-[#4A4A4A] hover:text-[#00A9A5] font-medium transition-colors">Communauté</a>
+                </div>
+
+                {# Navigation droite #}
+                <div class="flex items-center gap-3">
+                    {# Localisation utilisateur #}
+                    <button class="hidden sm:flex items-center gap-2 text-sm text-[#00A9A5] bg-[#84DCCF]/10 px-3 py-2 rounded-lg hover:bg-[#84DCCF]/20 transition-colors">
+                        <svg class="w-4 h-4 animate-pulse" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+                        </svg>
+                        <span class="font-medium">Paris 11ème</span>
+                    </button>
+                    
+                    {# 
                     {% if app.user %}
-                        <span class="text-sm text-gray-600">
-                            Bonjour, <span class="font-semibold text-blue-600">{{ app.user.prenomUtilisateur }}</span>
-                        </span>
-                        
-                        {% if is_granted('ROLE_ADMIN') %}
-                            <span class="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded-full font-medium">
-                                Admin
-                            </span>
-                        {% endif %}
-                        
-                        <a href="{{ path('app_logout') }}" 
-                           class="text-sm bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors">
-                            Se déconnecter
+                        <a href="#" class="relative p-2 text-[#4A4A4A] hover:text-[#00A9A5] transition-colors">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                            </svg>
+                            <span class="absolute top-1 right-1 w-2 h-2 bg-[#FF6B6B] rounded-full"></span>
+                        </a>
+                        <a href="#" class="flex items-center gap-2">
+                            <img src="{{ asset('images/avatar-default.jpg') }}" alt="Avatar" class="w-9 h-9 rounded-full border-2 border-[#84DCCF]">
                         </a>
                     {% else %}
+                    #}
                         <a href="{{ path('app_utilisateur_login') }}" 
-                           class="text-sm text-blue-600 hover:text-blue-700 font-medium">
+                           class="hidden sm:block text-sm text-[#4A4A4A] hover:text-[#00A9A5] font-medium transition-colors">
                             Se connecter
                         </a>
                         <a href="{{ path('app_utilisateur_register') }}" 
-                           class="text-sm bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors">
-                            S'inscrire
+                           class="text-sm bg-[#00A9A5] hover:bg-[#008b87] text-white px-5 py-2.5 rounded-xl transition-all duration-200 font-medium shadow-md hover:shadow-lg">
+                            Rejoindre
                         </a>
-                    {% endif %}
+                    {# {% endif %} #}
                 </div>
             </div>
         </div>
     </nav>
 
-    {# Contenu principal #}
-    <main class="flex flex-col items-center justify-center py-20 px-4">
-        <div class="text-center max-w-2xl">
-            <h1 class="text-5xl font-bold text-slate-900 mb-6">
-                🍽️ Bienvenue sur Miam Up !
-            </h1>
+    {# Hero Section avec Map Preview #}
+    <section class="relative overflow-hidden">
+        <div class="absolute inset-0">
+            <img src="{{ asset('images/community-food.jpg') }}" 
+                 alt="Communauté culinaire" 
+                 class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-gradient-to-r from-[#4A4A4A]/90 via-[#4A4A4A]/70 to-transparent"></div>
+        </div>
+        
+        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                {# Texte #}
+                <div>
+                    <div class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 mb-6">
+                        <span class="w-2 h-2 bg-[#84DCCF] rounded-full animate-pulse"></span>
+                        <span class="text-white/90 text-sm font-medium">+2,500 gourmets près de chez vous</span>
+                    </div>
+                    
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-tight mb-6">
+                        Découvrez autour de 
+                        <span class="text-[#84DCCF]">vous</span>
+                    </h1>
+                    
+                    <p class="text-lg text-white/80 mb-8 max-w-lg">
+                        Explorez la carte interactive, trouvez les meilleurs restaurants et événements culinaires à proximité. Partagez vos découvertes avec la communauté.
+                    </p>
+                    
+                    {# Barre de recherche avec localisation #}
+                    <div class="bg-white rounded-2xl shadow-2xl p-2 max-w-xl">
+                        <div class="flex flex-col sm:flex-row gap-2">
+                            <div class="flex-1 flex items-center gap-3 px-4 py-3 bg-gray-50 rounded-xl">
+                                <svg class="w-5 h-5 text-[#00A9A5] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
+                                <input type="text" 
+                                       placeholder="Votre position : Paris 11ème" 
+                                       class="w-full bg-transparent outline-none text-[#4A4A4A] placeholder-gray-400">
+                            </div>
+                            <button class="bg-[#FF6B6B] hover:bg-[#e55a5a] text-white px-6 py-3 rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                                </svg>
+                                Explorer
+                            </button>
+                        </div>
+                    </div>
+                    
+                    {# Tags de proximité #}
+                    <div class="flex flex-wrap gap-2 mt-4">
+                        <span class="text-white/60 text-sm">À proximité :</span>
+                        <a href="#" class="text-sm text-white/80 hover:text-[#84DCCF] underline transition-colors">Restaurants < 500m</a>
+                        <a href="#" class="text-sm text-white/80 hover:text-[#84DCCF] underline transition-colors">Événements ce soir</a>
+                        <a href="#" class="text-sm text-white/80 hover:text-[#84DCCF] underline transition-colors">Groupes locaux</a>
+                    </div>
+                </div>
+                
+                {# Preview de la carte #}
+                <div class="relative hidden lg:block">
+                    <div class="relative rounded-2xl overflow-hidden shadow-2xl border-4 border-white/20">
+                        <img src="{{ asset('images/map-preview.jpg') }}" 
+                             alt="Carte interactive" 
+                             class="w-full h-auto">
+                        {# Overlay avec bouton #}
+                        <div class="absolute inset-0 bg-[#4A4A4A]/30 flex items-center justify-center">
+                            <a href="#map-section" class="bg-white text-[#00A9A5] px-6 py-3 rounded-xl font-bold shadow-lg hover:bg-gray-100 transition-colors flex items-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0121 18.382V7.618a1 1 0 01-.553-.894L15 7m0 13V7"></path>
+                                </svg>
+                                Ouvrir la carte
+                            </a>
+                        </div>
+                    </div>
+                    {# Badge localisation #}
+                    <div class="absolute -bottom-4 -left-4 bg-[#00A9A5] text-white px-4 py-2 rounded-xl shadow-lg flex items-center gap-2">
+                        <span class="w-3 h-3 bg-white rounded-full animate-pulse"></span>
+                        <span class="font-medium text-sm">12 restaurants à 5 min</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-            {% if app.user %}
-                <p class="text-xl text-gray-600 mb-8">
-                    Ravi de vous revoir, <span class="font-semibold text-blue-600">{{ app.user.prenomUtilisateur }} {{ app.user.nomUtilisateur }}</span> !
-                </p>
-
-                <div class="bg-white rounded-2xl shadow-lg p-8 text-left">
-                    <h2 class="text-2xl font-bold text-slate-800 mb-6">Votre profil</h2>
-                    <div class="grid sm:grid-cols-2 gap-4">
-                        <div class="bg-gray-50 rounded-xl p-4">
-                            <p class="text-sm text-gray-500">Pseudo</p>
-                            <p class="text-lg font-semibold text-slate-900">{{ app.user.pseudoUtilisateur }}</p>
+    {# Section Map Interactive #}
+    <section id="map-section" class="py-8 px-4 sm:px-6 lg:px-8 bg-white">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-col lg:flex-row gap-6">
+                {# Sidebar des filtres et résultats #}
+                <div class="lg:w-80 flex-shrink-0">
+                    <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+                        {# Header avec localisation #}
+                        <div class="bg-gradient-to-r from-[#00A9A5] to-[#84DCCF] p-4 text-white">
+                            <div class="flex items-center gap-2 mb-2">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+                                </svg>
+                                <span class="font-medium">Votre position</span>
+                            </div>
+                            <p class="text-white/90 text-sm">Paris 11ème, Boulevard Voltaire</p>
+                            <div class="flex items-center gap-4 mt-3 text-sm">
+                                <span class="bg-white/20 px-2 py-1 rounded-lg">Précision: ±15m</span>
+                                <button class="text-white/80 hover:text-white underline">Actualiser</button>
+                            </div>
                         </div>
-                        <div class="bg-gray-50 rounded-xl p-4">
-                            <p class="text-sm text-gray-500">Email</p>
-                            <p class="text-lg font-semibold text-slate-900">{{ app.user.emailUtilisateur }}</p>
-                        </div>
-                        <div class="bg-gray-50 rounded-xl p-4">
-                            <p class="text-sm text-gray-500">Téléphone</p>
-                            <p class="text-lg font-semibold text-slate-900">{{ app.user.numUtilisateur }}</p>
-                        </div>
-                        <div class="bg-gray-50 rounded-xl p-4">
-                            <p class="text-sm text-gray-500">Rôles</p>
-                            <div class="flex flex-wrap gap-2 mt-1">
-                                {% for role in app.user.roles %}
-                                    <span class="text-xs font-medium px-2.5 py-1 rounded-full 
-                                        {% if role == 'ROLE_ADMIN' %}
-                                            bg-purple-100 text-purple-800
-                                        {% else %}
-                                            bg-blue-100 text-blue-800
-                                        {% endif %}">
-                                        {{ role }}
+                        
+                        {# Filtres #}
+                        <div class="p-4 border-b border-gray-100">
+                            <h3 class="font-bold text-[#4A4A4A] mb-3">Afficher sur la carte</h3>
+                            <div class="space-y-2">
+                                <label class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
+                                    <input type="checkbox" checked class="w-5 h-5 text-[#00A9A5] rounded focus:ring-[#00A9A5]">
+                                    <span class="flex items-center gap-2">
+                                        <span class="w-8 h-8 bg-[#84DCCF]/20 rounded-lg flex items-center justify-center">🍽️</span>
+                                        <span class="text-[#4A4A4A]">Restaurants</span>
                                     </span>
+                                    <span class="ml-auto text-sm text-gray-400">48</span>
+                                </label>
+                                <label class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
+                                    <input type="checkbox" checked class="w-5 h-5 text-[#FF6B6B] rounded focus:ring-[#FF6B6B]">
+                                    <span class="flex items-center gap-2">
+                                        <span class="w-8 h-8 bg-[#FF6B6B]/20 rounded-lg flex items-center justify-center">📅</span>
+                                        <span class="text-[#4A4A4A]">Événements</span>
+                                    </span>
+                                    <span class="ml-auto text-sm text-gray-400">12</span>
+                                </label>
+                                <label class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
+                                    <input type="checkbox" class="w-5 h-5 text-[#00A9A5] rounded focus:ring-[#00A9A5]">
+                                    <span class="flex items-center gap-2">
+                                        <span class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">👥</span>
+                                        <span class="text-[#4A4A4A]">Membres actifs</span>
+                                    </span>
+                                    <span class="ml-auto text-sm text-gray-400">156</span>
+                                </label>
+                                <label class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
+                                    <input type="checkbox" class="w-5 h-5 text-[#00A9A5] rounded focus:ring-[#00A9A5]">
+                                    <span class="flex items-center gap-2">
+                                        <span class="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center">⭐</span>
+                                        <span class="text-[#4A4A4A]">Mes favoris</span>
+                                    </span>
+                                    <span class="ml-auto text-sm text-gray-400">8</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        {# Rayon de recherche #}
+                        <div class="p-4 border-b border-gray-100">
+                            <div class="flex justify-between items-center mb-2">
+                                <h3 class="font-bold text-[#4A4A4A]">Rayon de recherche</h3>
+                                <span class="text-[#00A9A5] font-bold">2 km</span>
+                            </div>
+                            <input type="range" min="0.5" max="10" step="0.5" value="2" 
+                                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-[#00A9A5]">
+                            <div class="flex justify-between text-xs text-gray-400 mt-1">
+                                <span>500m</span>
+                                <span>10km</span>
+                            </div>
+                        </div>
+                        
+                        {# Résultats proches #}
+                        <div class="p-4 max-h-80 overflow-y-auto">
+                            <h3 class="font-bold text-[#4A4A4A] mb-3">À moins de 500m</h3>
+                            <div class="space-y-3">
+                                {% set proches = [
+                                    {nom: 'Le Petit Bistro', type: 'Français', distance: '120m', note: 4.8, icon: '🍽️'},
+                                    {nom: 'Café des Amis', type: 'Café', distance: '250m', note: 4.5, icon: '☕'},
+                                    {nom: 'Sushi Express', type: 'Japonais', distance: '380m', note: 4.3, icon: '🍣'}
+                                ] %}
+                                {% for place in proches %}
+                                    <div class="flex items-center gap-3 p-2 rounded-xl hover:bg-gray-50 cursor-pointer transition-colors group">
+                                        <span class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center text-xl">{{ place.icon }}</span>
+                                        <div class="flex-1 min-w-0">
+                                            <p class="font-medium text-[#4A4A4A] group-hover:text-[#00A9A5] transition-colors truncate">{{ place.nom }}</p>
+                                            <p class="text-sm text-gray-500">{{ place.type }} • {{ place.distance }}</p>
+                                        </div>
+                                        <div class="flex items-center gap-1 text-sm">
+                                            <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                                            </svg>
+                                            <span class="font-bold">{{ place.note }}</span>
+                                        </div>
+                                    </div>
                                 {% endfor %}
                             </div>
                         </div>
                     </div>
                 </div>
-            {% else %}
-                <p class="text-xl text-gray-600 mb-8">
-                    Trouvez les meilleurs restaurants autour de vous et partagez vos expériences culinaires.
-                </p>
-
-                <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                    <a href="{{ path('app_utilisateur_register') }}" 
-                       class="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-8 py-4 rounded-xl text-lg transition-colors shadow-lg hover:shadow-xl">
-                        Créer un compte
-                    </a>
-                    <a href="{{ path('app_utilisateur_login') }}" 
-                       class="bg-white hover:bg-gray-50 text-slate-900 font-semibold px-8 py-4 rounded-xl text-lg transition-colors shadow-lg hover:shadow-xl border border-gray-200">
-                        Se connecter
-                    </a>
+                
+                {# Zone de carte #}
+                <div class="flex-1">
+                    <div class="bg-gray-100 rounded-2xl overflow-hidden shadow-lg border border-gray-200 h-[600px] relative">
+                        {# Placeholder pour la carte Leaflet/Mapbox #}
+                        <img src="{{ asset('images/map-preview.jpg') }}" 
+                             alt="Carte interactive" 
+                             class="w-full h-full object-cover">
+                    
+                        
+                        {# Boutons de contrôle de la carte #}
+                        <div class="absolute top-4 right-4 flex flex-col gap-2">
+                            <button class="w-10 h-10 bg-white rounded-xl shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors" title="Zoom +">
+                                <svg class="w-5 h-5 text-[#4A4A4A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                </svg>
+                            </button>
+                            <button class="w-10 h-10 bg-white rounded-xl shadow-lg flex items-center justify-center hover:bg-gray-50 transition-colors" title="Zoom -">
+                                <svg class="w-5 h-5 text-[#4A4A4A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
+                                </svg>
+                            </button>
+                            <button class="w-10 h-10 bg-[#00A9A5] rounded-xl shadow-lg flex items-center justify-center hover:bg-[#008b87] transition-colors" title="Ma position">
+                                <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        {# Légende #}
+                        <div class="absolute bottom-4 left-4 bg-white rounded-xl shadow-lg p-3">
+                            <div class="flex items-center gap-4 text-sm">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-3 h-3 bg-[#84DCCF] rounded-full"></span>
+                                    <span class="text-gray-600">Restaurant</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="w-3 h-3 bg-[#FF6B6B] rounded-full"></span>
+                                    <span class="text-gray-600">Événement</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="w-3 h-3 bg-[#00A9A5] rounded-full animate-pulse"></span>
+                                    <span class="text-gray-600">Vous</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            {% endif %}
+            </div>
         </div>
-    </main>
+    </section>
+
+    {# Stats Section avec localisation #}
+    <section class="bg-white py-8 border-b border-gray-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-center gap-2 mb-6">
+                <svg class="w-5 h-5 text-[#00A9A5]" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+                </svg>
+                <span class="text-gray-500">Dans un rayon de <span class="text-[#00A9A5] font-bold">2 km</span> autour de vous</span>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                <div class="p-4 rounded-2xl bg-[#84DCCF]/10">
+                    <p class="text-3xl font-bold text-[#00A9A5]">48</p>
+                    <p class="text-sm text-gray-500">Restaurants à proximité</p>
+                </div>
+                <div class="p-4 rounded-2xl bg-[#84DCCF]/10">
+                    <p class="text-3xl font-bold text-[#00A9A5]">156</p>
+                    <p class="text-sm text-gray-500">Gourmets connectés</p>
+                </div>
+                <div class="p-4 rounded-2xl bg-[#FF6B6B]/10">
+                    <p class="text-3xl font-bold text-[#FF6B6B]">12</p>
+                    <p class="text-sm text-gray-500">Événements ce soir</p>
+                </div>
+                <div class="p-4 rounded-2xl bg-purple-50">
+                    <p class="text-3xl font-bold text-purple-600">3</p>
+                    <p class="text-sm text-gray-500">Nouveautés cette semaine</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# Événements à proximité #}
+    <section id="evenements" class="py-16 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex justify-between items-center mb-8">
+                <div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <svg class="w-5 h-5 text-[#00A9A5]" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+                        </svg>
+                        <span class="text-sm text-[#00A9A5] font-medium">À moins de 2 km</span>
+                    </div>
+                    <h2 class="text-2xl font-bold text-[#4A4A4A]">Événements près de chez vous</h2>
+                </div>
+                <a href="#" class="text-[#00A9A5] font-semibold hover:underline flex items-center gap-1">
+                    Voir sur la carte
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </a>
+            </div>
+            
+            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% set evenements = [
+                    {titre: 'Dégustation de vins & fromages', date: 'Ce soir', heure: '19h00', lieu: 'Le Petit Bistro', distance: '120m', participants: 24, image: '🍷', type: 'Dégustation'},
+                    {titre: 'Atelier cuisine italienne', date: 'Demain', heure: '14h00', lieu: 'Cucina Mia', distance: '450m', participants: 12, image: '🍝', type: 'Atelier'},
+                    {titre: 'Soirée food truck festival', date: 'Samedi', heure: '18h00', lieu: 'Place de la Mairie', distance: '800m', participants: 156, image: '🚚', type: 'Festival'}
+                ] %}
+                
+                {% for event in evenements %}
+                    <div class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 group">
+                        <div class="h-32 bg-gradient-to-br from-[#84DCCF] to-[#00A9A5] flex items-center justify-center relative">
+                            <span class="text-6xl">{{ event.image }}</span>
+                            <div class="absolute top-3 left-3 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-1">
+                                <span class="text-xs font-bold text-[#4A4A4A]">{{ event.type }}</span>
+                            </div>
+                            <div class="absolute top-3 right-3 bg-[#00A9A5] text-white rounded-lg px-2 py-1 flex items-center gap-1">
+                                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+                                </svg>
+                                <span class="text-xs font-bold">{{ event.distance }}</span>
+                            </div>
+                        </div>
+                        <div class="p-5">
+                            <div class="flex items-center gap-2 text-sm text-[#00A9A5] font-medium mb-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                </svg>
+                                {{ event.date }} à {{ event.heure }}
+                            </div>
+                            <h3 class="font-bold text-[#4A4A4A] text-lg mb-2 group-hover:text-[#00A9A5] transition-colors">{{ event.titre }}</h3>
+                            <div class="flex items-center gap-1 text-sm text-gray-500 mb-4">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                </svg>
+                                {{ event.lieu }}
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <div class="flex -space-x-2">
+                                    {% for i in 1..3 %}
+                                        <div class="w-8 h-8 rounded-full bg-gray-200 border-2 border-white flex items-center justify-center text-xs">👤</div>
+                                    {% endfor %}
+                                    <div class="w-8 h-8 rounded-full bg-[#84DCCF] border-2 border-white flex items-center justify-center text-xs text-white font-bold">+{{ event.participants - 3 }}</div>
+                                </div>
+                                <button class="bg-[#FF6B6B] hover:bg-[#e55a5a] text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                                    Participer
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    {# Restaurants à proximité #}
+    <section id="restaurants" class="py-16 px-4 sm:px-6 lg:px-8 bg-white">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex justify-between items-center mb-8">
+                <div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <svg class="w-5 h-5 text-[#00A9A5]" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+                        </svg>
+                        <span class="text-sm text-[#00A9A5] font-medium">À moins de 500m</span>
+                    </div>
+                    <h2 class="text-2xl font-bold text-[#4A4A4A]">Restaurants tout près</h2>
+                </div>
+                <a href="#" class="text-[#00A9A5] font-semibold hover:underline flex items-center gap-1">
+                    Voir sur la carte
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </a>
+            </div>
+            
+            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {% set restaurants = [
+                    {nom: 'Le Petit Bistro', type: 'Bistrot • Français', note: 4.8, avis: 124, distance: '120m', image: '🍽️', tags: ['Cozy', 'Romantique']},
+                    {nom: 'Café des Amis', type: 'Café • Brunch', note: 4.5, avis: 89, distance: '250m', image: '☕', tags: ['Brunch', 'Terrasse']},
+                    {nom: 'Sushi Express', type: 'Japonais • Sushi', note: 4.3, avis: 203, distance: '380m', image: '🍣', tags: ['Rapide', 'Frais']},
+                    {nom: 'La Pizzetta', type: 'Italien • Pizza', note: 4.6, avis: 156, distance: '420m', image: '🍕', tags: ['Familial', 'Four à bois']}
+                ] %}
+                
+                {% for resto in restaurants %}
+                    <div class="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 group">
+                        <div class="h-40 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center relative">
+                            <span class="text-6xl">{{ resto.image }}</span>
+                            <div class="absolute top-3 left-3 bg-[#00A9A5] text-white rounded-lg px-2 py-1 flex items-center gap-1">
+                                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+                                </svg>
+                                <span class="text-xs font-bold">{{ resto.distance }}</span>
+                            </div>
+                            <button class="absolute top-3 right-3 w-9 h-9 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-[#FF6B6B] hover:text-white transition-colors group/heart">
+                                <svg class="w-5 h-5 text-gray-400 group-hover/heart:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="p-4">
+                            <div class="flex items-center gap-2 mb-2">
+                                {% for tag in resto.tags %}
+                                    <span class="text-xs bg-[#84DCCF]/20 text-[#00A9A5] px-2 py-1 rounded-full">{{ tag }}</span>
+                                {% endfor %}
+                            </div>
+                            <h3 class="font-bold text-[#4A4A4A] text-lg group-hover:text-[#00A9A5] transition-colors">{{ resto.nom }}</h3>
+                            <p class="text-sm text-gray-500 mb-2">{{ resto.type }}</p>
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-1">
+                                    <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                                    </svg>
+                                    <span class="font-bold text-[#4A4A4A]">{{ resto.note }}</span>
+                                    <span class="text-sm text-gray-400">({{ resto.avis }})</span>
+                                </div>
+                                <a href="#" class="text-[#00A9A5] hover:underline text-sm font-medium">Itinéraire</a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    {# Communauté - Posts récents avec localisation #}
+    <section id="communaute" class="py-16 px-4 sm:px-6 lg:px-8 bg-[#84DCCF]/5">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex justify-between items-center mb-8">
+                <div>
+                    <h2 class="text-2xl font-bold text-[#4A4A4A]">Ce que partage la communauté locale</h2>
+                    <p class="text-gray-500 mt-1">Les derniers avis des gourmets près de chez vous</p>
+                </div>
+                <a href="#" class="bg-[#00A9A5] hover:bg-[#008b87] text-white px-5 py-2.5 rounded-xl font-medium transition-colors shadow-md">
+                    Partager mon avis
+                </a>
+            </div>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% set posts = [
+                    {user: 'Marie L.', avatar: '👩', restaurant: 'Le Petit Bistro', distance: 'à 120m', contenu: 'Une soirée magique ! Le foie gras était divin et l\'ambiance très chaleureuse.', image: '✨', likes: 45, comments: 8},
+                    {user: 'Thomas D.', avatar: '👨', restaurant: 'Café des Amis', distance: 'à 250m', contenu: 'Le meilleur brunch du quartier ! Les pancakes sont incroyables.', image: '🥞', likes: 32, comments: 5},
+                    {user: 'Sophie M.', avatar: '👩‍🦰', restaurant: 'Sushi Express', distance: 'à 380m', contenu: 'Livraison rapide et sushis toujours frais. Mon spot préféré !', image: '🍱', likes: 67, comments: 12}
+                ] %}
+                
+                {% for post in posts %}
+                    <div class="bg-white rounded-2xl p-5 shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-10 h-10 bg-gradient-to-br from-[#84DCCF] to-[#00A9A5] rounded-full flex items-center justify-center text-xl">{{ post.avatar }}</div>
+                            <div class="flex-1">
+                                <p class="font-semibold text-[#4A4A4A]">{{ post.user }}</p>
+                                <div class="flex items-center gap-2">
+                                    <p class="text-sm text-gray-500">a visité <span class="text-[#00A9A5]">{{ post.restaurant }}</span></p>
+                                    <span class="text-xs bg-[#84DCCF]/20 text-[#00A9A5] px-2 py-0.5 rounded-full">{{ post.distance }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 mb-4 line-clamp-3">{{ post.contenu }}</p>
+                        <div class="h-32 bg-gray-100 rounded-xl flex items-center justify-center mb-4">
+                            <span class="text-5xl">{{ post.image }}</span>
+                        </div>
+                        <div class="flex items-center gap-6 text-sm text-gray-500">
+                            <button class="flex items-center gap-1 hover:text-[#FF6B6B] transition-colors">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                                </svg>
+                                {{ post.likes }}
+                            </button>
+                            <button class="flex items-center gap-1 hover:text-[#00A9A5] transition-colors">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                                </svg>
+                                {{ post.comments }}
+                            </button>
+                            <button class="flex items-center gap-1 hover:text-[#00A9A5] transition-colors ml-auto">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path>
+                                </svg>
+                                Partager
+                            </button>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    {# Groupes locaux #}
+    <section class="py-16 px-4 sm:px-6 lg:px-8 bg-white">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex justify-between items-center mb-8">
+                <div>
+                    <div class="flex items-center gap-2 mb-1">
+                        <svg class="w-5 h-5 text-[#00A9A5]" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+                        </svg>
+                        <span class="text-sm text-[#00A9A5] font-medium">Dans votre quartier</span>
+                    </div>
+                    <h2 class="text-2xl font-bold text-[#4A4A4A]">Rejoignez un groupe local</h2>
+                </div>
+                <a href="#" class="text-[#00A9A5] font-semibold hover:underline flex items-center gap-1">
+                    Voir tous les groupes
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </a>
+            </div>
+            
+            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {% set groupes = [
+                    {nom: 'Foodies du 11ème', membres: 340, distance: 'dans votre arrondissement', image: '🍽️', couleur: 'from-[#84DCCF] to-[#00A9A5]'},
+                    {nom: 'Brunch Paris 11', membres: 156, distance: 'à 500m', image: '🥐', couleur: 'from-orange-400 to-red-500'},
+                    {nom: 'Apéro Vendredi', membres: 89, distance: 'à 200m', image: '🍷', couleur: 'from-purple-400 to-pink-500'},
+                    {nom: 'Running & Breakfast', membres: 67, distance: 'à 1km', image: '🏃', couleur: 'from-green-400 to-emerald-500'}
+                ] %}
+                
+                {% for groupe in groupes %}
+                    <div class="bg-white rounded-2xl p-5 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-[#84DCCF] cursor-pointer group">
+                        <div class="w-16 h-16 bg-gradient-to-br {{ groupe.couleur }} rounded-2xl flex items-center justify-center text-3xl mb-4 group-hover:scale-110 transition-transform">{{ groupe.image }}</div>
+                        <h3 class="font-bold text-[#4A4A4A] mb-1 group-hover:text-[#00A9A5] transition-colors">{{ groupe.nom }}</h3>
+                        <p class="text-sm text-[#00A9A5] font-medium mb-1">{{ groupe.membres }} membres</p>
+                        <p class="text-xs text-gray-400 mb-4">{{ groupe.distance }}</p>
+                        <button class="w-full bg-gray-100 hover:bg-[#00A9A5] hover:text-white text-[#4A4A4A] py-2 rounded-lg font-medium transition-colors">Rejoindre</button>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    {# CTA - Activer la localisation #}
+    <section class="py-16 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-4xl mx-auto">
+            <div class="bg-gradient-to-r from-[#00A9A5] to-[#84DCCF] rounded-3xl p-8 sm:p-12 text-center text-white shadow-xl relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/2"></div>
+                <div class="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full translate-y-1/2 -translate-x-1/2"></div>
+                
+                <div class="relative">
+                    <div class="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <svg class="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+                        </svg>
+                    </div>
+                    <h2 class="text-3xl sm:text-4xl font-bold mb-4">Activez votre localisation</h2>
+                    <p class="text-lg text-white/90 mb-8 max-w-xl mx-auto">
+                        Rejoignez Miam Up pour découvrir les restaurants et événements près de chez vous en temps réel. Partagez vos découvertes avec la communauté locale.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                        <a href="{{ path('app_utilisateur_register') }}" class="bg-white text-[#00A9A5] px-8 py-4 rounded-xl font-bold text-lg hover:bg-gray-100 transition-colors shadow-lg flex items-center justify-center gap-2">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+                            </svg>
+                            Activer ma position
+                        </a>
+                        <a href="#" class="bg-transparent border-2 border-white text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-white/10 transition-colors">
+                            En savoir plus
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# Footer #}
+    <footer class="bg-[#4A4A4A] text-white py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <div class="w-10 h-10 bg-gradient-to-br from-[#84DCCF] to-[#00A9A5] rounded-xl flex items-center justify-center">
+                            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                        </div>
+                        <span class="text-xl font-bold">Miam Up</span>
+                    </div>
+                    <p class="text-gray-400 text-sm">Le réseau social culinaire géolocalisé. Découvrez, partagez et rencontrez près de chez vous.</p>
+                </div>
+                
+                <div>
+                    <h4 class="font-bold mb-4">Explorer</h4>
+                    <ul class="space-y-2 text-gray-400 text-sm">
+                        <li><a href="#" class="hover:text-[#84DCCF] transition-colors">Carte interactive</a></li>
+                        <li><a href="#" class="hover:text-[#84DCCF] transition-colors">Restaurants à proximité</a></li>
+                        <li><a href="#" class="hover:text-[#84DCCF] transition-colors">Événements locaux</a></li>
+                        <li><a href="#" class="hover:text-[#84DCCF] transition-colors">Groupes de quartier</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-bold mb-4">Communauté</h4>
+                    <ul class="space-y-2 text-gray-400 text-sm">
+                        <li><a href="#" class="hover:text-[#84DCCF] transition-colors">Devenir membre</a></li>
+                        <li><a href="#" class="hover:text-[#84DCCF] transition-colors">Organiser un événement</a></li>
+                        <li><a href="#" class="hover:text-[#84DCCF] transition-colors">Référencer mon restaurant</a></li>
+                        <li><a href="#" class="hover:text-[#84DCCF] transition-colors">Centre d'aide</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="font-bold mb-4">Suivez-nous</h4>
+                    <div class="flex gap-3">
+                        <a href="#" class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center hover:bg-[#84DCCF] transition-colors">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"></path></svg>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center hover:bg-[#84DCCF] transition-colors">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"></path></svg>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center hover:bg-[#84DCCF] transition-colors">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"></path></svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="border-t border-white/10 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <p class="text-gray-400 text-sm">&copy; {{ "now"|date("Y") }} Miam Up. Tous droits réservés.</p>
+                <div class="flex gap-6 text-sm text-gray-400">
+                    <a href="#" class="hover:text-[#84DCCF] transition-colors">Confidentialité</a>
+                    <a href="#" class="hover:text-[#84DCCF] transition-colors">Conditions</a>
+                    <a href="#" class="hover:text-[#84DCCF] transition-colors">Cookies</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
 </div>
 {% endblock %}
