@@ -13,29 +13,41 @@ class RestaurantSearchController extends AbstractController
     #[Route('/api/restaurants/search', name: 'api_restaurant_search', methods: ['GET'])]
     public function search(Request $request, RestaurantRepository $repository): JsonResponse
     {
-        // On récupère les coordonnées GPS envoyées dans l'URL (ex: ?lat=45.75&lng=4.83)
-        // Par défaut, si rien n'est mis, on centre sur Lyon (45.75 / 4.83)
         $lat = $request->query->get('lat', 45.7578);
         $lng = $request->query->get('lng', 4.8322);
 
-        // Appel de la méthode Haversine créée dans le Repository
-        // On cherche dans un rayon de 10km
         $restaurants = $repository->findNearby((float)$lat, (float)$lng, 10);
 
-        // On prépare un tableau simple pour éviter les boucles infinies (Circular Reference)
+        // --- ON PRÉPARE LES DATES POUR LE CALCUL DU STATUT ---
+        $today = (new \DateTime())->format('Y-m-d');
+        $tomorrow = (new \DateTime('+1 day'))->format('Y-m-d');
+
         $data = [];
         foreach ($restaurants as $result) {
-            // On extrait l'objet restaurant (index 0) et la valeur distance
             $restaurant = $result[0];
-            $distance = $result['distance'] ?? null; // Utilisation de l'opérateur de coalescence pour éviter les erreurs
+            $distance = $result['distance'] ?? null;
+
+            // --- LOGIQUE DE STATUT (Identique au MapController) ---
+            $status = 'standard';
+            foreach ($restaurant->getEvenements() as $event) {
+                $eventDate = $event->getDateEvenement()->format('Y-m-d');
+
+                if ($eventDate === $today) {
+                    $status = 'today';
+                    break;
+                } elseif ($eventDate === $tomorrow) {
+                    $status = 'soon';
+                }
+            }
 
             $data[] = [
-                'id'          => $restaurant->getId(), // INDISPENSABLE pour la Card de ton collègue
+                'id'          => $restaurant->getId(),
                 'nom'         => $restaurant->getNomRestaurant(),
                 'adresse'     => $restaurant->getAdresseRestaurant(),
                 'lat'         => (float)$restaurant->getLatitude(),
                 'lng'         => (float)$restaurant->getLongitude(),
-                'distance_km' => ($distance !== null) ? round((float)$distance, 2) : null
+                'distance_km' => ($distance !== null) ? round((float)$distance, 2) : null,
+                'event_status'=> $status // <--- ON AJOUTE L'INFO ICI !
             ];
         }
         return new JsonResponse($data);

@@ -3,28 +3,48 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import './MapComponents.css';
 import L from 'leaflet';
-import icon from 'leaflet/dist/images/marker-icon.png';
-import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
 // --- CONFIGURATION DES ICÔNES ---
 
-// 1. Icône par défaut pour les restaurants (Bleue standard)
-let DefaultIcon = L.icon({
-    iconUrl: icon,
-    shadowUrl: iconShadow,
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34]
-});
-L.Marker.prototype.options.icon = DefaultIcon;
+// --- CONFIGURATION DES ICÔNES ---
 
-// icône "MOI"
+const restaurantIcons = {
+    // 1. Le resto classique (gris/simple)
+    standard: new L.Icon({
+        iconUrl: '/images/markers/resto_simple.png',
+        iconSize: [40, 40],
+        iconAnchor: [20, 40],
+        popupAnchor: [0, -40],
+    }),
+
+    // 2. Le resto avec événement à venir (Calendrier Bleu)
+    soon: new L.Icon({
+        iconUrl: '/images/markers/resto_calendr_rouge.png',
+        iconSize: [40, 40], // Même taille que le standard pour la cohérence
+        iconAnchor: [20, 40],
+        popupAnchor: [0, -40],
+    }),
+
+    // 3. Le resto avec événement AUJOURD'HUI (Calendrier Vert)
+    today: new L.Icon({
+        iconUrl: '/images/markers/resto_calendr_vert.png',
+        iconSize: [48, 48], // Un peu plus grand pour l'emphase (Boost visuel)
+        iconAnchor: [24, 48],
+        popupAnchor: [0, -48],
+    })
+};
+
 const userIcon = new L.Icon({
-    iconUrl: '/images/markers/user.png',
+    iconUrl: '/images/markers/user.png', // Assure-toi d'avoir ce fichier ou change le nom
     iconSize: [50, 50],
     iconAnchor: [25, 50],
     popupAnchor: [0, -50],
 });
+
+// La fonction de sélection reste la même
+const getMarkerIcon = (status) => {
+    return restaurantIcons[status] || restaurantIcons.standard;
+};
 
 /**
  * COMPOSANT INTERNE : Gère les événements de la carte
@@ -36,9 +56,7 @@ const LocationHandler = ({ setUserPos }) => {
         const handleLocationUpdate = (event) => {
             const { lat, lng } = event.detail;
             console.log("📍 React a capturé la position :", lat, lng);
-
             setUserPos([lat, lng]);
-
             map.flyTo([lat, lng], 13.5, {
                 animate: true,
                 duration: 1.5
@@ -60,7 +78,7 @@ const MapComponent = ({ magasins: magasinsInitiaux }) => {
 
     useEffect(() => {
         const handleRestaurantsUpdate = (event) => {
-            console.log("🚀 Mise à jour des magasins avec distances :", event.detail.restaurants);
+            console.log("🚀 Données reçues dans React :", event.detail.restaurants);
             setListeMagasins(event.detail.restaurants);
         };
 
@@ -70,7 +88,7 @@ const MapComponent = ({ magasins: magasinsInitiaux }) => {
 
     const center = listeMagasins.length > 0
         ? [listeMagasins[0].lat, listeMagasins[0].lng]
-        : [48.8566, 2.3522];
+        : [45.78, 4.83];
 
     return (
         <MapContainer center={center} zoom={6} scrollWheelZoom={true}>
@@ -81,36 +99,31 @@ const MapComponent = ({ magasins: magasinsInitiaux }) => {
 
             <LocationHandler setUserPos={setUserPos} />
 
-            {/* PHASE 1 : MARQUEUR PERSONNALISÉ POUR L'UTILISATEUR */}
+            {/* MARQUEUR UTILISATEUR */}
             {userPos && (
-                <Marker
-                    position={userPos}
-                    icon={userIcon} // On utilise notre constante définie plus haut
-                >
+                <Marker position={userPos} icon={userIcon}>
                     <Popup>📍 Vous êtes ici</Popup>
                 </Marker>
             )}
 
-            {/* Boucle sur les restaurants */}
+            {/* BOUCLE RESTAURANTS */}
             {listeMagasins.map((magasin, index) => (
                 <Marker
                     key={index}
                     position={[magasin.lat, magasin.lng]}
-                    // Ici, pour l'instant, ça utilise l'icône par défaut (DefaultIcon)
+                    icon={getMarkerIcon(magasin.event_status)}
                 >
                     <Popup>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', minWidth: '150px' }}>
                             <b style={{ fontSize: '1.1rem', color: '#1f2937' }}>{magasin.nom}</b>
-
                             <span style={{ color: '#4f46e5', fontWeight: '600', fontSize: '0.9rem' }}>
                                 📍 {(magasin.distance_km !== undefined && magasin.distance_km !== null)
                                 ? `à ${Number(magasin.distance_km).toFixed(1)} km`
                                 : 'Distance non calculée'
                             }
                             </span>
-
                             <button
-                                onClick={() => console.log("ID envoyé à la card :", magasin.id)}
+                                onClick={() => console.log("ID envoyé :", magasin.id)}
                                 style={{
                                     marginTop: '5px',
                                     backgroundColor: '#4f46e5',
@@ -119,8 +132,7 @@ const MapComponent = ({ magasins: magasinsInitiaux }) => {
                                     padding: '8px',
                                     borderRadius: '4px',
                                     cursor: 'pointer',
-                                    textAlign: 'center',
-                                    fontSize: '0.8rem'
+                                    textAlign: 'center'
                                 }}
                             >
                                 Voir détails
@@ -129,7 +141,6 @@ const MapComponent = ({ magasins: magasinsInitiaux }) => {
                     </Popup>
                 </Marker>
             ))}
-
         </MapContainer>
     );
 };

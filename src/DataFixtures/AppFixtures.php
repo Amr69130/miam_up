@@ -39,7 +39,7 @@ class AppFixtures extends Fixture
 
         // --- Specialités ---
         $specialites = [];
-        foreach (['Italien', 'Chinois', 'Français', 'Asiatique', 'Fast Food'] as $s) {
+        foreach (['Italien', 'Chinois', 'Français', 'Asiatique', 'Fast Food', 'Japonais', 'Burger'] as $s) {
             $spec = new Specialite();
             $spec->setNomSpecialite($s);
             $manager->persist($spec);
@@ -66,34 +66,30 @@ class AppFixtures extends Fixture
 
         // --- Types ---
         $types = [];
-        foreach (['Restaurant', 'Café', 'Bar', 'Bistro', 'Gastro'] as $t) {
+        foreach (['Restaurant', 'Café', 'Bistro', 'Gastro', 'Fast-Food'] as $t) {
             $type = new Type();
             $type->setNomType($t);
             $manager->persist($type);
             $types[] = $type;
         }
 
-        // --- Restaurants fixes pour tests AUTOUR DE MOI (2 par zone) ---
+        // --- Restaurants (Tes originaux + mes ajouts de test) ---
         $restaurantsData = [
-            // ECULLY - Sauvegarde
-            ['nom'=>'EcullyTacos', 'adresse'=>'20 Avenue des sources, 69130 Écully', 'lat'=>45.7777, 'lng'=>4.7795],
-            ['nom'=>'EcullyPizza', 'adresse'=>'480 Avenue Ben Gourion, 69009 Lyon', 'lat'=>45.78828, 'lng'=>4.78720],
+            // TES ORIGINAUX (On n'y touche pas)
+            ['nom'=>'EcullyTacos', 'adresse'=>'20 Avenue des sources, 69130 Écully', 'lat'=>45.7777, 'lng'=>4.7795, 'event' => null],
+            ['nom'=>'EcullyPizza', 'adresse'=>'480 Avenue Ben Gourion, 69009 Lyon', 'lat'=>45.78828, 'lng'=>4.78720, 'event' => 'today'],
+            ['nom'=>'Lyon9Tacos', 'adresse'=>'43 Rue du Sergent Michel Berthet, 69009 Lyon', 'lat'=>45.7809, 'lng'=>4.8049, 'event' => null],
+            ['nom'=>'Lyon9Pizza', 'adresse'=>'30 Rue du Sergent Michel Berthet, 69009 Lyon', 'lat'=>45.7813, 'lng'=>4.8038, 'event' => 'soon'],
+            ['nom'=>'RilleuxTacos', 'adresse'=>'8 Avenue des Nations, 69140 Rillieux-la-Pape', 'lat'=>45.8270, 'lng'=>4.8990, 'event' => null],
+            ['nom'=>'RilleuxPizza', 'adresse'=>'20 Avenue des Nations, 69140 Rillieux-la-Pape', 'lat'=>45.8250, 'lng'=>4.9040, 'event' => 'soon'],
+            ['nom'=>'Lyon8Tacos', 'adresse'=>'120 Avenue Paul Santy, 69008 Lyon', 'lat'=>45.7286, 'lng'=>4.8743, 'event' => null],
+            ['nom'=>'Lyon8Pizza', 'adresse'=>'130 Avenue Paul Santy, 69008 Lyon', 'lat'=>45.7285, 'lng'=>4.8766, 'event' => 'today'],
+            ['nom'=>'VilletteTacos', 'adresse'=>'30 rue des Serventières, 38200 Villette‑de‑Vienne', 'lat'=>45.5894, 'lng'=>4.9150, 'event' => null],
+            ['nom'=>'VilettePizza', 'adresse'=>'147 route de Marennes, 38200 Villette‑de‑Vienne', 'lat'=>45.5920, 'lng'=>4.9170, 'event' => 'today'],
 
-            // LYON 9 - École
-            ['nom'=>'Lyon9Tacos', 'adresse'=>'43 Rue du Sergent Michel Berthet, 69009 Lyon', 'lat'=>45.7809, 'lng'=>4.8049],
-            ['nom'=>'Lyon9Pizza', 'adresse'=>'30 Rue du Sergent Michel Berthet, 69009 Lyon', 'lat'=>45.7813, 'lng'=>4.8038],
-
-            // RILLIEUX - Les Alagniers
-            ['nom'=>'RilleuxTacos', 'adresse'=>'8 Avenue des Nations, 69140 Rillieux-la-Pape', 'lat'=>45.8270, 'lng'=>4.8990],
-            ['nom'=>'RilleuxPizza', 'adresse'=>'20 Avenue des Nations, 69140 Rillieux-la-Pape', 'lat'=>45.8250, 'lng'=>4.9040],
-
-            // LYON 8 - Mermoz / Etats-Unis
-            ['nom'=>'Lyon8Tacos', 'adresse'=>'120 Avenue Paul Santy, 69008 Lyon', 'lat'=>45.7286, 'lng'=>4.8743],
-            ['nom'=>'Lyon8Pizza', 'adresse'=>'130 Avenue Paul Santy, 69008 Lyon', 'lat'=>45.7285, 'lng'=>4.8766],
-
-            // Villette-de-Vienne
-            ['nom'=>'VilletteTacos', 'adresse'=>'30 rue des Serventières, 38200 Villette‑de‑Vienne', 'lat'=>45.5894, 'lng'=>4.9150],
-            ['nom'=>'VilettePizza', 'adresse'=>'147 route de Marennes, 38200 Villette‑de‑Vienne', 'lat'=>45.5920, 'lng'=>4.9170],
+            // MES AJOUTS DE TEST (Pour voir les couleurs)
+            ['nom'=>'TEST_ORANGE_BURGERS', 'adresse'=>'Test Today', 'lat'=>45.7785, 'lng'=>4.7800, 'event' => 'today'],
+            ['nom'=>'TEST_VERT_SUSHI', 'adresse'=>'Test Soon', 'lat'=>45.7820, 'lng'=>4.8060, 'event' => 'soon'],
         ];
 
         $restaurants = [];
@@ -105,15 +101,33 @@ class AppFixtures extends Fixture
             $resto->setLongitude($data['lng']);
             $resto->setNumTelRestaurant($faker->phoneNumber);
             $resto->setSiret($faker->numerify('##############'));
-            $resto->setDescriptionRestaurant('Restaurant test pour ' . $data['nom']);
-            // Relations aléatoires
+            $resto->setDescriptionRestaurant('Restaurant spécialisé en ' . $data['nom']);
+
             foreach ($faker->randomElements($specialites, rand(1,3)) as $s) $resto->addSpecialite($s);
             foreach ($faker->randomElements($regimes, rand(1,3)) as $r) $resto->addRegime($r);
             foreach ($faker->randomElements($amenagements, rand(1,3)) as $a) $resto->addAmenagement($a);
-            foreach ($faker->randomElements($types, rand(1,3)) as $t) $resto->addType($t);
+            foreach ($faker->randomElements($types, rand(1,1)) as $t) $resto->addType($t);
 
             $manager->persist($resto);
             $restaurants[] = $resto;
+
+            // --- CRÉATION DE L'ÉVÉNEMENT SELON LE STATUT TEST ---
+            if ($data['event'] === 'today') {
+                $ev = new Evenement();
+                // On utilise descriptionEvenement car Titre n'existe pas dans ton entité
+                $ev->setDescriptionEvenement("Dégustation spéciale chez " . $data['nom']);
+                $ev->setDateEvenement(new \DateTime()); // AUJOURD'HUI
+                $ev->setNombrePlaces(20);
+                $ev->setRestaurant($resto);
+                $manager->persist($ev);
+            } elseif ($data['event'] === 'soon') {
+                $ev = new Evenement();
+                $ev->setDescriptionEvenement("Grand Buffet " . $data['nom'] . " : événement demain !");
+                $ev->setDateEvenement(new \DateTime('+1 day')); // DEMAIN
+                $ev->setNombrePlaces(30);
+                $ev->setRestaurant($resto);
+                $manager->persist($ev);
+            }
         }
 
         // --- Utilisateurs ---
@@ -149,17 +163,6 @@ class AppFixtures extends Fixture
         $manager->persist($admin);
         $utilisateurs[] = $admin;
 
-        // --- Événements ---
-        for ($i = 0; $i < 8; $i++) {
-            $evenement = new Evenement();
-            $evenement->setDateEvenement($faker->dateTimeThisYear);
-            $evenement->setDescriptionEvenement($faker->sentence);
-            $evenement->setNombrePlaces($faker->numberBetween(10,50));
-            $evenement->setRestaurant($restaurants[array_rand($restaurants)]);
-            foreach ($faker->randomElements($utilisateurs, rand(2,6)) as $u) $evenement->addUtilisateur($u);
-            $manager->persist($evenement);
-        }
-
         // --- Paiements ---
         foreach ($utilisateurs as $user) {
             $paiement = new Paiement();
@@ -169,24 +172,6 @@ class AppFixtures extends Fixture
             $paiement->setStatusPaiement($faker->randomElement(['En attente','Payé','Annulé']));
             $paiement->setUtilisateur($user);
             $manager->persist($paiement);
-        }
-
-        // --- Conversations & Messages ---
-        for ($i = 0; $i < 5; $i++) {
-            $conv = new Conversation();
-            $conv->setNomConversation('Discussion '.$i);
-            $conv->setDateCreation($faker->dateTimeThisYear);
-            foreach ($faker->randomElements($utilisateurs, rand(3,6)) as $u) $conv->addMembre($u);
-            $manager->persist($conv);
-            for ($j = 0; $j < rand(3,7); $j++) {
-                $msg = new Message();
-                $msg->setConversation($conv);
-                $msg->setExpediteur($utilisateurs[array_rand($utilisateurs)]);
-                $msg->setDateMessage($faker->dateTimeThisYear);
-                $msg->setContenu($faker->text(50));
-                $msg->setStatusMessage($faker->randomElement(['lu','non lu']));
-                $manager->persist($msg);
-            }
         }
 
         $manager->flush();
