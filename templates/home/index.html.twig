@@ -3,51 +3,12 @@
 {% block title %}Accueil - Miam Up{% endblock %}
 
 {% block body %}
-<div class="min-h-screen bg-gray-50">
+<div class="flex min-h-screen bg-gray-50">
 
-    {# Navbar #}
-    <nav class="bg-white shadow-sm border-b border-gray-200">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                {# Logo #}
-                <a href="{{ path('app_home') }}" class="flex items-center gap-2 text-xl font-bold text-slate-900">
-                    🍽️ Miam Up
-                </a>
-
-                {# Navigation #}
-                <div class="flex items-center gap-4">
-                    {% if app.user %}
-                        <span class="text-sm text-gray-600">
-                            Bonjour, <span class="font-semibold text-blue-600">{{ app.user.prenomUtilisateur }}</span>
-                        </span>
-                        
-                        {% if is_granted('ROLE_ADMIN') %}
-                            <span class="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded-full font-medium">
-                                Admin
-                            </span>
-                        {% endif %}
-                        
-                        <a href="{{ path('app_logout') }}" 
-                           class="text-sm bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition-colors">
-                            Se déconnecter
-                        </a>
-                    {% else %}
-                        <a href="{{ path('app_utilisateur_login') }}" 
-                           class="text-sm text-blue-600 hover:text-blue-700 font-medium">
-                            Se connecter
-                        </a>
-                        <a href="{{ path('app_utilisateur_register') }}" 
-                           class="text-sm bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors">
-                            S'inscrire
-                        </a>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </nav>
+    {% include 'components/_nav.html.twig' %}
 
     {# Contenu principal #}
-    <main class="flex flex-col items-center justify-center py-20 px-4">
+    <main class="flex-1 flex flex-col items-center justify-center py-20 px-4">
         <div class="text-center max-w-2xl">
             <h1 class="text-5xl font-bold text-slate-900 mb-6">
                 🍽️ Bienvenue sur Miam Up !
