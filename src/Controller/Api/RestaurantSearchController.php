@@ -40,6 +40,17 @@ class RestaurantSearchController extends AbstractController
                 }
             }
 
+            // --- BLOC DE TEST QUI FORCE UN EVENT ---
+            if ($restaurant->getNomRestaurant() === 'EcullyPizza') {
+                $status = 'today'; // On force le vert pour tester le PNG
+            }
+            if ($restaurant->getNomRestaurant() === 'EcullyTacos') {
+                $status = 'soon'; // On force le bleu pour tester le PNG
+            }
+            if ($restaurant->getNomRestaurant() === 'Lyon9Pizza') {
+                $status = 'soon'; // On force le bleu pour tester le PNG
+            }
+
             $data[] = [
                 'id'          => $restaurant->getId(),
                 'nom'         => $restaurant->getNomRestaurant(),

@@ -6,48 +6,40 @@ import L from 'leaflet';
 
 // --- CONFIGURATION DES ICÔNES ---
 
-// --- CONFIGURATION DES ICÔNES ---
-
 const restaurantIcons = {
-    // 1. Le resto classique (gris/simple)
     standard: new L.Icon({
-        iconUrl: '/images/markers/resto_simple.png',
+        iconUrl: '/images/markers/resto_gris.png', // Ton nouveau PNG gris
         iconSize: [40, 40],
         iconAnchor: [20, 40],
         popupAnchor: [0, -40],
     }),
-
-    // 2. Le resto avec événement à venir (Calendrier Bleu)
     soon: new L.Icon({
-        iconUrl: '/images/markers/resto_calendr_rouge.png',
-        iconSize: [40, 40], // Même taille que le standard pour la cohérence
+        iconUrl: '/images/markers/resto_bleu.png', // Ton nouveau PNG bleu
+        iconSize: [40, 40],
         iconAnchor: [20, 40],
         popupAnchor: [0, -40],
     }),
-
-    // 3. Le resto avec événement AUJOURD'HUI (Calendrier Vert)
     today: new L.Icon({
-        iconUrl: '/images/markers/resto_calendr_vert.png',
-        iconSize: [48, 48], // Un peu plus grand pour l'emphase (Boost visuel)
+        iconUrl: '/images/markers/resto_vert.png', // Ton nouveau PNG vert
+        iconSize: [48, 48],
         iconAnchor: [24, 48],
         popupAnchor: [0, -48],
     })
 };
 
 const userIcon = new L.Icon({
-    iconUrl: '/images/markers/user.png', // Assure-toi d'avoir ce fichier ou change le nom
+    iconUrl: '/images/markers/user.png',
     iconSize: [50, 50],
     iconAnchor: [25, 50],
     popupAnchor: [0, -50],
 });
 
-// La fonction de sélection reste la même
 const getMarkerIcon = (status) => {
     return restaurantIcons[status] || restaurantIcons.standard;
 };
 
 /**
- * COMPOSANT INTERNE : Gère les événements de la carte
+ * COMPOSANT INTERNE : Ton LocationHandler qui gère le flyTo
  */
 const LocationHandler = ({ setUserPos }) => {
     const map = useMap();
