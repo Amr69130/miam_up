@@ -1,9 +1,38 @@
 import { Controller } from '@hotwired/stimulus';
 
 export default class extends Controller {
-    // Correction ici : on simplifie les noms pour éviter les erreurs Stimulus
     static targets = ["button", "icon", "spinner", "label", "message"];
 
+    /**
+     * NOUVELLE FONCTION : Filtrage par nom (Bouton OK)
+     */
+    filter() {
+        const input = document.getElementById('search-input');
+        const query = input.value.toLowerCase().trim();
+        const mapRoot = document.getElementById('react-map-root');
+
+        if (!mapRoot) return;
+
+        // On récupère les données initiales injectées par Symfony
+        const allRestaurants = JSON.parse(mapRoot.dataset.items);
+
+        console.log("🔍 Filtrage en cours pour :", query);
+
+        // Filtrage local
+        const filtered = allRestaurants.filter(resto =>
+            resto.nom.toLowerCase().includes(query)
+        );
+
+        // Envoi à la carte React via l'événement qu'elle écoute déjà
+        const event = new CustomEvent('restaurants-updated', {
+            detail: { restaurants: filtered }
+        });
+        window.dispatchEvent(event);
+    }
+
+    /**
+     * FONCTION EXISTANTE : Géolocalisation (Bouton Orange)
+     */
     findMe() {
         this.setLoading(true);
         this.messageTarget.classList.add('hidden');
@@ -13,14 +42,12 @@ export default class extends Controller {
             return;
         }
 
-        // --- ON FORCE UNE LECTURE FRAICHE ---
         const options = {
-            enableHighAccuracy: true, // Demande le GPS réel, pas juste l'IP
-            timeout: 15000,           // On laisse 15 secondes au GPS pour se réveiller
-            maximumAge: 0             // INTERDIT d'utiliser la position en cache (René Cassin)
+            enableHighAccuracy: true,
+            timeout: 15000,
+            maximumAge: 0
         };
 
-        // Optionnel mais efficace : On "watch" la position pour forcer le rafraîchissement
         navigator.geolocation.getCurrentPosition(
             (position) => {
                 console.log("📍 GPS Fix obtenu !");
@@ -33,7 +60,6 @@ export default class extends Controller {
 
     handleSuccess(position) {
         const { latitude, longitude } = position.coords;
-        console.log("📍 Position réelle (Crolles?) :", latitude, longitude);
 
         const event = new CustomEvent("location-updated", {
             detail: { lat: latitude, lng: longitude }
@@ -71,15 +97,9 @@ export default class extends Controller {
     handleError(error) {
         let msg = "Une erreur est survenue lors de la localisation.";
         switch (error.code) {
-            case error.PERMISSION_DENIED:
-                msg = "Accès refusé. Autorisez la géoloc dans le navigateur.";
-                break;
-            case error.POSITION_UNAVAILABLE:
-                msg = "Signal GPS trop faible.";
-                break;
-            case error.TIMEOUT:
-                msg = "Délai dépassé.";
-                break;
+            case 1: msg = "Accès refusé. Autorisez la géoloc."; break;
+            case 2: msg = "Signal GPS trop faible."; break;
+            case 3: msg = "Délai dépassé."; break;
         }
         this.showMessage(msg, "error");
         this.setLoading(false);
@@ -87,9 +107,8 @@ export default class extends Controller {
 
     setLoading(isLoading) {
         this.buttonTarget.disabled = isLoading;
-        // Correction des noms de targets ici
-        if (this.hasIconTarget) this.iconTarget.classList.toggle('hidden', isLoading); // Celle-là est OK
-        if (this.hasSpinnerTarget) this.spinnerTarget.classList.toggle('hidden', !isLoading); // OK aussi
+        if (this.hasIconTarget) this.iconTarget.classList.toggle('hidden', isLoading);
+        if (this.hasSpinnerTarget) this.spinnerTarget.classList.toggle('hidden', !isLoading);
         this.labelTarget.textContent = isLoading ? "Recherche..." : "Autour de moi";
     }
 

@@ -15,24 +15,25 @@
 {% block body %}
     <div class="container mx-auto px-4 py-8">
 
-        {# 1.2 & 1.3 : Barre de recherche et Bouton avec Feedback #}
-        <div class="max-w-4xl mx-auto mb-10 text-center">
+        {# BLOC RECHERCHE ET GEOLOC (Tout est lié au contrôleur search-location) #}
+        <div class="max-w-4xl mx-auto mb-10 text-center" data-controller="search-location">
             <div class="flex flex-col md:flex-row items-center justify-center gap-4 bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
 
-                {# Champ de recherche (CORRIGÉ avec Stimulus) #}
-                <div class="relative w-full md:w-80 flex gap-2" data-controller="search-filter">
+                {# Champ de recherche par nom #}
+                <div class="relative w-full md:w-80 flex gap-2">
                     <div class="relative flex-grow">
                         <input type="text"
                                id="search-input"
-                               data-action="keydown.enter->search-filter#filter"
+                               data-action="keydown.enter->search-location#filter"
                                placeholder="Rechercher un restaurant..."
                                class="w-full pl-10 pr-4 py-2 rounded-full border border-gray-200 focus:ring-2 focus:ring-orange-500 outline-none text-sm">
                         <svg class="w-4 h-4 absolute left-3 top-2.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                         </svg>
                     </div>
-                    <button id="btn-search-confirm"
-                            data-action="click->search-filter#filter"
+                    <button type="button"
+                            id="btn-search-confirm"
+                            data-action="click->search-location#filter"
                             class="bg-gray-800 text-white px-4 py-2 rounded-full hover:bg-black transition text-sm font-bold shadow-sm">
                         OK
                     </button>
@@ -40,8 +41,8 @@
 
                 <span class="hidden md:block text-gray-300">|</span>
 
-                {# Contrôleur Stimulus (Autour de moi) #}
-                <div data-controller="search-location">
+                {# Bouton Autour de moi (Géolocalisation) #}
+                <div>
                     <button data-search-location-target="button"
                             data-action="click->search-location#findMe"
                             id="btn-geoloc"
@@ -59,6 +60,8 @@
 
                         <span data-search-location-target="label" id="btn-text">Autour de moi</span>
                     </button>
+
+                    {# Message de feedback #}
                     <div data-search-location-target="message" id="geoloc-message" class="hidden mt-2 p-2 text-sm rounded-md border"></div>
                 </div>
             </div>
