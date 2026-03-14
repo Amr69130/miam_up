@@ -3,24 +3,25 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import './MapComponents.css';
 import L from 'leaflet';
+import InfoModal from './InfoModal'; // Importation de ta nouvelle modal
 
 // --- CONFIGURATION DES ICÔNES ---
 
 const restaurantIcons = {
     standard: new L.Icon({
-        iconUrl: '/images/markers/resto_gris.png', // Ton nouveau PNG gris
+        iconUrl: '/images/markers/resto_gris.png',
         iconSize: [40, 40],
         iconAnchor: [20, 40],
         popupAnchor: [0, -40],
     }),
     soon: new L.Icon({
-        iconUrl: '/images/markers/resto_bleu.png', // Ton nouveau PNG bleu
+        iconUrl: '/images/markers/resto_bleu.png',
         iconSize: [40, 40],
         iconAnchor: [20, 40],
         popupAnchor: [0, -40],
     }),
     today: new L.Icon({
-        iconUrl: '/images/markers/resto_vert.png', // Ton nouveau PNG vert
+        iconUrl: '/images/markers/resto_vert.png',
         iconSize: [48, 48],
         iconAnchor: [24, 48],
         popupAnchor: [0, -48],
@@ -39,7 +40,7 @@ const getMarkerIcon = (status) => {
 };
 
 /**
- * COMPOSANT INTERNE : Ton LocationHandler qui gère le flyTo
+ * COMPOSANT INTERNE : Gère les événements de la carte
  */
 const LocationHandler = ({ setUserPos }) => {
     const map = useMap();
@@ -47,7 +48,6 @@ const LocationHandler = ({ setUserPos }) => {
     useEffect(() => {
         const handleLocationUpdate = (event) => {
             const { lat, lng } = event.detail;
-            console.log("📍 React a capturé la position :", lat, lng);
             setUserPos([lat, lng]);
             map.flyTo([lat, lng], 13.5, {
                 animate: true,
@@ -56,9 +56,7 @@ const LocationHandler = ({ setUserPos }) => {
         };
 
         window.addEventListener('location-updated', handleLocationUpdate);
-        return () => {
-            window.removeEventListener('location-updated', handleLocationUpdate);
-        };
+        return () => window.removeEventListener('location-updated', handleLocationUpdate);
     }, [map, setUserPos]);
 
     return null;
@@ -68,9 +66,18 @@ const MapComponent = ({ magasins: magasinsInitiaux }) => {
     const [listeMagasins, setListeMagasins] = useState(magasinsInitiaux);
     const [userPos, setUserPos] = useState(null);
 
+    // --- ÉTAT POUR LA MODAL ---
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
     useEffect(() => {
+        // --- LOGIQUE ONBOARDING (localStorage) ---
+        const hasVisited = localStorage.getItem('miamup_has_visited');
+        if (!hasVisited) {
+            setIsModalOpen(true);
+            localStorage.setItem('miamup_has_visited', 'true');
+        }
+
         const handleRestaurantsUpdate = (event) => {
-            console.log("🚀 Données reçues dans React :", event.detail.restaurants);
             setListeMagasins(event.detail.restaurants);
         };
 
@@ -83,57 +90,88 @@ const MapComponent = ({ magasins: magasinsInitiaux }) => {
         : [45.78, 4.83];
 
     return (
-        <MapContainer center={center} zoom={6} scrollWheelZoom={true}>
-            <TileLayer
-                attribution='&copy; OSM contributors'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
+        <div style={{ position: 'relative', width: '100%', height: '500px' }}>
 
-            <LocationHandler setUserPos={setUserPos} />
+            {/* BOUTON INFO FLOTTANT */}
+            <button
+                onClick={() => setIsModalOpen(true)}
+                title="Aide et légende"
+                style={{
+                    position: 'absolute',
+                    top: '15px',
+                    right: '15px',
+                    zIndex: 1000,
+                    backgroundColor: 'white',
+                    border: '2px solid #4f46e5',
+                    borderRadius: '50%',
+                    width: '35px',
+                    height: '35px',
+                    fontWeight: 'bold',
+                    color: '#4f46e5',
+                    cursor: 'pointer',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    fontSize: '18px'
+                }}
+            >
+                i
+            </button>
 
-            {/* MARQUEUR UTILISATEUR */}
-            {userPos && (
-                <Marker position={userPos} icon={userIcon}>
-                    <Popup>📍 Vous êtes ici</Popup>
-                </Marker>
-            )}
+            {/* FENÊTRE MODALE */}
+            <InfoModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
 
-            {/* BOUCLE RESTAURANTS */}
-            {listeMagasins.map((magasin, index) => (
-                <Marker
-                    key={index}
-                    position={[magasin.lat, magasin.lng]}
-                    icon={getMarkerIcon(magasin.event_status)}
-                >
-                    <Popup>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', minWidth: '150px' }}>
-                            <b style={{ fontSize: '1.1rem', color: '#1f2937' }}>{magasin.nom}</b>
-                            <span style={{ color: '#4f46e5', fontWeight: '600', fontSize: '0.9rem' }}>
-                                📍 {(magasin.distance_km !== undefined && magasin.distance_km !== null)
-                                ? `à ${Number(magasin.distance_km).toFixed(1)} km`
-                                : 'Distance non calculée'
-                            }
-                            </span>
-                            <button
-                                onClick={() => console.log("ID envoyé :", magasin.id)}
-                                style={{
-                                    marginTop: '5px',
-                                    backgroundColor: '#4f46e5',
-                                    color: 'white',
-                                    border: 'none',
-                                    padding: '8px',
-                                    borderRadius: '4px',
-                                    cursor: 'pointer',
-                                    textAlign: 'center'
-                                }}
-                            >
-                                Voir détails
-                            </button>
-                        </div>
-                    </Popup>
-                </Marker>
-            ))}
-        </MapContainer>
+            <MapContainer center={center} zoom={6} scrollWheelZoom={true} style={{ height: '100%', width: '100%' }}>
+                <TileLayer
+                    attribution='&copy; OSM contributors'
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+
+                <LocationHandler setUserPos={setUserPos} />
+
+                {userPos && (
+                    <Marker position={userPos} icon={userIcon}>
+                        <Popup>📍 Vous êtes ici</Popup>
+                    </Marker>
+                )}
+
+                {listeMagasins.map((magasin, index) => (
+                    <Marker
+                        key={index}
+                        position={[magasin.lat, magasin.lng]}
+                        icon={getMarkerIcon(magasin.event_status)}
+                    >
+                        <Popup>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', minWidth: '150px' }}>
+                                <b style={{ fontSize: '1.1rem', color: '#1f2937' }}>{magasin.nom}</b>
+                                <span style={{ color: '#4f46e5', fontWeight: '600', fontSize: '0.9rem' }}>
+                                    📍 {(magasin.distance_km !== undefined && magasin.distance_km !== null)
+                                    ? `à ${Number(magasin.distance_km).toFixed(1)} km`
+                                    : 'Distance non calculée'
+                                }
+                                </span>
+                                <button
+                                    onClick={() => console.log("ID envoyé :", magasin.id)}
+                                    style={{
+                                        marginTop: '5px',
+                                        backgroundColor: '#4f46e5',
+                                        color: 'white',
+                                        border: 'none',
+                                        padding: '8px',
+                                        borderRadius: '4px',
+                                        cursor: 'pointer',
+                                        textAlign: 'center'
+                                    }}
+                                >
+                                    Voir détails
+                                </button>
+                            </div>
+                        </Popup>
+                    </Marker>
+                ))}
+            </MapContainer>
+        </div>
     );
 };
 
