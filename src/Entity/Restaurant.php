@@ -375,4 +375,23 @@ class Restaurant
     {
         return $this->nom_restaurant;
     }
+
+    public function getEventStatus(): string
+    {
+        $now = new \DateTime();
+        $today = $now->format('Y-m-d');
+        $tomorrow = (new \DateTime('+1 day'))->format('Y-m-d');
+
+        foreach ($this->evenements as $event) {
+            $eventDate = $event->getDateEvenement()->format('Y-m-d');
+            if ($eventDate === $today) {
+                return 'today';
+            }
+            if ($eventDate === $tomorrow) {
+                return 'soon';
+            }
+        }
+
+        return 'standard';
+    }
 }
