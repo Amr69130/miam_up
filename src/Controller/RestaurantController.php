@@ -34,4 +34,13 @@ final class RestaurantController extends AbstractController
             'restaurant' => $restaurant,
         ]);
     }
+    #[Route('/panneau', name: 'app_panneau_resto')]
+    public function panneau(): Response
+    {
+        // On renvoie vers le fichier index de ton nouveau dossier pannel_resto
+        // Et on lui passe la variable 'active' pour allumer le bon bouton dans la sidebar
+        return $this->render('pannel_resto/index.html.twig', [
+            'active' => 'monresto',
+        ]);
+    }
 }

@@ -1,0 +1,144 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Localisation – Panneau restaurateur{% endblock %}
+
+{#
+  Variables attendues :
+    restaurant          (nom, logo, note, total_avis)
+    localisation        (latitude: float, longitude: float)
+    demande_en_attente  bool
+    historique          array de { id, champ, ancienne_valeur, nouvelle_valeur, date,
+                                   statut: 'en_attente' | 'acceptee' | 'refusee' }
+#}
+
+{% block body %}
+
+<div class="flex min-h-screen bg-[#F8F8F8]">
+
+  {% include 'pannel_resto/_sidebar.html.twig' with { active: 'monresto' } %}
+
+  <div class="ml-16 flex-1 flex flex-col min-h-screen">
+
+    {% include 'panneau/_header.html.twig' %}
+    {% include 'panneau/_tabs_nav.html.twig' with { active_tab: 'localisation' } %}
+
+    <main class="p-6 max-w-3xl">
+
+      <div class="mb-6">
+        <h2 class="text-xl font-bold text-[#4A4A4A]">Localisation</h2>
+        <p class="text-sm text-gray-500 mt-1 max-w-xl">
+          Les coordonnées GPS de votre restaurant sont gérées par l'équipe Miam_Up.
+          Vous pouvez soumettre une demande de modification.
+        </p>
+      </div>
+
+      {# Coordonnées actuelles #}
+      <div class="bg-white rounded-xl border border-gray-200 p-5 mb-4">
+        <div class="flex items-center gap-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wide mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          Coordonnées actuelles
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div class="bg-gray-50 rounded-xl p-4">
+            <p class="text-xs text-gray-400 mb-1">Latitude</p>
+            <p class="text-2xl font-bold text-[#4A4A4A]">{{ localisation.latitude }}</p>
+          </div>
+          <div class="bg-gray-50 rounded-xl p-4">
+            <p class="text-xs text-gray-400 mb-1">Longitude</p>
+            <p class="text-2xl font-bold text-[#4A4A4A]">{{ localisation.longitude }}</p>
+          </div>
+        </div>
+      </div>
+
+      {# Bannière info #}
+      <div class="bg-blue-50 border border-blue-100 rounded-xl px-4 py-3 flex items-start gap-2.5 mb-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <p class="text-sm text-blue-700">
+          Pour modifier votre localisation, soumettez une demande ci-dessous.
+          <span class="font-medium">Un administrateur Miam_Up validera ou refusera la modification sous 48h.</span>
+        </p>
+      </div>
+
+      {# Formulaire de demande #}
+      <div class="bg-white rounded-xl border border-gray-200 p-5 mb-6">
+        <h3 class="font-semibold text-[#4A4A4A] text-sm mb-4">Demande de modification de coordonnées</h3>
+
+        {% if demande_en_attente %}
+          <div class="bg-yellow-50 border border-yellow-200 rounded-lg px-4 py-3 text-sm text-yellow-700 mb-4">
+            Une demande est déjà en attente de validation. Vous pouvez soumettre une nouvelle demande, elle sera traitée après la précédente.
+          </div>
+        {% endif %}
+
+        <form method="POST" action="{{ path('panneau_localisation_demande') }}">
+          <input type="hidden" name="_token" value="{{ csrf_token('localisation_demande') }}">
+          <div class="grid grid-cols-2 gap-4 mb-4">
+            <div>
+              <label class="block text-xs text-gray-500 mb-1.5">
+                Nouvelle latitude <span class="text-gray-400">(optionnel)</span>
+              </label>
+              <input type="text" name="nouvelle_latitude"
+                     placeholder="{{ localisation.latitude }}"
+                     class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-[#4A4A4A] outline-none focus:border-[#00A9A5] transition-colors placeholder-gray-300">
+            </div>
+            <div>
+              <label class="block text-xs text-gray-500 mb-1.5">
+                Nouvelle longitude <span class="text-gray-400">(optionnel)</span>
+              </label>
+              <input type="text" name="nouvelle_longitude"
+                     placeholder="{{ localisation.longitude }}"
+                     class="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-[#4A4A4A] outline-none focus:border-[#00A9A5] transition-colors placeholder-gray-300">
+            </div>
+          </div>
+          <button type="submit"
+                  class="flex items-center gap-2 bg-[#00A9A5] hover:bg-[#008b87] text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors shadow-sm">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+            Envoyer la demande
+          </button>
+        </form>
+      </div>
+
+      {# Historique des demandes #}
+      <div>
+        <h3 class="font-semibold text-[#4A4A4A] text-sm mb-3">Historique des demandes</h3>
+        <div class="space-y-3">
+          {% for h in historique %}
+
+            {% if h.statut == 'en_attente' %}
+              {% set statut_class = 'text-orange-500' %}
+              {% set statut_label = 'En attente' %}
+            {% elseif h.statut == 'acceptee' %}
+              {% set statut_class = 'text-[#00A9A5]' %}
+              {% set statut_label = 'Acceptée' %}
+            {% else %}
+              {% set statut_class = 'text-[#FF6B6B]' %}
+              {% set statut_label = 'Refusée' %}
+            {% endif %}
+
+            <div class="bg-white rounded-xl border border-gray-200 px-4 py-3 flex items-center justify-between">
+              <div>
+                <p class="font-medium text-sm text-[#4A4A4A]">{{ h.champ }}</p>
+                <p class="text-xs text-gray-400 mt-0.5">
+                  {{ h.ancienne_valeur }}
+                  <span class="font-semibold text-[#4A4A4A]">→ {{ h.nouvelle_valeur }}</span>
+                  · {{ h.date }}
+                </p>
+              </div>
+              <div class="flex items-center gap-1.5 text-xs font-semibold {{ statut_class }}">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                {{ statut_label }}
+              </div>
+            </div>
+
+          {% else %}
+            <div class="bg-white rounded-xl border border-dashed border-gray-200 px-6 py-8 text-center">
+              <p class="text-sm text-gray-400">Aucune demande pour l'instant.</p>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+{% endblock %}
