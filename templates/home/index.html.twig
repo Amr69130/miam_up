@@ -1,73 +1,193 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Accueil - Miam Up{% endblock %}
+{% block title %}Accueil - Miam_Up{% endblock %}
 
 {% block body %}
-<div class="flex min-h-screen bg-gray-50">
 
-    {% include 'components/_nav.html.twig' %}
+{# ── Images fallback Unsplash (quand le restaurant n'a pas d'image uploadée) ── #}
+{% set fallback_images = [
+    'https://images.unsplash.com/photo-1765276999390-d77d822b3c4b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmcmVuY2glMjByZXN0YXVyYW50JTIwZWxlZ2FudCUyMGRpbmluZyUyMHRhYmxlfGVufDF8fHx8MTc3NTgyMjI1M3ww&ixlib=rb-4.1.0&q=80&w=1080',
+    'https://images.unsplash.com/photo-1698217602652-116968212647?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjb3p5JTIwYmlzdHJvdCUyMHBhcmlzJTIwaW50ZXJpb3IlMjB3YXJtfGVufDF8fHx8MTc3NTgyMjI1M3ww&ixlib=rb-4.1.0&q=80&w=1080',
+    'https://images.unsplash.com/photo-1773327275715-d3b43141fa29?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxvdXRkb29yJTIwZ2FyZGVuJTIwcmVzdGF1cmFudCUyMHRlcnJhY2UlMjBkaW5pbmd8ZW58MXx8fHwxNzc1ODIyMjU0fDA&ixlib=rb-4.1.0&q=80&w=1080',
+    'https://images.unsplash.com/photo-1675729378170-dff874aaaa24?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBjcmVhdGl2ZSUyMGN1aXNpbmUlMjBwbGF0aW5nJTIwZGlzaHxlbnwxfHx8fDE3NzU4MjIyNTR8MA&ixlib=rb-4.1.0&q=80&w=1080',
+    'https://images.unsplash.com/photo-1649695121711-2f2ea8e8faf4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmcmVuY2glMjBicmFzc2VyaWUlMjBzZWFmb29kJTIwcmVzdGF1cmFudCUyMGludGVyaW9yfGVufDF8fHx8MTc3NTgyMjI1NXww&ixlib=rb-4.1.0&q=80&w=1080',
+    'https://images.unsplash.com/photo-1713026464108-c9929157ed55?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxpdGFsaWFuJTIwdHJhdHRvcmlhJTIwY296eSUyMGNhbmRsZWxpZ2h0JTIwZGlubmVyfGVufDF8fHx8MTc3NTgyMjI1NXww&ixlib=rb-4.1.0&q=80&w=1080',
+] %}
 
-    {# Contenu principal #}
-    <main class="flex-1 flex flex-col items-center justify-center py-20 px-4">
-        <div class="text-center max-w-2xl">
-            <h1 class="text-5xl font-bold text-slate-900 mb-6">
-                🍽️ Bienvenue sur Miam Up !
-            </h1>
+<div class="flex h-screen overflow-hidden bg-[#F8F8F8] font-['Inter',sans-serif]">
 
-            {% if app.user %}
-                <p class="text-xl text-gray-600 mb-8">
-                    Ravi de vous revoir, <span class="font-semibold text-blue-600">{{ app.user.prenomUtilisateur }} {{ app.user.nomUtilisateur }}</span> !
+    {# ═══ Sidebar ═══ #}
+    {% include 'partials/_sidebar.html.twig' with { active: 'accueil' } %}
+
+    {# ═══ Contenu principal ═══ #}
+    <div class="flex-1 overflow-y-auto">
+
+        {# ─── Hero Section ─── #}
+        <div class="relative h-72 overflow-hidden">
+            <img
+                src="https://images.unsplash.com/photo-1540982318052-f5357b1cc18c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwYXJpcyUyMGFlcmlhbCUyMGNpdHlzY2FwZSUyMGV2ZW5pbmd8ZW58MXx8fHwxNzc1ODIyMjUyfDA&ixlib=rb-4.1.0&q=80&w=1080"
+                alt="Vue panoramique de Paris"
+                class="w-full h-full object-cover"
+                loading="eager"
+            />
+            <div class="absolute inset-0 bg-gradient-to-b from-black/40 to-black/70"></div>
+            <div class="absolute inset-0 flex flex-col justify-center px-10">
+                <h1 class="text-white text-4xl font-medium leading-10 mb-2">
+                    Bienvenue sur Miam_Up
+                </h1>
+                <p class="text-white/80 text-lg leading-7 max-w-xl">
+                    Découvrez les meilleurs restaurants autour de chez vous.
+                    Explorez la carte, consultez les avis et participez aux
+                    évènements si vous le souhaiter !
                 </p>
-
-                <div class="bg-white rounded-2xl shadow-lg p-8 text-left">
-                    <h2 class="text-2xl font-bold text-slate-800 mb-6">Votre profil</h2>
-                    <div class="grid sm:grid-cols-2 gap-4">
-                        <div class="bg-gray-50 rounded-xl p-4">
-                            <p class="text-sm text-gray-500">Pseudo</p>
-                            <p class="text-lg font-semibold text-slate-900">{{ app.user.pseudoUtilisateur }}</p>
-                        </div>
-                        <div class="bg-gray-50 rounded-xl p-4">
-                            <p class="text-sm text-gray-500">Email</p>
-                            <p class="text-lg font-semibold text-slate-900">{{ app.user.emailUtilisateur }}</p>
-                        </div>
-                        <div class="bg-gray-50 rounded-xl p-4">
-                            <p class="text-sm text-gray-500">Téléphone</p>
-                            <p class="text-lg font-semibold text-slate-900">{{ app.user.numUtilisateur }}</p>
-                        </div>
-                        <div class="bg-gray-50 rounded-xl p-4">
-                            <p class="text-sm text-gray-500">Rôles</p>
-                            <div class="flex flex-wrap gap-2 mt-1">
-                                {% for role in app.user.roles %}
-                                    <span class="text-xs font-medium px-2.5 py-1 rounded-full 
-                                        {% if role == 'ROLE_ADMIN' %}
-                                            bg-purple-100 text-purple-800
-                                        {% else %}
-                                            bg-blue-100 text-blue-800
-                                        {% endif %}">
-                                        {{ role }}
-                                    </span>
-                                {% endfor %}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            {% else %}
-                <p class="text-xl text-gray-600 mb-8">
-                    Trouvez les meilleurs restaurants autour de vous et partagez vos expériences culinaires.
-                </p>
-
-                <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                    <a href="{{ path('app_utilisateur_register') }}" 
-                       class="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-8 py-4 rounded-xl text-lg transition-colors shadow-lg hover:shadow-xl">
-                        Créer un compte
+                <div class="mt-6 flex gap-3">
+                    <a href="{{ path('app_map') }}"
+                       class="bg-[#00A9A5] text-white px-6 py-3 rounded-[14px] hover:bg-[#008F8C] transition-colors flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+                            <circle cx="12" cy="10" r="3"/>
+                        </svg>
+                        Explorer la carte
                     </a>
-                    <a href="{{ path('app_utilisateur_login') }}" 
-                       class="bg-white hover:bg-gray-50 text-slate-900 font-semibold px-8 py-4 rounded-xl text-lg transition-colors shadow-lg hover:shadow-xl border border-gray-200">
-                        Se connecter
+                    <a href="{{ path('restaurant_list') }}"
+                       class="bg-white/20 backdrop-blur text-white px-6 py-3 rounded-[14px] hover:bg-white/30 transition-colors">
+                        Voir tous les restaurants
                     </a>
                 </div>
-            {% endif %}
+            </div>
         </div>
-    </main>
+
+        <div class="p-8 space-y-10">
+
+            {# ─── Les mieux notés ─── #}
+            <section>
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-xl font-medium text-[#0a0a0a]">Les mieux notés</h2>
+                    <a href="{{ path('restaurant_list') }}"
+                       class="text-[#00A9A5] text-sm flex items-center gap-1 hover:underline">
+                        Voir tout
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+                        </svg>
+                    </a>
+                </div>
+
+                {% if topRated is not empty %}
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {% for restaurant in topRated %}
+                            <a href="{{ path('restaurant_show', { id: restaurant.id }) }}"
+                               class="bg-white rounded-2xl overflow-hidden border border-gray-100 hover:shadow-lg transition-shadow group">
+                                <div class="h-40 overflow-hidden bg-gray-100">
+                                    <img
+                                        src="{{ restaurant.imageFilename is defined and restaurant.imageFilename
+                                            ? asset('uploads/restaurants/' ~ restaurant.imageFilename)
+                                            : fallback_images[loop.index0 % fallback_images|length] }}"
+                                        alt="{{ restaurant.nomRestaurant }}"
+                                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                        loading="lazy"
+                                    />
+                                </div>
+                                <div class="p-4">
+                                    <h3 class="text-lg font-medium text-[#0a0a0a] mb-1">{{ restaurant.nomRestaurant }}</h3>
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                             fill="#FFB900" stroke="#FFB900" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                                        </svg>
+                                        <span class="text-sm text-[#0a0a0a]">
+                                            {{ restaurant.noteConsommateurs is not null ? restaurant.noteConsommateurs|number_format(1) : 'N/A' }}
+                                        </span>
+                                        {% if restaurant.specialite is not empty %}
+                                            <span class="text-[#99a1af]">·</span>
+                                            <span class="text-sm text-[#6a7282]">{{ restaurant.specialite.first.nomSpecialite }}</span>
+                                        {% endif %}
+                                    </div>
+                                    {% if restaurant.adresseRestaurant %}
+                                        <div class="flex items-center gap-1 text-[#6a7282] text-sm">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                                 stroke="#6A7282" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0">
+                                                <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+                                                <circle cx="12" cy="10" r="3"/>
+                                            </svg>
+                                            <span class="truncate">{{ restaurant.adresseRestaurant }}</span>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="bg-white rounded-2xl border border-gray-100 p-8 text-center text-[#99a1af]">
+                        Aucun restaurant noté pour le moment.
+                    </div>
+                {% endif %}
+            </section>
+
+            {# ─── À découvrir ─── #}
+            <section>
+                <div class="flex items-center gap-2 mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                         stroke="#00A9A5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                    <h2 class="text-xl font-medium text-[#0a0a0a]">À découvrir</h2>
+                </div>
+
+                {% if discover is not empty %}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {% for restaurant in discover %}
+                            <a href="{{ path('restaurant_show', { id: restaurant.id }) }}"
+                               class="bg-white rounded-2xl p-4 border border-gray-100 hover:shadow-lg transition-shadow flex gap-4">
+                                <div class="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 bg-gray-100">
+                                    <img
+                                        src="{{ restaurant.imageFilename is defined and restaurant.imageFilename
+                                            ? asset('uploads/restaurants/' ~ restaurant.imageFilename)
+                                            : fallback_images[(loop.index0 + 3) % fallback_images|length] }}"
+                                        alt="{{ restaurant.nomRestaurant }}"
+                                        class="w-full h-full object-cover"
+                                        loading="lazy"
+                                    />
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <h3 class="font-medium text-[#0a0a0a] mb-1">{{ restaurant.nomRestaurant }}</h3>
+                                    <div class="flex items-center gap-1 mb-1">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
+                                             fill="#FFB900" stroke="#FFB900" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                                        </svg>
+                                        <span class="text-sm text-[#0a0a0a]">
+                                            {{ restaurant.noteConsommateurs is not null ? restaurant.noteConsommateurs|number_format(1) : 'N/A' }}
+                                        </span>
+                                        {% if restaurant.specialite is not empty %}
+                                            <span class="text-sm text-[#6a7282]">· {{ restaurant.specialite.first.nomSpecialite }}</span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="flex items-center gap-1 text-xs text-[#6a7282]">
+                                        {% if restaurant.adresseRestaurant %}
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
+                                                 stroke="#6A7282" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0">
+                                                <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+                                                <circle cx="12" cy="10" r="3"/>
+                                            </svg>
+                                            <span class="truncate">{{ restaurant.adresseRestaurant }}</span>
+                                        {% else %}
+                                            <span class="italic">Adresse non renseignée</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </a>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="bg-white rounded-2xl border border-gray-100 p-8 text-center text-[#99a1af]">
+                        Aucun restaurant à découvrir pour le moment.
+                    </div>
+                {% endif %}
+            </section>
+
+        </div>
+    </div>
 </div>
 {% endblock %}
