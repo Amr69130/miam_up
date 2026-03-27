@@ -111,20 +111,23 @@ class AppFixtures extends Fixture
             $manager->persist($resto);
             $restaurants[] = $resto;
 
-            // --- CRÉATION DE L'ÉVÉNEMENT SELON LE STATUT TEST ---
+            // --- NOUVELLE LOGIQUE D'ÉVÉNEMENT (Semaine 1) ---
             if ($data['event'] === 'today') {
                 $ev = new Evenement();
-                // On utilise descriptionEvenement car Titre n'existe pas dans ton entité
-                $ev->setDescriptionEvenement("Dégustation spéciale chez " . $data['nom']);
-                $ev->setDateEvenement(new \DateTime()); // AUJOURD'HUI
+                $ev->setTitre("🔥 Soirée Spéciale " . $data['nom']);
+                $ev->setDescriptionEvenement("Événement test pour marqueur VERT");
+                $ev->setDateEvenement(new \DateTime('today 18:00'));
+                $ev->setDateFin(new \DateTime('today 23:59'));
                 $ev->setNombrePlaces(20);
                 $ev->setRestaurant($resto);
                 $manager->persist($ev);
             } elseif ($data['event'] === 'soon') {
                 $ev = new Evenement();
-                $ev->setDescriptionEvenement("Grand Buffet " . $data['nom'] . " : événement demain !");
-                $ev->setDateEvenement(new \DateTime('+1 day')); // DEMAIN
-                $ev->setNombrePlaces(30);
+                $ev->setTitre("Bientôt : " . $data['nom']);
+                $ev->setDescriptionEvenement("Événement test pour marqueur BLEU");
+                $ev->setDateEvenement(new \DateTime('+3 days 12:00'));
+                $ev->setDateFin(new \DateTime('+3 days 15:00'));
+                $ev->setNombrePlaces(50);
                 $ev->setRestaurant($resto);
                 $manager->persist($ev);
             }

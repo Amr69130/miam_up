@@ -70,18 +70,21 @@ const MapComponent = ({ magasins: magasinsInitiaux }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     useEffect(() => {
-        // --- LOGIQUE ONBOARDING (localStorage) ---
+        // --- ONBOARDING (localStorage) ---
         const hasVisited = localStorage.getItem('miamup_has_visited');
         if (!hasVisited) {
             setIsModalOpen(true);
             localStorage.setItem('miamup_has_visited', 'true');
         }
 
+        //fonction qui vient receptionner les nouveaux resultats
         const handleRestaurantsUpdate = (event) => {
+            //mise à jour de la liste avec les données filtrées
             setListeMagasins(event.detail.restaurants);
         };
-
+        //ici on ecoute le signal envoyé dans la barre de recherche
         window.addEventListener('restaurants-updated', handleRestaurantsUpdate);
+        //enfin on nettoie l'ecouteur lorsqu'on quitte
         return () => window.removeEventListener('restaurants-updated', handleRestaurantsUpdate);
     }, []);
 
