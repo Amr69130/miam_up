@@ -1,0 +1,62 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouveau Event | Miam Up{% endblock %}
+
+{% block body %}
+    <div class="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-2xl mx-auto bg-white rounded-xl shadow-md overflow-hidden p-8 border border-gray-100">
+
+            <div class="mb-8 text-center">
+                <h1 class="text-3xl font-bold text-gray-900">Ajouter un événement</h1>
+                <p class="text-gray-500 mt-2 text-sm italic underline">Partagez vos bons plans avec la communauté</p>
+            </div>
+
+            {{ form_start(form, {'attr': {'class': 'space-y-6'}}) }}
+
+            <div class="grid grid-cols-1 gap-6">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Titre de l'événement</label>
+                    {{ form_widget(form.titre) }}
+                    <div class="text-red-500 text-xs mt-1">
+                        {{ form_errors(form.titre) }}
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Où ça se passe ?</label>
+                    {{ form_widget(form.restaurant) }}
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Début</label>
+                        {{ form_widget(form.date_evenement) }}
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1">Fin (optionnel)</label>
+                        {{ form_widget(form.date_fin) }}
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Description</label>
+                    {{ form_widget(form.description_evenement) }}
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Nombre de places</label>
+                    {{ form_widget(form.nombre_places) }}
+                </div>
+            </div>
+
+            <div class="pt-4 flex items-center justify-between gap-4">
+                <a href="{{ path('app_map') }}" class="text-gray-400 hover:text-gray-600 font-medium">Annuler</a>
+                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transform hover:scale-105 transition duration-200">
+                    Publier sur la carte
+                </button>
+            </div>
+
+            {{ form_end(form) }}
+        </div>
+    </div>
+{% endblock %}

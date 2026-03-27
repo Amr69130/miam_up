@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: EvenementRepository::class)]
 class Evenement
@@ -17,6 +18,9 @@ class Evenement
     private ?int $id = null;
 
     #[ORM\Column]
+    #[Assert\NotBlank(message: "La date de l'événement est obligatoire.")]
+    #[Assert\Type("\DateTimeInterface")]
+    #[Assert\GreaterThanOrEqual("today", message: "On ne peut pas créer d'événement dans une date passé.")]
     private ?\DateTime $date_evenement = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
@@ -36,6 +40,14 @@ class Evenement
 
     #[ORM\ManyToOne(inversedBy: 'evenements')]
     private ?Restaurant $restaurant = null;
+
+    #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Le titre est obligatoire pour l'affichage sur la carte.")]
+    #[Assert\Length(min: 3, max: 255, minMessage: "Le titre est trop court.")]
+    private ?string $titre = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTime $date_fin = null;
 
     public function __construct()
     {
@@ -127,6 +139,30 @@ class Evenement
     public function setRestaurant(?Restaurant $restaurant): static
     {
         $this->restaurant = $restaurant;
+
+        return $this;
+    }
+
+    public function getTitre(): ?string
+    {
+        return $this->titre;
+    }
+
+    public function setTitre(string $titre): static
+    {
+        $this->titre = $titre;
+
+        return $this;
+    }
+
+    public function getDateFin(): ?\DateTime
+    {
+        return $this->date_fin;
+    }
+
+    public function setDateFin(?\DateTime $date_fin): static
+    {
+        $this->date_fin = $date_fin;
 
         return $this;
     }
