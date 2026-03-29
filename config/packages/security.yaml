@@ -24,6 +24,12 @@ security:
                 password_parameter: _password
                 success_handler: App\Security\LoginSuccessHandler
                 enable_csrf: true
+            
+            # OAuth Google Authenticator
+            custom_authenticators:
+                - App\Security\GoogleAuthenticator
+            entry_point: form_login
+            
             logout:
                 path: app_logout
                 target: app_utilisateur_login
@@ -41,6 +47,7 @@ security:
         - { path: ^/$, roles: PUBLIC_ACCESS }
         - { path: ^/utilisateur/connexion, roles: PUBLIC_ACCESS }
         - { path: ^/utilisateur/inscription, roles: PUBLIC_ACCESS }
+        - { path: ^/connect/google, roles: PUBLIC_ACCESS }
         - { path: ^/admin, roles: PUBLIC_ACCESS }
 
 when@test:
