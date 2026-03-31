@@ -144,34 +144,14 @@ const MapComponent = ({ magasins: magasinsInitiaux }) => {
                         key={index}
                         position={[magasin.lat, magasin.lng]}
                         icon={getMarkerIcon(magasin.event_status)}
-                    >
-                        <Popup>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', minWidth: '150px' }}>
-                                <b style={{ fontSize: '1.1rem', color: '#1f2937' }}>{magasin.nom}</b>
-                                <span style={{ color: '#4f46e5', fontWeight: '600', fontSize: '0.9rem' }}>
-                                    📍 {(magasin.distance_km !== undefined && magasin.distance_km !== null)
-                                    ? `à ${Number(magasin.distance_km).toFixed(1)} km`
-                                    : 'Distance non calculée'
-                                }
-                                </span>
-                                <button
-                                    onClick={() => console.log("ID envoyé :", magasin.id)}
-                                    style={{
-                                        marginTop: '5px',
-                                        backgroundColor: '#4f46e5',
-                                        color: 'white',
-                                        border: 'none',
-                                        padding: '8px',
-                                        borderRadius: '4px',
-                                        cursor: 'pointer',
-                                        textAlign: 'center'
-                                    }}
-                                >
-                                    Voir détails
-                                </button>
-                            </div>
-                        </Popup>
-                    </Marker>
+                        eventHandlers={{
+                            click: () => {
+                                window.dispatchEvent(new CustomEvent('open-restaurant-modal', { 
+                                    detail: { id: magasin.id, distance_km: magasin.distance_km } 
+                                }));
+                            },
+                        }}
+                    />
                 ))}
             </MapContainer>
         </div>

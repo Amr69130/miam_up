@@ -20,6 +20,39 @@ final class RestaurantController extends AbstractController
         ]);
     }
 
+    #[Route('/restaurant/{id}/modal', name: 'restaurant_modal', methods: ['GET'])]
+    public function modal(int $id, \Symfony\Component\HttpFoundation\Request $request, RestaurantRepository $restaurantRepository): Response
+    {
+        $restaurant = $restaurantRepository->find($id);
+
+        if (!$restaurant) {
+            return new Response('', Response::HTTP_NOT_FOUND);
+        }
+
+        $distance = $request->query->get('distance');
+
+        // Calcul du statut de l'événement
+        $today = (new \DateTime())->format('Y-m-d');
+        $tomorrow = (new \DateTime('+1 day'))->format('Y-m-d');
+        $status = 'standard';
+        
+        foreach ($restaurant->getEvenements() as $event) {
+            $eventDate = $event->getDateEvenement()->format('Y-m-d');
+            if ($eventDate === $today) {
+                $status = 'today';
+                break;
+            } elseif ($eventDate === $tomorrow) {
+                $status = 'soon';
+            }
+        }
+
+        return $this->render('restaurant/_modal.html.twig', [
+            'restaurant' => $restaurant,
+            'distance_km' => $distance,
+            'event_status' => $status,
+        ]);
+    }
+
     #[Route('/restaurant/{id}', name: 'restaurant_show')]
     public function show(int $id, RestaurantRepository $restaurantRepository): Response
     {
