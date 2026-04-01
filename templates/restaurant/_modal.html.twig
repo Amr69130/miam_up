@@ -1,80 +1,120 @@
-<div class="fixed top-6 left-6 bottom-6 w-[calc(100%-3rem)] md:w-[400px] rounded-3xl bg-white shadow-2xl z-[9999] overflow-hidden flex flex-col animate-[slideIn_0.3s_ease-out] border border-gray-100">
+<div class="fixed top-6 left-6 bottom-6 w-[calc(100%-3rem)] md:w-[400px] rounded-2xl bg-white shadow-2xl z-[9999] overflow-hidden flex flex-col animate-[slideIn_0.3s_ease-out] border border-gray-100">
     
     <!-- Zone avec scroll si le contenu est trop long -->
     <div class="overflow-y-auto flex-grow h-full custom-scrollbar">
-        <!-- En-tête / Bannière (Type Google Maps) -->
-        <div class="relative w-full h-40 bg-indigo-50 flex items-center justify-center border-b border-gray-200">
-            <!-- Bouton Fermer Fixé pour la barre latérale -->
-            <button data-action="click->restaurant-modal#close" class="absolute top-4 right-4 bg-white/90 hover:bg-white text-gray-800 rounded-full w-10 h-10 flex items-center justify-center shadow-md transition-transform hover:scale-105 z-10 font-bold border border-gray-200">
-                ✕
-            </button>
-            <span class="text-6xl opacity-75">🍽️</span>
-        </div>
-
-        <!-- Contenu Principal -->
-        <div class="p-6 flex-grow flex flex-col gap-6">
         
-        <div>
-            <h2 class="text-3xl font-black text-gray-900 mb-1 leading-tight">{{ restaurant.nomRestaurant }}</h2>
-            <p class="text-indigo-600 font-semibold flex items-center gap-2 mt-1">
-                📍 {% if distance_km is not empty %}
-                    À {{ distance_km|number_format(1) }} km
-                {% else %}
-                    Distance non calculée
-                {% endif %}
-            </p>
-        </div>
-
-        {% if restaurant.adresseRestaurant %}
-            <div class="border-t border-gray-100 pt-4">
-                <h3 class="font-bold text-gray-400 uppercase text-xs tracking-wider mb-2 flex items-center gap-2">
-                    <span>🗺️</span> Adresse
-                </h3>
-                <p class="text-gray-800 font-medium">{{ restaurant.adresseRestaurant }}</p>
-            </div>
-        {% endif %}
-
-        {% if restaurant.descriptionRestaurant %}
-            <div class="border-t border-gray-100 pt-4">
-                <h3 class="font-bold text-gray-400 uppercase text-xs tracking-wider mb-2 flex items-center gap-2">
-                    <span>📝</span> Description
-                </h3>
-                <p class="text-gray-600 leading-relaxed text-sm">{{ restaurant.descriptionRestaurant }}</p>
-            </div>
-        {% endif %}
-
-        <div class="border-t border-gray-100 pt-4">
-            <h3 class="font-bold text-gray-400 uppercase text-xs tracking-wider mb-3 flex items-center gap-2">
-                <span>🎉</span> Événements
-            </h3>
-            
-            {% if event_status == 'today' %}
-                <div class="bg-green-50 border border-green-200 text-green-900 p-4 rounded-xl flex gap-3 shadow-sm">
-                    <span class="text-2xl pt-1">🔥</span>
-                    <div>
-                        <p class="font-bold text-lg">Aujourd'hui !</p>
-                        <p class="text-sm opacity-80">Des utilisateurs se réunissent dans ce restaurant aujourd'hui.</p>
-                    </div>
-                </div>
-            {% elseif event_status == 'soon' %}
-                <div class="bg-blue-50 border border-blue-200 text-blue-900 p-4 rounded-xl flex gap-3 shadow-sm">
-                    <span class="text-2xl pt-1">📅</span>
-                    <div>
-                        <p class="font-bold text-lg">Prochainement</p>
-                        <p class="text-sm opacity-80">Un événement est organisé ici dans les jours à venir.</p>
-                    </div>
-                </div>
+        <!-- Image de couverture avec bouton de fermeture -->
+        <div class="relative w-full h-48 bg-gray-200">
+            <!-- Remplacement par l'image du restaurant si disponible -->
+            {% if restaurant.logo %}
+                <img src="{{ restaurant.logo }}" class="w-full h-full object-cover" alt="{{ restaurant.nomRestaurant }}">
             {% else %}
-                <div class="bg-gray-50 border border-gray-200 text-gray-700 p-4 rounded-xl flex gap-3 shadow-sm">
-                    <span class="text-2xl pt-1">😴</span>
-                    <div>
-                        <p class="font-bold text-lg">Aucun événement</p>
-                        <p class="text-sm opacity-80">Soyez le premier à organiser un repas ici !</p>
-                    </div>
+                <div class="w-full h-full flex flex-col items-center justify-center bg-gray-100 text-gray-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-16 h-16 mb-2">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.999 2.999 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.999 2.999 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 1.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75L12 18z" />
+                    </svg>
+                    <span class="text-sm font-medium">Image non disponible</span>
                 </div>
             {% endif %}
+            
+            <!-- Bouton Fermer -->
+            <button data-action="click->restaurant-modal#close" class="absolute top-4 right-4 bg-black/40 hover:bg-black/60 text-white rounded-full w-8 h-8 flex items-center justify-center transition-colors z-10 font-bold border border-transparent">
+                ✕
+            </button>
         </div>
-        
-    </div>
+
+        <!-- Corps de la carte -->
+        <div class="px-5 pt-4 pb-6 flex-grow flex flex-col">
+            
+            <!-- Titre et sous-titre -->
+            <div>
+                <h2 class="text-3xl font-extrabold text-gray-900 mb-1 tracking-tight">{{ restaurant.nomRestaurant }}</h2>
+                <p class="text-gray-500 italic text-sm mb-2">Restaurant</p>
+                
+                <!-- Note / Étoiles -->
+                <div class="flex items-center gap-1 text-sm text-gray-600 mb-4">
+                    <span class="font-semibold text-gray-800">{{ restaurant.noteConsommateurs|default('4,5')|number_format(1, ',') }}</span>
+                    <div class="flex text-yellow-400 text-sm">
+                        {% set rating = restaurant.noteConsommateurs|default(4.5) %}
+                        {% for i in 1..5 %}
+                            {% if rating >= i %}
+                                <span>★</span>
+                            {% elseif rating >= i - 0.5 %}
+                                <span>★</span>
+                            {% else %}
+                                <span class="text-gray-300">★</span>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <span class="ml-1">(48)</span> <!-- Simulé pour l'exemple -->
+                </div>
+            </div>
+
+            <!-- Onglets (Navigation) -->
+            <div class="border-y border-black mt-1 mb-4">
+                <nav class="flex justify-between items-center px-2 py-3">
+                    <a href="#" class="text-[#20B2AA] font-medium text-sm border-b-2 border-[#20B2AA] pb-3 -mb-[13px]">Présentation</a>
+                    <a href="#" class="text-gray-700 font-medium text-sm hover:text-gray-900 pb-3 -mb-[13px]">Menu</a>
+                    <a href="#" class="text-gray-700 font-medium text-sm hover:text-gray-900 pb-3 -mb-[13px]">Evenements</a>
+                </nav>
+            </div>
+
+            <!-- Liste des informations -->
+            <div class="flex flex-col gap-3 mb-6">
+                <!-- Adresse -->
+                {% if restaurant.adresseRestaurant %}
+                <div class="flex items-start gap-3">
+                    <span class="text-black text-lg w-5 flex justify-center mt-0.5">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><path fill-rule="evenodd" d="M11.54 22.351l.07.04.028.016a.76.76 0 00.723 0l.028-.015.071-.041a16.975 16.975 0 001.144-.742 19.58 19.58 0 002.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 00-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 002.682 2.282 16.975 16.975 0 001.145.742zM12 13.5a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd" /></svg>
+                    </span>
+                    <span class="text-xs text-gray-800 font-medium pt-1">{{ restaurant.adresseRestaurant }}</span>
+                </div>
+                {% endif %}
+                
+                <!-- Horaires -->
+                {% if restaurant.horaires %}
+                <div class="flex items-start gap-3">
+                    <span class="text-black text-lg w-5 flex justify-center mt-0.5">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 6a.75.75 0 00-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 000-1.5h-3.75V6z" clip-rule="evenodd" /></svg>
+                    </span>
+                    <div class="text-xs pt-1 flex items-center gap-1 group cursor-pointer">
+                        <span class="text-gray-800">{{ restaurant.horaires }}</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4 text-black"><path fill-rule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" /></svg>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Téléphone -->
+                {% if restaurant.numTelRestaurant %}
+                <div class="flex items-start gap-3">
+                    <span class="text-black text-lg w-5 flex justify-center mt-0.5">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><path fill-rule="evenodd" d="M1.5 4.5a3 3 0 013-3h1.372c.86 0 1.61.586 1.819 1.42l1.105 4.423a1.875 1.875 0 01-.694 1.955l-1.293.97c-.135.101-.164.249-.126.352a11.285 11.285 0 006.697 6.697c.103.038.25.009.352-.126l.97-1.293a1.875 1.875 0 011.955-.694l4.423 1.105c.834.209 1.42.959 1.42 1.82V19.5a3 3 0 01-3 3h-2.25C8.552 22.5 1.5 15.448 1.5 6.75V4.5z" clip-rule="evenodd" /></svg>
+                    </span>
+                    <span class="text-xs text-gray-800 pt-1">{{ restaurant.numTelRestaurant }}</span>
+                </div>
+                {% endif %}
+
+                <!-- Site Web -->
+                {% if restaurant.siteWeb %}
+                <div class="flex items-start gap-3">
+                    <span class="text-black text-lg w-5 flex justify-center mt-0.5">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm-1.892 14.38a1.5 1.5 0 01-1.353-.915l-1.015-2.538a.75.75 0 01.32-.93c.319-.213.627-.453.916-.717A.75.75 0 0111.25 12v.75a.75.75 0 001.5 0v-1.12a.75.75 0 011.5 0v3.375A2.625 2.625 0 0016.875 17.625h.194a2.25 2.25 0 01-2.072 1.341 9.043 9.043 0 01-4.889-2.336zm4.84-2.88a1.125 1.125 0 01-2.25 0v-3.375a2.25 2.25 0 00-4.5 0v1.12a5.228 5.228 0 00-.173.238l-1.077-2.693a9.002 9.002 0 0110.82-.44 1.125 1.125 0 01-2.82.766z" clip-rule="evenodd" /></svg>
+                    </span>
+                    <a href="{{ restaurant.siteWeb }}" target="_blank" class="text-xs text-gray-800 pt-1 hover:underline">{{ restaurant.siteWeb }}</a>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Description -->
+            {% if restaurant.descriptionRestaurant %}
+            <div>
+                <h3 class="font-bold text-gray-900 text-sm mb-2">Description</h3>
+                <p class="text-gray-700 text-[13px] leading-snug">
+                    {{ restaurant.descriptionRestaurant|nl2br }}
+                </p>
+            </div>
+            {% endif %}
+
+        </div>
     </div>
 </div>
