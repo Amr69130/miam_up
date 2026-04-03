@@ -1,0 +1,179 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Restaurants à Paris - Miam_Up{% endblock %}
+
+{% block body %}
+
+{% set fallback_images = [
+    'https://images.unsplash.com/photo-1765276999390-d77d822b3c4b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmcmVuY2glMjByZXN0YXVyYW50JTIwZWxlZ2FudCUyMGRpbmluZyUyMHRhYmxlfGVufDF8fHx8MTc3NTgyMjI1M3ww&ixlib=rb-4.1.0&q=80&w=1080',
+    'https://images.unsplash.com/photo-1698217602652-116968212647?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjb3p5JTIwYmlzdHJvdCUyMHBhcmlzJTIwaW50ZXJpb3IlMjB3YXJtfGVufDF8fHx8MTc3NTgyMjI1M3ww&ixlib=rb-4.1.0&q=80&w=1080',
+    'https://images.unsplash.com/photo-1773327275715-d3b43141fa29?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxvdXRkb29yJTIwZ2FyZGVuJTIwcmVzdGF1cmFudCUyMHRlcnJhY2UlMjBkaW5pbmd8ZW58MXx8fHwxNzc1ODIyMjU0fDA&ixlib=rb-4.1.0&q=80&w=1080',
+    'https://images.unsplash.com/photo-1675729378170-dff874aaaa24?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBjcmVhdGl2ZSUyMGN1aXNpbmUlMjBwbGF0aW5nJTIwZGlzaHxlbnwxfHx8fDE3NzU4MjIyNTR8MA&ixlib=rb-4.1.0&q=80&w=1080',
+    'https://images.unsplash.com/photo-1649695121711-2f2ea8e8faf4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxmcmVuY2glMjBicmFzc2VyaWUlMjBzZWFmb29kJTIwcmVzdGF1cmFudCUyMGludGVyaW9yfGVufDF8fHx8MTc3NTgyMjI1NXww&ixlib=rb-4.1.0&q=80&w=1080',
+    'https://images.unsplash.com/photo-1713026464108-c9929157ed55?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxpdGFsaWFuJTIwdHJhdHRvcmlhJTIwY296eSUyMGNhbmRsZWxpZ2h0JTIwZGlubmVyfGVufDF8fHx8MTc3NTgyMjI1NXww&ixlib=rb-4.1.0&q=80&w=1080',
+] %}
+
+<div class="flex h-screen overflow-hidden bg-[#F8F8F8] font-['Inter',sans-serif]">
+
+    {# ═══ Sidebar ═══ #}
+    {% include 'partials/_sidebar.html.twig' with { active: 'restaurants' } %}
+
+    {# ═══ Contenu principal ═══ #}
+    <div class="flex-1 flex flex-col overflow-hidden">
+
+        {# ─── Header fixe : titre + barre de recherche ─── #}
+        <div class="bg-white/95 backdrop-blur border-b border-gray-100 px-8 pt-5 pb-4 flex-shrink-0">
+            <h1 class="text-2xl font-medium text-[#4A4A4A] mb-4">Restaurants à Paris</h1>
+
+            <div class="flex gap-3 items-center">
+                {# Barre de recherche #}
+                <form method="get" action="{{ path('restaurant_list') }}" class="flex-1">
+                    <div class="bg-[#f3f4f6] rounded-[14px] h-11 flex items-center gap-2 px-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                             stroke="#99A1AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0">
+                            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+                        </svg>
+                        <input
+                            type="text"
+                            name="q"
+                            value="{{ search }}"
+                            placeholder="Rechercher par nom, cuisine ou adresse..."
+                            class="bg-transparent flex-1 outline-none text-[16px] text-[#0a0a0a] placeholder-[#99a1af]"
+                        />
+                    </div>
+                </form>
+
+                {# Bouton filtres #}
+                <button class="bg-[#f3f4f6] rounded-[14px] w-10 h-10 flex items-center justify-center flex-shrink-0 hover:bg-gray-200 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                         stroke="#4A5565" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="4" x2="4" y1="21" y2="14"/><line x1="4" x2="4" y1="10" y2="3"/>
+                        <line x1="12" x2="12" y1="21" y2="12"/><line x1="12" x2="12" y1="8" y2="3"/>
+                        <line x1="20" x2="20" y1="21" y2="16"/><line x1="20" x2="20" y1="12" y2="3"/>
+                        <line x1="1" x2="7" y1="14" y2="14"/><line x1="9" x2="15" y1="8" y2="8"/>
+                        <line x1="17" x2="23" y1="16" y2="16"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        {# ─── Liste scrollable ─── #}
+        <div class="flex-1 overflow-y-auto px-8 py-4">
+
+            {# Compteur #}
+            <p class="text-sm text-[#6a7282] mb-4">
+                {{ totalCount }} restaurant{{ totalCount > 1 ? 's' : '' }} trouvé{{ totalCount > 1 ? 's' : '' }}
+            </p>
+
+            {% if restaurants is not empty %}
+                <div class="flex flex-col gap-4">
+                    {% for restaurant in restaurants %}
+
+                        {# ── Carte restaurant horizontale ── #}
+                        <a href="{{ path('restaurant_show', { id: restaurant.id }) }}"
+                           class="bg-white rounded-2xl overflow-hidden border border-gray-100 hover:shadow-lg hover:border-[#84DCCF] transition-all flex h-28">
+
+                            {# Image gauche #}
+                            <div class="w-32 h-full flex-shrink-0 overflow-hidden">
+                                <img
+                                    src="{{ restaurant.imageFilename is defined and restaurant.imageFilename
+                                        ? asset('uploads/restaurants/' ~ restaurant.imageFilename)
+                                        : fallback_images[loop.index0 % fallback_images|length] }}"
+                                    alt="{{ restaurant.nomRestaurant }}"
+                                    class="w-full h-full object-cover"
+                                    loading="lazy"
+                                />
+                            </div>
+
+                            {# Contenu droite #}
+                            <div class="flex-1 p-3 flex flex-col justify-between min-w-0">
+
+                                {# Bloc haut : nom + note + description #}
+                                <div>
+                                    {# Ligne titre + prix #}
+                                    <div class="flex items-center justify-between mb-1">
+                                        <h3 class="text-base font-medium text-[#4A4A4A]">{{ restaurant.nomRestaurant }}</h3>
+                                        {% if restaurant.prixMoyen is defined and restaurant.prixMoyen %}
+                                            <span class="text-sm text-[#6a7282] flex-shrink-0 ml-4">{{ restaurant.prixMoyen }}</span>
+                                        {% endif %}
+                                    </div>
+
+                                    {# Note + spécialité #}
+                                    <div class="flex items-center gap-3 mb-1">
+                                        <div class="flex items-center gap-1">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+                                                 fill="#FFB900" stroke="#FFB900" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                                            </svg>
+                                            <span class="text-sm font-medium text-[#4A4A4A]">
+                                                {{ restaurant.noteConsommateurs is not null ? restaurant.noteConsommateurs|number_format(1) : 'N/A' }}
+                                            </span>
+                                            {% if restaurant.avis is defined %}
+                                                <span class="text-sm text-[#99a1af]">({{ restaurant.avis|length }})</span>
+                                            {% endif %}
+                                        </div>
+
+                                        {% if restaurant.specialite is not empty %}
+                                            <span class="text-[#d1d5dc]">|</span>
+                                            <span class="text-sm text-[#4A4A4A]">{{ restaurant.specialite.first.nomSpecialite }}</span>
+                                        {% endif %}
+                                    </div>
+
+                                    {# Description #}
+                                    {% if restaurant.descriptionRestaurant is defined and restaurant.descriptionRestaurant %}
+                                        <p class="text-sm text-[#6a7282] leading-5 line-clamp-2">
+                                            {{ restaurant.descriptionRestaurant }}
+                                        </p>
+                                    {% endif %}
+                                </div>
+
+                                {# Bloc bas : adresse + statut ouverture #}
+                                <div class="flex items-center justify-between">
+                                    {% if restaurant.adresseRestaurant %}
+                                        <div class="flex items-center gap-1 text-sm text-[#6a7282]">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                                 stroke="#6A7282" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0">
+                                                <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+                                                <circle cx="12" cy="10" r="3"/>
+                                            </svg>
+                                            <span class="truncate">{{ restaurant.adresseRestaurant }}</span>
+                                        </div>
+                                    {% endif %}
+
+                                    {# Statut ouverture #}
+                                    <div class="flex items-center gap-1 flex-shrink-0 ml-4">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                                        </svg>
+                                        <span class="text-sm text-[#00A9A5]">Ouvert</span>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </a>
+
+                    {% endfor %}
+                </div>
+
+            {% else %}
+                {# État vide #}
+                <div class="bg-white rounded-2xl border border-gray-100 p-12 text-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                         stroke="#84DCCF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="mx-auto mb-4">
+                        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+                    </svg>
+                    <p class="text-[#4A4A4A] text-lg mb-1">Aucun restaurant trouvé</p>
+                    {% if search is not empty %}
+                        <p class="text-sm text-[#4A4A4A]/60">
+                            Aucun résultat pour « <strong class="text-[#FF6B6B]">{{ search }}</strong> ».
+                            Essayez un autre terme.
+                        </p>
+                    {% endif %}
+                </div>
+            {% endif %}
+
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -4,19 +4,29 @@ namespace App\Controller;
 
 use App\Repository\RestaurantRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 final class RestaurantController extends AbstractController
 {
     #[Route('/restaurants', name: 'restaurant_list')]
-    public function index(RestaurantRepository $restaurantRepository): Response
+    public function index(Request $request, RestaurantRepository $restaurantRepository): Response
     {
-        // On récupère tous les restaurants pour les afficher côté client
-        $restaurants = $restaurantRepository->findAll();
+        $search = $request->query->get('q', '');
 
-        return $this->render('restaurant/index.html.twig', [
+        if ($search !== '') {
+            $restaurants = $restaurantRepository->searchByNameOrAddress($search);
+        } else {
+            $restaurants = $restaurantRepository->findAll();
+        }
+
+        usort($restaurants, fn($a, $b) => ($b->getNoteConsommateurs() ?? 0) <=> ($a->getNoteConsommateurs() ?? 0));
+
+        return $this->render('restaurant/list.html.twig', [
             'restaurants' => $restaurants,
+            'search'      => $search,
+            'totalCount'  => count($restaurants),
         ]);
     }
 
