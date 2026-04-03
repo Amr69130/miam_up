@@ -13,29 +13,60 @@ class RestaurantSearchController extends AbstractController
     #[Route('/api/restaurants/search', name: 'api_restaurant_search', methods: ['GET'])]
     public function search(Request $request, RestaurantRepository $repository): JsonResponse
     {
-        // On récupère les coordonnées GPS envoyées dans l'URL (ex: ?lat=45.75&lng=4.83)
-        // Par défaut, si rien n'est mis, on centre sur Lyon (45.75 / 4.83)
         $lat = $request->query->get('lat', 45.7578);
         $lng = $request->query->get('lng', 4.8322);
 
-        // Appel de la méthode Haversine créée dans le Repository
-        // On cherche dans un rayon de 10km
         $restaurants = $repository->findNearby((float)$lat, (float)$lng, 10);
 
-        // On prépare un tableau simple pour éviter les boucles infinies (Circular Reference)
+        // --- ON PRÉPARE LES DATES POUR LE CALCUL DU STATUT ---
+        $today = (new \DateTime())->format('Y-m-d');
+        $tomorrow = (new \DateTime('+1 day'))->format('Y-m-d');
+
         $data = [];
         foreach ($restaurants as $result) {
-            // On extrait l'objet restaurant (index 0) et la valeur distance
             $restaurant = $result[0];
-            $distance = $result['distance'] ?? null; // Utilisation de l'opérateur de coalescence pour éviter les erreurs
+            $distance = $result['distance'] ?? null;
+
+            $status = 'standard';
+            $eventsData = [];
+
+            foreach ($restaurant->getEvenements() as $event) {
+                $eventDate = $event->getDateEvenement()->format('Y-m-d');
+
+                // On récupère les participants
+                $participants = [];
+                foreach ($event->getUtilisateurs() as $u) {
+                    $participants[] = [
+                        'id' => $u->getId(),
+                        'prenom' => $u->getPrenomUtilisateur()
+                    ];
+                }
+
+                $eventsData[] = [
+                    'id' => $event->getId(),
+                    'titre' => $event->getTitre(),
+                    'participants' => $participants,
+                    // ON AJOUTE L'ID DU CRÉATEUR ICI POUR L'ÉTOILE ⭐
+                    'createur_id' => $event->getCreateur() ? $event->getCreateur()->getId() : null,
+                    'is_joined' => $event->getUtilisateurs()->contains($this->getUser()),
+                ];
+
+                if ($eventDate === $today) {
+                    $status = 'today';
+                } elseif ($eventDate === $tomorrow && $status !== 'today') {
+                    $status = 'soon';
+                }
+            }
 
             $data[] = [
-                'id'          => $restaurant->getId(), // INDISPENSABLE pour la Card de ton collègue
+                'id'          => $restaurant->getId(),
                 'nom'         => $restaurant->getNomRestaurant(),
                 'adresse'     => $restaurant->getAdresseRestaurant(),
                 'lat'         => (float)$restaurant->getLatitude(),
                 'lng'         => (float)$restaurant->getLongitude(),
-                'distance_km' => ($distance !== null) ? round((float)$distance, 2) : null
+                'distance_km' => ($distance !== null) ? round((float)$distance, 2) : null,
+                'event_status'=> $status,
+                'events'      => $eventsData
             ];
         }
         return new JsonResponse($data);
