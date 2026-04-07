@@ -29,8 +29,7 @@ class Evenement
     #[ORM\Column(nullable: true)]
     private ?int $nombre_places = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $participants = null;
+
 
     /**
      * @var Collection<int, Utilisateur>
@@ -95,17 +94,6 @@ class Evenement
         return $this;
     }
 
-    public function getParticipants(): ?string
-    {
-        return $this->participants;
-    }
-
-    public function setParticipants(?string $participants): static
-    {
-        $this->participants = $participants;
-
-        return $this;
-    }
 
     /**
      * @return Collection<int, Utilisateur>
