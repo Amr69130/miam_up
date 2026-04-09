@@ -47,7 +47,7 @@ final class RestaurantController extends AbstractController
     #[Route('/panneau', name: 'app_panneau_resto')]
     public function panneau(): Response
     {
-        return $this->render('pannel_resto/index.html.twig', [
+            return $this->render('pannel_resto/mon_restaurant.html.twig', [
             'active' => 'monresto',
             'active_tab' => 'restaurant',
             'restaurant' => $this->getMockRestaurant()
