@@ -35,4 +35,34 @@ class EvenementController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
+
+    #[Route('/event/join/{id}', name: 'app_event_join')]
+    public function joinEvent(Evenement $event, EntityManagerInterface $entityManager): Response
+    {
+        // 1. Sécurité : Bloquer l'action si l'utilisateur n'est pas connecté
+        $user = $this->getUser();
+        
+        if (!$user) {
+            // Redirection vers la page de connexion
+            $this->addFlash('danger', 'Vous devez être connecté pour rejoindre un événement.');
+            return $this->redirectToRoute('app_login');
+        }
+
+        // 2. Vérification d'Unicité (avec la VRAIE relation de Ghouti)
+        if ($event->getUtilisateurs()->contains($user)) {
+            // Si déjà inscrit -> on le désinscrit (toggle)
+            $event->removeUtilisateur($user);
+            $this->addFlash('warning', 'Vous êtes désinscrit de l\'événement.');
+        } else {
+            // Si nouveau -> on l'inscrit
+            $event->addUtilisateur($user);
+            $this->addFlash('success', 'Vous êtes bien inscrit à l\'événement !');
+        }
+
+        // 3. Persistance : On applique les changements dans la base de données
+        $entityManager->flush();
+
+        // 4. Redirection vers la carte
+        return $this->redirectToRoute('app_carte'); 
+    }
 }
