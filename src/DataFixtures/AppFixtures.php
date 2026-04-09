@@ -178,5 +178,17 @@ class AppFixtures extends Fixture
         }
 
         $manager->flush();
+
+        // --- INSCRIPTION AUX ÉVÉNEMENTS ---
+        $tousLesEvenements = $manager->getRepository(Evenement::class)->findAll();
+
+        foreach ($tousLesEvenements as $ev) {
+            $nbInscrits = rand(2, 5);
+            $inscritsAuHasard = $faker->randomElements($utilisateurs, $nbInscrits);
+
+            foreach ($inscritsAuHasard as $userInscrit) {
+                $ev->addUtilisateur($userInscrit);
+            }
+        }
     }
 }
