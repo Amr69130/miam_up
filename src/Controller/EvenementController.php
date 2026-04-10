@@ -8,10 +8,11 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 
 class EvenementController extends AbstractController
 {
+
     #[Route('/creer-mon-event', name: 'app_evenement_test')]
     public function new(Request $request, EntityManagerInterface $em): Response
     {
@@ -28,7 +29,7 @@ class EvenementController extends AbstractController
             $em->flush();
 
             $this->addFlash('success', 'Événement ajouté sur la carte !');
-            return $this->redirectToRoute('app_carte');
+            return $this->redirectToRoute('app_map');
         }
 
         return $this->render('evenement/new.html.twig', [
@@ -41,17 +42,18 @@ class EvenementController extends AbstractController
     {
         // 1. Sécurité : Bloquer l'action si l'utilisateur n'est pas connecté
         $user = $this->getUser();
-        
+
         if (!$user) {
             // Redirection vers la page de connexion
             $this->addFlash('danger', 'Vous devez être connecté pour rejoindre un événement.');
-            return $this->redirectToRoute('app_login');
+            return $this->redirectToRoute('app_utilisateur_login');
         }
 
         // 2. Vérification d'Unicité (avec la VRAIE relation de Ghouti)
         if ($event->getUtilisateurs()->contains($user)) {
             // Si déjà inscrit -> on le désinscrit (toggle)
             $event->removeUtilisateur($user);
+            $user->addEvenement($event);
             $this->addFlash('warning', 'Vous êtes désinscrit de l\'événement.');
         } else {
             // Si nouveau -> on l'inscrit
@@ -63,6 +65,6 @@ class EvenementController extends AbstractController
         $entityManager->flush();
 
         // 4. Redirection vers la carte
-        return $this->redirectToRoute('app_carte'); 
+        return $this->redirectToRoute('app_map');
     }
 }
