@@ -27,28 +27,35 @@ class RestaurantSearchController extends AbstractController
             $restaurant = $result[0];
             $distance = $result['distance'] ?? null;
 
-            // --- LOGIQUE DE STATUT (Identique au MapController) ---
             $status = 'standard';
+            $eventsData = [];
+
             foreach ($restaurant->getEvenements() as $event) {
                 $eventDate = $event->getDateEvenement()->format('Y-m-d');
 
+                // On récupère les participants
+                $participants = [];
+                foreach ($event->getUtilisateurs() as $u) {
+                    $participants[] = [
+                        'id' => $u->getId(),
+                        'prenom' => $u->getPrenomUtilisateur()
+                    ];
+                }
+
+                $eventsData[] = [
+                    'id' => $event->getId(),
+                    'titre' => $event->getTitre(),
+                    'participants' => $participants,
+                    // ON AJOUTE L'ID DU CRÉATEUR ICI POUR L'ÉTOILE ⭐
+                    'createur_id' => $event->getCreateur() ? $event->getCreateur()->getId() : null,
+                    'is_joined' => $event->getUtilisateurs()->contains($this->getUser()),
+                ];
+
                 if ($eventDate === $today) {
                     $status = 'today';
-                    break;
-                } elseif ($eventDate === $tomorrow) {
+                } elseif ($eventDate === $tomorrow && $status !== 'today') {
                     $status = 'soon';
                 }
-            }
-
-            // --- BLOC DE TEST QUI FORCE UN EVENT ---
-            if ($restaurant->getNomRestaurant() === 'EcullyPizza') {
-                $status = 'today'; // On force le vert pour tester le PNG
-            }
-            if ($restaurant->getNomRestaurant() === 'EcullyTacos') {
-                $status = 'soon'; // On force le bleu pour tester le PNG
-            }
-            if ($restaurant->getNomRestaurant() === 'Lyon9Pizza') {
-                $status = 'soon'; // On force le bleu pour tester le PNG
             }
 
             $data[] = [
@@ -58,7 +65,8 @@ class RestaurantSearchController extends AbstractController
                 'lat'         => (float)$restaurant->getLatitude(),
                 'lng'         => (float)$restaurant->getLongitude(),
                 'distance_km' => ($distance !== null) ? round((float)$distance, 2) : null,
-                'event_status'=> $status // <--- ON AJOUTE L'INFO ICI !
+                'event_status'=> $status,
+                'events'      => $eventsData
             ];
         }
         return new JsonResponse($data);
