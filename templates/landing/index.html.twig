@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Miam'Up - Découvrez les meilleurs restaurants{% endblock %}
+
+{% block body %}
+<div class="min-h-screen flex flex-col items-center justify-center bg-[#F8F8F8]">
+
+    <div class="text-center">
+        <h1 class="text-5xl font-bold text-[#4A4A4A] mb-4">🍽️ Miam'Up</h1>
+        <p class="text-lg text-[#4A4A4A]/70 mb-10">Découvrez les meilleurs restaurants autour de vous.</p>
+
+        <div class="flex gap-4 justify-center">
+            <a href="{{ path('app_utilisateur_login') }}"
+               class="px-8 py-3 bg-[#00A9A5] text-white font-medium rounded-xl hover:bg-[#008F8C] transition-colors">
+                Se connecter
+            </a>
+            <a href="{{ path('app_utilisateur_register') }}"
+               class="px-8 py-3 border-2 border-[#00A9A5] text-[#00A9A5] font-medium rounded-xl hover:bg-[#84DCCF]/15 transition-colors">
+                S'inscrire
+            </a>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
