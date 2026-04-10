@@ -29,8 +29,7 @@ class Evenement
     #[ORM\Column(nullable: true)]
     private ?int $nombre_places = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $participants = null;
+
 
     /**
      * @var Collection<int, Utilisateur>
@@ -48,6 +47,9 @@ class Evenement
 
     #[ORM\Column(nullable: true)]
     private ?\DateTime $date_fin = null;
+
+    #[ORM\ManyToOne(inversedBy: 'evenementsCrees')]
+    private ?Utilisateur $createur = null;
 
     public function __construct()
     {
@@ -95,17 +97,6 @@ class Evenement
         return $this;
     }
 
-    public function getParticipants(): ?string
-    {
-        return $this->participants;
-    }
-
-    public function setParticipants(?string $participants): static
-    {
-        $this->participants = $participants;
-
-        return $this;
-    }
 
     /**
      * @return Collection<int, Utilisateur>
@@ -163,6 +154,18 @@ class Evenement
     public function setDateFin(?\DateTime $date_fin): static
     {
         $this->date_fin = $date_fin;
+
+        return $this;
+    }
+
+    public function getCreateur(): ?Utilisateur
+    {
+        return $this->createur;
+    }
+
+    public function setCreateur(?Utilisateur $createur): static
+    {
+        $this->createur = $createur;
 
         return $this;
     }

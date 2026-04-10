@@ -146,14 +146,59 @@ const MapComponent = ({ magasins: magasinsInitiaux }) => {
                         icon={getMarkerIcon(magasin.event_status)}
                     >
                         <Popup>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', minWidth: '150px' }}>
-                                <b style={{ fontSize: '1.1rem', color: '#1f2937' }}>{magasin.nom}</b>
-                                <span style={{ color: '#4f46e5', fontWeight: '600', fontSize: '0.9rem' }}>
-                                    📍 {(magasin.distance_km !== undefined && magasin.distance_km !== null)
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', minWidth: '200px' }}>
+                                <b style={{ fontSize: '1.1rem', color: '#1f2937' }}>
+                                    {magasin.nom} (ID: {magasin.id} | Statut: {magasin.event_status})
+                                </b>
+
+                                <span style={{ color: '#4f46e5', fontWeight: '600', fontSize: '0.85rem' }}>
+            📍 {(magasin.distance_km !== undefined && magasin.distance_km !== null)
                                     ? `à ${Number(magasin.distance_km).toFixed(1)} km`
                                     : 'Distance non calculée'
                                 }
-                                </span>
+        </span>
+
+                                {/* --- SECTION ÉVÉNEMENT (Si présent) --- */}
+                                {magasin.events && magasin.events.length > 0 && (
+                                    <div style={{ borderTop: '1px solid #eee', pt: '8px', marginTop: '5px' }}>
+                                        {magasin.events.map((event) => (
+                                            <div key={event.id} style={{ marginBottom: '10px' }}>
+                                                <div style={{ fontWeight: 'bold', fontSize: '0.9rem' }}>🔥 {event.titre}</div>
+
+                                                {/* Liste des participants */}
+                                                <ul style={{ listStyle: 'none', padding: 0, margin: '5px 0', fontSize: '0.8rem' }}>
+                                                    {event.participants.map(p => (
+                                                        <li key={p.id} style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px dashed #eee' }}>
+                                                            <span>{p.prenom}</span>
+                                                            {p.id === event.createur_id && (
+                                                                <span style={{ color: '#d97706', fontWeight: 'bold' }}>⭐ Orga</span>
+                                                            )}
+                                                        </li>
+                                                    ))}
+                                                </ul>
+
+                                                {/* Bouton Rejoindre/Quitter */}
+                                                <a href={`/event/join/${event.id}`}
+                                                   style={{
+                                                       display: 'block',
+                                                       textAlign: 'center',
+                                                       padding: '4px',
+                                                       borderRadius: '4px',
+                                                       textDecoration: 'none',
+                                                       fontSize: '0.8rem',
+                                                       backgroundColor: event.is_joined ? '#fee2e2' : '#dbeafe',
+                                                       color: event.is_joined ? '#dc2626' : '#2563eb',
+                                                       fontWeight: 'bold',
+                                                       border: '1px solid currentColor'
+                                                   }}>
+                                                    {event.is_joined ? 'Quitter' : 'Rejoindre'}
+                                                </a>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {/* --- BOUTON DE TON COLLÈGUE (Gardé intact) --- */}
                                 <button
                                     onClick={() => console.log("ID envoyé :", magasin.id)}
                                     style={{
@@ -164,10 +209,11 @@ const MapComponent = ({ magasins: magasinsInitiaux }) => {
                                         padding: '8px',
                                         borderRadius: '4px',
                                         cursor: 'pointer',
-                                        textAlign: 'center'
+                                        textAlign: 'center',
+                                        fontWeight: 'bold'
                                     }}
                                 >
-                                    Voir détails
+                                    Voir détails du Restaurant
                                 </button>
                             </div>
                         </Popup>

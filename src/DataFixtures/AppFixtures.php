@@ -73,23 +73,23 @@ class AppFixtures extends Fixture
             $types[] = $type;
         }
 
-        // --- Restaurants (Tes originaux + mes ajouts de test) ---
+        // --- Restaurants  ---
         $restaurantsData = [
             // TES ORIGINAUX (On n'y touche pas)
             ['nom'=>'EcullyTacos', 'adresse'=>'20 Avenue des sources, 69130 Écully', 'lat'=>45.7777, 'lng'=>4.7795, 'event' => null],
-            ['nom'=>'EcullyPizza', 'adresse'=>'480 Avenue Ben Gourion, 69009 Lyon', 'lat'=>45.78828, 'lng'=>4.78720, 'event' => 'today'],
+            ['nom'=>'EcullyPizza', 'adresse'=>'480 Avenue Ben Gourion, 69009 Lyon', 'lat'=>45.78828, 'lng'=>4.78720, 'event' => null],
             ['nom'=>'Lyon9Tacos', 'adresse'=>'43 Rue du Sergent Michel Berthet, 69009 Lyon', 'lat'=>45.7809, 'lng'=>4.8049, 'event' => null],
-            ['nom'=>'Lyon9Pizza', 'adresse'=>'30 Rue du Sergent Michel Berthet, 69009 Lyon', 'lat'=>45.7813, 'lng'=>4.8038, 'event' => 'soon'],
+            ['nom'=>'Lyon9Pizza', 'adresse'=>'30 Rue du Sergent Michel Berthet, 69009 Lyon', 'lat'=>45.7813, 'lng'=>4.8038, 'event' => null],
             ['nom'=>'RilleuxTacos', 'adresse'=>'8 Avenue des Nations, 69140 Rillieux-la-Pape', 'lat'=>45.8270, 'lng'=>4.8990, 'event' => null],
-            ['nom'=>'RilleuxPizza', 'adresse'=>'20 Avenue des Nations, 69140 Rillieux-la-Pape', 'lat'=>45.8250, 'lng'=>4.9040, 'event' => 'soon'],
+            ['nom'=>'RilleuxPizza', 'adresse'=>'20 Avenue des Nations, 69140 Rillieux-la-Pape', 'lat'=>45.8250, 'lng'=>4.9040, 'event' => null],
             ['nom'=>'Lyon8Tacos', 'adresse'=>'120 Avenue Paul Santy, 69008 Lyon', 'lat'=>45.7286, 'lng'=>4.8743, 'event' => null],
-            ['nom'=>'Lyon8Pizza', 'adresse'=>'130 Avenue Paul Santy, 69008 Lyon', 'lat'=>45.7285, 'lng'=>4.8766, 'event' => 'today'],
+            ['nom'=>'Lyon8Pizza', 'adresse'=>'130 Avenue Paul Santy, 69008 Lyon', 'lat'=>45.7285, 'lng'=>4.8766, 'event' => null],
             ['nom'=>'VilletteTacos', 'adresse'=>'30 rue des Serventières, 38200 Villette‑de‑Vienne', 'lat'=>45.5894, 'lng'=>4.9150, 'event' => null],
-            ['nom'=>'VilettePizza', 'adresse'=>'147 route de Marennes, 38200 Villette‑de‑Vienne', 'lat'=>45.5920, 'lng'=>4.9170, 'event' => 'today'],
+            ['nom'=>'VilettePizza', 'adresse'=>'147 route de Marennes, 38200 Villette‑de‑Vienne', 'lat'=>45.5920, 'lng'=>4.9170, 'event' => null],
 
             // MES AJOUTS DE TEST (Pour voir les couleurs)
-            ['nom'=>'TEST_ORANGE_BURGERS', 'adresse'=>'Test Today', 'lat'=>45.7785, 'lng'=>4.7800, 'event' => 'today'],
-            ['nom'=>'TEST_VERT_SUSHI', 'adresse'=>'Test Soon', 'lat'=>45.7820, 'lng'=>4.8060, 'event' => 'soon'],
+            ['nom'=>'TEST_ORANGE_BURGERS', 'adresse'=>'Test Today', 'lat'=>45.7785, 'lng'=>4.7800, 'event' => null],
+            ['nom'=>'TEST_VERT_SUSHI', 'adresse'=>'Test Soon', 'lat'=>45.7820, 'lng'=>4.8060, 'event' => null],
         ];
 
         $restaurants = [];
@@ -111,7 +111,7 @@ class AppFixtures extends Fixture
             $manager->persist($resto);
             $restaurants[] = $resto;
 
-            // --- NOUVELLE LOGIQUE D'ÉVÉNEMENT (Semaine 1) ---
+            /* // --- NOUVELLE LOGIQUE D'ÉVÉNEMENT (Semaine 1) ---
             if ($data['event'] === 'today') {
                 $ev = new Evenement();
                 $ev->setTitre("🔥 Soirée Spéciale " . $data['nom']);
@@ -130,7 +130,7 @@ class AppFixtures extends Fixture
                 $ev->setNombrePlaces(50);
                 $ev->setRestaurant($resto);
                 $manager->persist($ev);
-            }
+            }*/
         }
 
         // --- Utilisateurs ---
@@ -178,5 +178,17 @@ class AppFixtures extends Fixture
         }
 
         $manager->flush();
+
+        // --- INSCRIPTION AUX ÉVÉNEMENTS ---
+        $tousLesEvenements = $manager->getRepository(Evenement::class)->findAll();
+
+        foreach ($tousLesEvenements as $ev) {
+            $nbInscrits = rand(2, 5);
+            $inscritsAuHasard = $faker->randomElements($utilisateurs, $nbInscrits);
+
+            foreach ($inscritsAuHasard as $userInscrit) {
+                $ev->addUtilisateur($userInscrit);
+            }
+        }
     }
 }
