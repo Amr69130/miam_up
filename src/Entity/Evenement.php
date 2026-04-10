@@ -48,6 +48,9 @@ class Evenement
     #[ORM\Column(nullable: true)]
     private ?\DateTime $date_fin = null;
 
+    #[ORM\ManyToOne(inversedBy: 'evenementsCrees')]
+    private ?Utilisateur $createur = null;
+
     public function __construct()
     {
         $this->utilisateurs = new ArrayCollection();
@@ -151,6 +154,18 @@ class Evenement
     public function setDateFin(?\DateTime $date_fin): static
     {
         $this->date_fin = $date_fin;
+
+        return $this;
+    }
+
+    public function getCreateur(): ?Utilisateur
+    {
+        return $this->createur;
+    }
+
+    public function setCreateur(?Utilisateur $createur): static
+    {
+        $this->createur = $createur;
 
         return $this;
     }

@@ -25,6 +25,8 @@ class EvenementController extends AbstractController
             // Optionnel : On peut quand même noter QUI a créé l'événement
             // si tu as un champ 'createur' dans ton entité.
 
+            $evenement->setCreateur($this->getUser());
+
             $em->persist($evenement);
             $em->flush();
 
@@ -49,15 +51,20 @@ class EvenementController extends AbstractController
             return $this->redirectToRoute('app_utilisateur_login');
         }
 
-        // 2. Vérification d'Unicité (avec la VRAIE relation de Ghouti)
+        // 2. Vérification d'Unicité
         if ($event->getUtilisateurs()->contains($user)) {
-            // Si déjà inscrit -> on le désinscrit (toggle)
+            // Cas : L'utilisateur est DÉJÀ inscrit -> on le retire
             $event->removeUtilisateur($user);
-            $user->addEvenement($event);
+            // On s'assure que l'autre côté de la relation est aussi au courant
+            $user->removeEvenement($event);
+
             $this->addFlash('warning', 'Vous êtes désinscrit de l\'événement.');
         } else {
-            // Si nouveau -> on l'inscrit
+            // Cas : L'utilisateur n'est PAS inscrit -> on l'ajoute
             $event->addUtilisateur($user);
+            // On s'assure que l'autre côté de la relation est aussi au courant
+            $user->addEvenement($event);
+
             $this->addFlash('success', 'Vous êtes bien inscrit à l\'événement !');
         }
 
