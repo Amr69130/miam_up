@@ -35,4 +35,26 @@ export default class extends Controller {
     close() {
         this.containerTarget.innerHTML = '';
     }
+
+    switchTab(event) {
+        event.preventDefault();
+        const tabName = event.currentTarget.dataset.tab;
+        
+        // Masquer tous les contenus
+        this.element.querySelectorAll('[data-tab-content]').forEach(el => el.classList.add('hidden'));
+        
+        // Afficher le contenu ciblé
+        const target = this.element.querySelector(`[data-tab-content="${tabName}"]`);
+        if (target) {
+            target.classList.remove('hidden');
+        }
+
+        // Réinitialiser le style de tous les onglets
+        this.element.querySelectorAll('[data-tab]').forEach(el => {
+            el.className = "text-gray-700 font-medium text-sm hover:text-gray-900 pb-3 -mb-[13px] border-b-2 border-transparent transition-colors cursor-pointer";
+        });
+
+        // Appliquer le style actif
+        event.currentTarget.className = "text-[#20B2AA] font-medium text-sm border-b-2 border-[#20B2AA] pb-3 -mb-[13px] transition-colors cursor-pointer";
+    }
 }

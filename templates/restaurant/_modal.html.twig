@@ -53,14 +53,17 @@
             <!-- Onglets (Navigation) -->
             <div class="border-y border-black mt-1 mb-4">
                 <nav class="flex justify-between items-center px-2 py-3">
-                    <a href="#" class="text-[#20B2AA] font-medium text-sm border-b-2 border-[#20B2AA] pb-3 -mb-[13px]">Présentation</a>
-                    <a href="#" class="text-gray-700 font-medium text-sm hover:text-gray-900 pb-3 -mb-[13px]">Menu</a>
-                    <a href="#" class="text-gray-700 font-medium text-sm hover:text-gray-900 pb-3 -mb-[13px]">Evenements</a>
+                    <a data-action="click->restaurant-modal#switchTab" data-tab="presentation" class="text-[#20B2AA] font-medium text-sm border-b-2 border-[#20B2AA] pb-3 -mb-[13px] transition-colors cursor-pointer">Présentation</a>
+                    <a data-action="click->restaurant-modal#switchTab" data-tab="menu" class="text-gray-700 font-medium text-sm hover:text-gray-900 pb-3 -mb-[13px] border-b-2 border-transparent transition-colors cursor-pointer">Menu</a>
+                    <a data-action="click->restaurant-modal#switchTab" data-tab="events" class="text-gray-700 font-medium text-sm hover:text-gray-900 pb-3 -mb-[13px] border-b-2 border-transparent transition-colors cursor-pointer">Evénements</a>
                 </nav>
             </div>
 
-            <!-- Liste des informations -->
-            <div class="flex flex-col gap-3 mb-6">
+            <!-- Contenu des onglets -->
+            <!-- Contenu : Présentation -->
+            <div data-tab-content="presentation" class="block">
+                <!-- Liste des informations -->
+                <div class="flex flex-col gap-3 mb-6">
                 <!-- Adresse -->
                 {% if restaurant.adresseRestaurant %}
                 <div class="flex items-start gap-3">
@@ -114,6 +117,68 @@
                 </p>
             </div>
             {% endif %}
+            
+            </div> <!-- Fin du contenu Présentation -->
+
+            <!-- Contenu : Menu -->
+            <div data-tab-content="menu" class="hidden">
+                {% if restaurant.carteMenu %}
+                    <img src="{{ restaurant.carteMenu }}" alt="Menu du restaurant" class="w-full h-auto rounded-lg shadow-sm border border-gray-100 object-contain">
+                {% else %}
+                    <div class="text-center text-gray-500 py-10 text-sm">
+                        Aucun menu n'a encore été mis en ligne.
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Contenu : Événements -->
+            <div data-tab-content="events" class="hidden">
+                 {% if restaurant.evenements is not empty %}
+                    <div class="flex flex-col gap-4 mt-2 mb-6">
+                        {% for evenement in restaurant.evenements %}
+                            <div class="bg-gray-600 rounded-xl p-4 shadow-sm flex flex-col gap-5 text-white">
+                                <!-- Titre de l'événement -->
+                                <h4 class="text-center font-bold text-[16px] text-white">
+                                    {{ evenement.titre }}
+                                </h4>
+                                
+                                <div class="flex flex-col gap-4">
+                                    <!-- 1ère ligne -->
+                                    <div class="flex justify-between items-center text-[13px]">
+                                        <div class="text-red-400 font-medium">
+                                            {# Calcul indicatif si l'entité permet de soustraire les participants #}
+                                            Places restantes : <span class="font-normal">{{ (evenement.nombrePlaces|default(12)) - (evenement.utilisateurs|length) }}/{{ evenement.nombrePlaces|default(12) }}</span>
+                                        </div>
+                                        <div class="text-white font-normal">
+                                            Heure de rdv : {{ evenement.dateEvenement ? evenement.dateEvenement|date('G\\h') : 'N/C' }}
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- 2ème ligne -->
+                                    <div class="flex justify-between items-center">
+                                        <div class="text-gray-400 text-[13px] font-normal">
+                                            {% if evenement.dateEvenement %}
+                                                {% set days = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'] %}
+                                                {% set months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'] %}
+                                                {{ days[evenement.dateEvenement|date('w')] }} {{ evenement.dateEvenement|date('j') }} {{ months[evenement.dateEvenement|date('n') - 1] }} {{ evenement.dateEvenement|date('Y') }}
+                                            {% else %}
+                                                Date non définie
+                                            {% endif %}
+                                        </div>
+                                        <div class="text-white font-medium text-[14px]">
+                                            500 m
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="text-center text-gray-500 py-10 text-sm">
+                        Aucun événement à venir.
+                    </div>
+                {% endif %}
+            </div>
 
         </div>
     </div>
