@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>{% block title %}Miam Up{% endblock %}</title>
         <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>🍽️</text></svg>">
-        
+
         {% block stylesheets %}
             {{ encore_entry_link_tags('app') }}
         {% endblock %}
@@ -17,6 +17,22 @@
         {% endblock %}
     </head>
     <body class="bg-gray-50">
+    {# --- BLOC DES MESSAGES FLASH (TAILWIND) --- #}
+    <div class="fixed top-4 right-4 z-[9999] flex flex-col gap-3">
+        {% for label, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="rounded-lg p-4 shadow-xl text-white font-semibold min-w-[300px] border-l-4"
+                     style="background-color: {{ label == 'success' ? '#10b981' : (label == 'danger' ? '#f43f5e' : '#f59e0b') }};
+                         border-color: rgba(0,0,0,0.2);">
+                    <div class="flex justify-between items-center">
+                        <span>{{ message }}</span>
+                        <span class="ml-4 opacity-70">&times;</span>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endfor %}
+    </div>
+    {# ------------------------------------------ #}
         {% block body %}{% endblock %}
     </body>
 </html>
