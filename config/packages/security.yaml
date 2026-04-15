@@ -53,6 +53,7 @@ security:
         - { path: ^/restaurants, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/restaurant/, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/carte, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/favoris, roles: IS_AUTHENTICATED_FULLY }
 
 when@test:
     security:
