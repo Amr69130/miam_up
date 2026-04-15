@@ -57,4 +57,28 @@ export default class extends Controller {
         // Appliquer le style actif
         event.currentTarget.className = "text-[#20B2AA] font-medium text-sm border-b-2 border-[#20B2AA] pb-3 -mb-[13px] transition-colors cursor-pointer";
     }
+
+    openEventModal(event) {
+        const id = event.currentTarget.dataset.eventId;
+        if (!id) return;
+        const modal = document.getElementById(`event-modal-${id}`);
+        if (modal) {
+            modal.classList.remove('hidden');
+        }
+    }
+
+    closeEventModal(event) {
+        const id = event.currentTarget.dataset.eventId;
+        if (!id) return;
+        const modal = document.getElementById(`event-modal-${id}`);
+        if (modal) {
+            modal.classList.add('hidden');
+        }
+    }
+
+    closeEventModalOutside(event) {
+        if (event.target === event.currentTarget) {
+            event.currentTarget.classList.add('hidden');
+        }
+    }
 }
