@@ -168,10 +168,52 @@ const MapComponent = ({ magasins: magasinsInitiaux }) => {
                                                 {/* Liste des participants */}
                                                 <ul style={{ listStyle: 'none', padding: 0, margin: '5px 0', fontSize: '0.8rem' }}>
                                                     {event.participants.map(p => (
-                                                        <li key={p.id} style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px dashed #eee' }}>
-                                                            <span>{p.prenom}</span>
-                                                            {p.id === event.createur_id && (
-                                                                <span style={{ color: '#d97706', fontWeight: 'bold' }}>⭐ Orga</span>
+                                                        <li key={p.id} style={{
+                                                            display: 'flex',
+                                                            justifyContent: 'space-between',
+                                                            alignItems: 'center',
+                                                            padding: '4px 0',
+                                                            borderBottom: '1px dashed #eee'
+                                                        }}>
+                                                            {/* Gauche : Prénom et Badge Orga */}
+                                                            <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                <span style={{ fontWeight: p.is_me ? 'bold' : 'normal' }}>
+                    {p.prenom} {p.is_me && "(Moi)"}
+                </span>
+                                                                {p.id === event.createur_id && (
+                                                                    <span style={{ color: '#d97706', fontSize: '0.7rem', fontWeight: 'bold' }}>⭐ Orga</span>
+                                                                )}
+                                                            </div>
+
+                                                            {/* Droite : Logique Sociale (uniquement si ce n'est pas moi) */}
+                                                            {!p.is_me && (
+                                                                <div className="friend-action">
+                                                                    {/* On ajoute ?. pour éviter le crash si friendship est undefined */}
+                                                                    {p.friendship?.status === 'accepte' ? (
+                                                                        <span style={{ color: '#059669', fontWeight: 'bold', fontSize: '0.7rem' }}>✓ Ami</span>
+                                                                    ) : p.friendship?.status === 'en_attente' ? (
+                                                                        p.friendship?.am_i_sender ? (
+                                                                            <span style={{ color: '#6b7280', fontStyle: 'italic', fontSize: '0.7rem' }}>Attente...</span>
+                                                                        ) : (
+                                                                            <a href="/profil/amis" style={{
+                                                                                backgroundColor: '#4f46e5', color: 'white', padding: '2px 8px',
+                                                                                borderRadius: '4px', textDecoration: 'none', fontSize: '0.7rem',
+                                                                                fontWeight: 'bold'
+                                                                            }}>Répondre</a>
+                                                                        )
+                                                                    ) : (
+                                                                        /* Si p.friendship existe mais status est null, OU si p.friendship n'existe pas du tout */
+                                                                        <a href={`/ami/add/${p.id}`}
+                                                                           style={{
+                                                                               color: '#4f46e5',
+                                                                               textDecoration: 'none',
+                                                                               fontWeight: 'bold',
+                                                                               fontSize: '1.1rem',
+                                                                               padding: '0 5px'
+                                                                           }}
+                                                                           title="Ajouter en ami">+</a>
+                                                                    )}
+                                                                </div>
                                                             )}
                                                         </li>
                                                     ))}

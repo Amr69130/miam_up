@@ -57,4 +57,73 @@ class AmiController extends AbstractController
         $this->addFlash('success', 'Demande envoyée !');
         return $this->redirectToRoute('app_home');
     }
+
+
+    #[Route('/profil/amis', name: 'app_ami_list')]
+    public function list(AmitieRepository $amitieRepository): Response
+    {
+        $user = $this->getUser();
+
+        // 1. Demandes que j'ai REÇUES (en attente)
+        $demandesRecues = $amitieRepository->findBy([
+            'utilisateur_receveur' => $user,
+            'statut' => 'en_attente'
+        ]);
+
+        // 2. Demandes que j'ai FAITES (en attente) --- NOUVEAU ---
+        $demandesEnvoyees = $amitieRepository->findBy([
+            'utilisateur_demandeur' => $user,
+            'statut' => 'en_attente'
+        ]);
+
+        // 3. Mes amis (acceptés)
+        $amis = $amitieRepository->createQueryBuilder('a')
+            ->where('(a.utilisateur_demandeur = :user OR a.utilisateur_receveur = :user)')
+            ->andWhere('a.statut = :statut')
+            ->setParameter('user', $user)
+            ->setParameter('statut', 'accepte')
+            ->getQuery()
+            ->getResult();
+
+        return $this->render('ami/index.html.twig', [
+            'demandes_recues' => $demandesRecues,
+            'demandes_envoyees' => $demandesEnvoyees, // On l'envoie à la vue
+            'amis' => $amis,
+        ]);
+    }
+
+    #[Route('/ami/accept/{id}', name: 'app_ami_accept')]
+    public function accept(Amitie $amitie, EntityManagerInterface $em): Response
+    {
+        // Sécurité : Seul le receveur peut accepter
+        if ($amitie->getUtilisateurReceveur() !== $this->getUser()) {
+            $this->addFlash('danger', "Vous ne pouvez pas accepter cette demande.");
+            return $this->redirectToRoute('app_ami_list');
+        }
+
+        $amitie->setStatut('accepte');
+        $em->flush();
+
+        $this->addFlash('success', "Vous êtes maintenant ami avec " . $amitie->getUtilisateurDemandeur()->getPrenomUtilisateur());
+
+        return $this->redirectToRoute('app_ami_list');
+    }
+
+    #[Route('/ami/reject/{id}', name: 'app_ami_reject')]
+    public function reject(Amitie $amitie, EntityManagerInterface $em): Response
+    {
+        // Sécurité : Seul le receveur peut refuser
+        if ($amitie->getUtilisateurReceveur() !== $this->getUser()) {
+            $this->addFlash('danger', "Action non autorisée.");
+            return $this->redirectToRoute('app_ami_list');
+        }
+
+        // On supprime carrément la ligne pour permettre de redemander plus tard
+        $em->remove($amitie);
+        $em->flush();
+
+        $this->addFlash('secondary', "Demande refusée.");
+
+        return $this->redirectToRoute('app_ami_list');
+    }
 }
