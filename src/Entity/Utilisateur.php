@@ -80,6 +80,12 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Message::class, mappedBy: 'expediteur')]
     private Collection $messages_envoyes;
 
+    /**
+     * @var Collection<int, Evenement>
+     */
+    #[ORM\OneToMany(targetEntity: Evenement::class, mappedBy: 'createur')]
+    private Collection $evenementsCrees;
+
     public function __construct()
     {
         $this->role = new ArrayCollection();
@@ -87,6 +93,7 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         $this->evenements = new ArrayCollection();
         $this->conversations = new ArrayCollection();
         $this->messages_envoyes = new ArrayCollection();
+        $this->evenementsCrees = new ArrayCollection();
     }
 
     // ===== UserInterface & PasswordAuthenticatedUserInterface =====
@@ -171,4 +178,34 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     public function getMessagesEnvoyes(): Collection { return $this->messages_envoyes; }
     public function addMessagesEnvoye(Message $messagesEnvoye): static { if (!$this->messages_envoyes->contains($messagesEnvoye)) { $this->messages_envoyes->add($messagesEnvoye); $messagesEnvoye->setExpediteur($this); } return $this; }
     public function removeMessagesEnvoye(Message $messagesEnvoye): static { if ($this->messages_envoyes->removeElement($messagesEnvoye)) { if ($messagesEnvoye->getExpediteur() === $this) $messagesEnvoye->setExpediteur(null); } return $this; }
+
+    /**
+     * @return Collection<int, Evenement>
+     */
+    public function getEvenementsCrees(): Collection
+    {
+        return $this->evenementsCrees;
+    }
+
+    public function addEvenementsCree(Evenement $evenementsCree): static
+    {
+        if (!$this->evenementsCrees->contains($evenementsCree)) {
+            $this->evenementsCrees->add($evenementsCree);
+            $evenementsCree->setCreateur($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEvenementsCree(Evenement $evenementsCree): static
+    {
+        if ($this->evenementsCrees->removeElement($evenementsCree)) {
+            // set the owning side to null (unless already changed)
+            if ($evenementsCree->getCreateur() === $this) {
+                $evenementsCree->setCreateur(null);
+            }
+        }
+
+        return $this;
+    }
 }

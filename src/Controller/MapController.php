@@ -21,18 +21,42 @@ class MapController extends AbstractController
 
         $today = (new \DateTime())->format('Y-m-d');
         $tomorrow = (new \DateTime('+1 day'))->format('Y-m-d');
+        $currentUser = $this->getUser();
 
         foreach ($restaurantsEntities as $resto) {
             if ($resto->getLatitude() && $resto->getLongitude()) {
                 $status = 'standard';
+                $eventsData = [];
+
                 foreach ($resto->getEvenements() as $event) {
                     $eventDate = $event->getDateEvenement()->format('Y-m-d');
+
+                    // Gestion du status pour la couleur du marqueur
                     if ($eventDate === $today) {
                         $status = 'today';
-                        break;
-                    } elseif ($eventDate === $tomorrow) {
+                    } elseif ($eventDate === $tomorrow && $status !== 'today') {
                         $status = 'soon';
                     }
+
+                    // Préparation des participants
+                    $participants = [];
+                    foreach ($event->getUtilisateurs() as $u) {
+                        $participants[] = [
+                            'id'     => $u->getId(),
+                            'prenom' => $u->getPrenomUtilisateur(),
+                            'nom'    => $u->getNomUtilisateur(),
+                        ];
+                    }
+
+                    $eventsData[] = [
+                        'id' => $event->getId(),
+                        'titre' => $event->getTitre(),
+                        'date' => $event->getDateEvenement()->format('d/m H:i'),
+                        'description' => $event->getDescriptionEvenement(),
+                        'createur_id' => $event->getCreateur() ? $event->getCreateur()->getId() : null,
+                        'participants' => $participants,
+                        'is_joined' => $currentUser ? $event->getUtilisateurs()->contains($currentUser) : false
+                    ];
                 }
 
                 $restaurantsData[] = [
@@ -41,6 +65,7 @@ class MapController extends AbstractController
                     'lat'  => $resto->getLatitude(),
                     'lng'  => $resto->getLongitude(),
                     'event_status' => $status,
+                    'events' => $eventsData,
                 ];
             }
         }
@@ -55,10 +80,17 @@ class MapController extends AbstractController
     {
         $evenement = new Evenement();
         $form = $this->createForm(EvenementType::class, $evenement);
-
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $user = $this->getUser();
+
+            // 1. On définit le créateur (pour le badge ⭐)
+            $evenement->setCreateur($user);
+
+            // 2. On s'ajoute AUSSI comme participant (pour ne pas voir "Rejoindre")
+            $evenement->addUtilisateur($user);
+
             $em->persist($evenement);
             $em->flush();
 
