@@ -58,8 +58,15 @@ final class RestaurantController extends AbstractController
     }
 
     #[Route('/restaurant/{id}', name: 'restaurant_show')]
-    public function show(Restaurant $restaurant): Response
+    public function show(int $id, RestaurantRepository $restaurantRepository): Response
     {
+        // On récupère un restaurant spécifique par son ID (pour une page de détail)
+        $restaurant = $restaurantRepository->find($id);
+
+        if (!$restaurant) {
+            throw $this->createNotFoundException("Le restaurant n'existe pas.");
+        }
+
         return $this->render('restaurant/show.html.twig', [
             'restaurant' => $restaurant,
         ]);
@@ -110,21 +117,6 @@ final class RestaurantController extends AbstractController
         ]);
     }
 
-    #[Route('/restaurant/{id}', name: 'restaurant_show')]
-    public function show(int $id, RestaurantRepository $restaurantRepository): Response
-    {
-        // On récupère un restaurant spécifique par son ID (pour une page de détail)
-        $restaurant = $restaurantRepository->find($id);
-
-        if (!$restaurant) {
-            throw $this->createNotFoundException("Le restaurant n'existe pas.");
-        }
-
-        return $this->render('restaurant/show.html.twig', [
-            'restaurant' => $restaurant,
-        ]);
-    }
-    
     #[Route('/panneau/avis', name: 'app_panneau_avis')]
     public function avis(): Response
     {
