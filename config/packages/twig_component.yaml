@@ -1,5 +1,3 @@
 twig_component:
-    anonymous_template_directory: 'components/'
-    defaults:
-        # Namespace & directory for components
-        App\Twig\Components\: 'components/'
+    # Permet de retrouver les composants fournis par EasyAdmin
+    anonymous_template_directory: '%kernel.project_dir%/vendor/easycorp/easyadmin-bundle/src/Resources/views/components'
