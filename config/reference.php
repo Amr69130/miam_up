@@ -1566,11 +1566,18 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     monolog?: MonologConfig,
  *     twig_component?: TwigComponentConfig,
  *     webpack_encore?: WebpackEncoreConfig,
+<<<<<<< HEAD
  *     symfonycasts_tailwind?: SymfonycastsTailwindConfig,
  *     knpu_oauth2_client?: KnpuOauth2ClientConfig,
  *     "when@dev"?: array{
  *         imports?: ImportsConfig,
  *         parameters?: ParametersConfig,
+=======
+ *     symfonycasts_tailwind?: SymfonycastsTailwindConfig,
+ *     "when@dev"?: array{
+ *         imports?: ImportsConfig,
+ *         parameters?: ParametersConfig,
+>>>>>>> feature/page_acceuil
  *         services?: ServicesConfig,
  *         framework?: FrameworkConfig,
  *         doctrine?: DoctrineConfig,
@@ -1586,12 +1593,20 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         maker?: MakerConfig,
  *         twig_component?: TwigComponentConfig,
  *         webpack_encore?: WebpackEncoreConfig,
+<<<<<<< HEAD
  *         symfonycasts_tailwind?: SymfonycastsTailwindConfig,
  *         knpu_oauth2_client?: KnpuOauth2ClientConfig,
  *     },
  *     "when@prod"?: array{
  *         imports?: ImportsConfig,
  *         parameters?: ParametersConfig,
+=======
+ *         symfonycasts_tailwind?: SymfonycastsTailwindConfig,
+ *     },
+ *     "when@prod"?: array{
+ *         imports?: ImportsConfig,
+ *         parameters?: ParametersConfig,
+>>>>>>> feature/page_acceuil
  *         services?: ServicesConfig,
  *         framework?: FrameworkConfig,
  *         doctrine?: DoctrineConfig,
@@ -1604,12 +1619,20 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         monolog?: MonologConfig,
  *         twig_component?: TwigComponentConfig,
  *         webpack_encore?: WebpackEncoreConfig,
+<<<<<<< HEAD
  *         symfonycasts_tailwind?: SymfonycastsTailwindConfig,
  *         knpu_oauth2_client?: KnpuOauth2ClientConfig,
  *     },
  *     "when@test"?: array{
  *         imports?: ImportsConfig,
  *         parameters?: ParametersConfig,
+=======
+ *         symfonycasts_tailwind?: SymfonycastsTailwindConfig,
+ *     },
+ *     "when@test"?: array{
+ *         imports?: ImportsConfig,
+ *         parameters?: ParametersConfig,
+>>>>>>> feature/page_acceuil
  *         services?: ServicesConfig,
  *         framework?: FrameworkConfig,
  *         doctrine?: DoctrineConfig,
@@ -1623,8 +1646,12 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         monolog?: MonologConfig,
  *         twig_component?: TwigComponentConfig,
  *         webpack_encore?: WebpackEncoreConfig,
+<<<<<<< HEAD
  *         symfonycasts_tailwind?: SymfonycastsTailwindConfig,
  *         knpu_oauth2_client?: KnpuOauth2ClientConfig,
+=======
+ *         symfonycasts_tailwind?: SymfonycastsTailwindConfig,
+>>>>>>> feature/page_acceuil
  *     },
  *     ...<string, ExtensionType|array{ // extra keys must follow the when@%env% pattern or match an extension alias
  *         imports?: ImportsConfig,
@@ -1704,6 +1731,7 @@ namespace Symfony\Component\Routing\Loader\Configurator;
  *     alias: string,
  *     deprecated?: array{package:string, version:string, message?:string},
  * }
+
  * @psalm-type RoutesConfig = array{
  *     "when@dev"?: array<string, RouteConfig|ImportConfig|AliasConfig>,
  *     "when@prod"?: array<string, RouteConfig|ImportConfig|AliasConfig>,

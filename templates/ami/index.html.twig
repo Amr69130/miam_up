@@ -1,0 +1,77 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes Amis{% endblock %}
+
+{% block body %}
+    <div class="max-w-4xl mx-auto p-6">
+        <h1 class="text-3xl font-bold mb-8 text-indigo-700">🤝 Espace Social</h1>
+
+        {# 1. SECTION DEMANDES REÇUES (À ACCEPTER) #}
+        <div class="bg-white shadow-md rounded-lg p-6 mb-8 border-l-4 border-yellow-400">
+            <h2 class="text-xl font-semibold mb-4 text-gray-800 flex items-center gap-2">
+                <span>📥</span> Demandes en attente
+            </h2>
+            {% if demandes_recues is empty %}
+                <p class="text-gray-500 italic">Aucune nouvelle demande pour le moment.</p>
+            {% else %}
+                <ul class="divide-y divide-gray-200">
+                    {% for demande in demandes_recues %}
+                        <li class="py-4 flex items-center justify-between">
+                            <span class="font-medium text-lg text-gray-900">{{ demande.utilisateurDemandeur.prenomUtilisateur }}</span>
+                            <div class="flex gap-2">
+                                <a href="{{ path('app_ami_accept', {'id': demande.id}) }}" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-md font-bold transition shadow-sm">Accepter</a>
+                                <a href="{{ path('app_ami_reject', {'id': demande.id}) }}" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md font-bold transition shadow-sm">Refuser</a>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+
+        {# 2. SECTION DEMANDES ENVOYÉES (EN ATTENTE DE LEUR RÉPONSE) #}
+        <div class="bg-white shadow-md rounded-lg p-6 mb-8 border-l-4 border-blue-400">
+            <h2 class="text-xl font-semibold mb-4 text-gray-800 flex items-center gap-2">
+                <span>📤</span> Demandes envoyées
+            </h2>
+            {% if demandes_envoyees is empty %}
+                <p class="text-gray-500 italic">Vous n'avez envoyé aucune demande en attente.</p>
+            {% else %}
+                <ul class="divide-y divide-gray-200">
+                    {% for envoi in demandes_envoyees %}
+                        <li class="py-4 flex items-center justify-between">
+                            <span class="text-gray-700">Vous avez demandé <strong class="text-indigo-600">{{ envoi.utilisateurReceveur.prenomUtilisateur }}</strong></span>
+                            <span class="text-xs font-bold bg-blue-100 text-blue-700 px-3 py-1 rounded-full uppercase tracking-wider">
+                                En attente
+                            </span>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+
+        {# 3. SECTION MES AMIS (DÉJÀ ACCEPTÉS) #}
+        <div class="bg-white shadow-md rounded-lg p-6 border border-gray-100">
+            <h2 class="text-xl font-semibold mb-6 text-gray-800 flex items-center gap-2">
+                <span class="text-2xl">👥</span> Ma liste d'amis
+            </h2>
+
+            {% if amis is empty %}
+                <p class="text-gray-500 italic text-center py-4">Vous n'avez pas encore d'amis dans votre liste.</p>
+            {% else %}
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                    {% for amitie in amis %}
+                        {% set ami = (amitie.utilisateurDemandeur == app.user) ? amitie.utilisateurReceveur : amitie.utilisateurDemandeur %}
+                        <div class="flex items-center justify-between p-4 bg-indigo-50 border border-indigo-100 rounded-xl shadow-sm hover:shadow-md transition">
+                            <span class="font-bold text-indigo-900">
+                                {{ ami.prenomUtilisateur }}
+                            </span>
+                            <span class="text-xs bg-indigo-200 text-indigo-700 px-2 py-1 rounded-full uppercase font-semibold">
+                                Ami
+                            </span>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
