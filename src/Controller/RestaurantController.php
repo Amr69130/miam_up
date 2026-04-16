@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Repository\RestaurantRepository;
+use App\Entity\Restaurant;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -53,6 +54,14 @@ final class RestaurantController extends AbstractController
             'restaurants' => $restaurants,
             'search'      => $search,
             'totalCount'  => count($restaurants),
+        ]);
+    }
+
+    #[Route('/restaurant/{id}', name: 'restaurant_show')]
+    public function show(Restaurant $restaurant): Response
+    {
+        return $this->render('restaurant/show.html.twig', [
+            'restaurant' => $restaurant,
         ]);
     }
 

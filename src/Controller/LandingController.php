@@ -11,7 +11,7 @@ class LandingController extends AbstractController
     #[Route('/', name: 'app_landing')]
     public function index(): Response
     {
-        // Si déjà connecté, rediriger vers l'accueil
+        // Si déjà connecté, rediriger vers le dashboard
         if ($this->getUser()) {
             return $this->redirectToRoute('app_home');
         }
