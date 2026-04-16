@@ -3,32 +3,32 @@
 {% block title %}Connexion - Miam Up{% endblock %}
 
 {% block body %}
-<div class="min-h-screen flex flex-col items-center justify-center p-4">
-    <div class="grid md:grid-cols-2 items-center gap-4 max-md:gap-8 max-w-6xl max-md:max-w-lg w-full p-4 [box-shadow:0_2px_10px_-3px_rgba(6,81,237,0.3)] rounded-md">
+<div class="min-h-screen flex flex-col items-center justify-center p-4 bg-[#F8F8F8]">
+    <div class="grid md:grid-cols-2 items-center gap-4 max-md:gap-8 max-w-6xl max-md:max-w-lg w-full p-4 shadow-lg rounded-2xl bg-white overflow-hidden">
         <div class="md:max-w-md w-full px-4 py-4">
             <form method="POST" action="{{ path('app_utilisateur_login') }}">
                 <div class="mb-12">
-                    <h1 class="text-slate-900 text-3xl font-bold">Connexion</h1>
-                    <p class="text-[15px] mt-6 text-slate-600">Pas encore de compte ? 
-                        <a href="{{ path('app_utilisateur_register') }}" class="text-blue-600 font-medium hover:underline ml-1 whitespace-nowrap">Inscrivez-vous</a>
+                    <h1 class="text-[#4A4A4A] text-3xl font-bold">Connexion</h1>
+                    <p class="text-[15px] mt-6 text-[#4A4A4A]/70">Pas encore de compte ? 
+                        <a href="{{ path('app_utilisateur_register') }}" class="text-[#00A9A5] font-medium hover:underline ml-1 whitespace-nowrap">Inscrivez-vous</a>
                     </p>
                 </div>
 
                 {# Erreur d'authentification Symfony #}
                 {% if error %}
-                    <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-md">
+                    <div class="mb-4 p-4 bg-[#FF6B6B]/10 border border-[#FF6B6B]/30 text-[#FF6B6B] rounded-xl">
                         {{ error.messageKey|trans(error.messageData, 'security') }}
                     </div>
                 {% endif %}
 
                 {# Messages flash #}
                 {% for message in app.flashes('success') %}
-                    <div class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded-md">
+                    <div class="mb-4 p-4 bg-[#84DCCF]/20 border border-[#84DCCF] text-[#00A9A5] rounded-xl">
                         {{ message }}
                     </div>
                 {% endfor %}
                 {% for message in app.flashes('error') %}
-                    <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-md">
+                    <div class="mb-4 p-4 bg-[#FF6B6B]/10 border border-[#FF6B6B]/30 text-[#FF6B6B] rounded-xl">
                         {{ message }}
                     </div>
                 {% endfor %}
@@ -37,9 +37,9 @@
                 <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
 
                 <div>
-                    <label class="text-slate-900 text-[13px] font-medium block mb-2">Email</label>
+                    <label class="text-[#4A4A4A] text-[13px] font-medium block mb-2">Email</label>
                     <div class="relative flex items-center">
-                        <input name="_username" type="email" required value="{{ last_username|default('') }}" autocomplete="email" autofocus class="w-full text-slate-900 text-sm border-b border-slate-300 focus:border-blue-600 pl-2 pr-8 py-3 outline-none" placeholder="Entrez votre email" />
+                        <input name="_username" type="email" required value="{{ last_username|default('') }}" autocomplete="email" autofocus class="w-full text-[#4A4A4A] text-sm border-b border-gray-300 focus:border-[#00A9A5] pl-2 pr-8 py-3 outline-none" placeholder="Entrez votre email" />
                         <svg xmlns="http://www.w3.org/2000/svg" fill="#bbb" stroke="#bbb" class="w-[18px] h-[18px] absolute right-2" viewBox="0 0 682.667 682.667">
                             <defs>
                                 <clipPath id="a" clipPathUnits="userSpaceOnUse">
@@ -55,9 +55,9 @@
                 </div>
 
                 <div class="mt-8">
-                    <label class="text-slate-900 text-[13px] font-medium block mb-2">Mot de passe</label>
+                    <label class="text-[#4A4A4A] text-[13px] font-medium block mb-2">Mot de passe</label>
                     <div class="relative flex items-center">
-                        <input name="_password" type="password" required autocomplete="current-password" class="w-full text-slate-900 text-sm border-b border-slate-300 focus:border-blue-600 pl-2 pr-8 py-3 outline-none" placeholder="Entrez votre mot de passe" />
+                        <input name="_password" type="password" required autocomplete="current-password" class="w-full text-[#4A4A4A] text-sm border-b border-gray-300 focus:border-[#00A9A5] pl-2 pr-8 py-3 outline-none" placeholder="Entrez votre mot de passe" />
                         <svg xmlns="http://www.w3.org/2000/svg" fill="#bbb" stroke="#bbb" class="w-[18px] h-[18px] absolute right-2 cursor-pointer" viewBox="0 0 128 128">
                             <path d="M64 104C22.127 104 1.367 67.496.504 65.943a4 4 0 0 1 0-3.887C1.367 60.504 22.127 24 64 24s62.633 36.504 63.496 38.057a4 4 0 0 1 0 3.887C126.633 67.496 105.873 104 64 104zM8.707 63.994C13.465 71.205 32.146 96 64 96c31.955 0 50.553-24.775 55.293-31.994C114.535 56.795 95.854 32 64 32 32.045 32 13.447 56.775 8.707 63.994zM64 88c-13.234 0-24-10.766-24-24s10.766-24 24-24 24 10.766 24 24-10.766 24-24 24zm0-40c-8.822 0-16 7.178-16 16s7.178 16 16 16 16-7.178 16-16-7.178-16-16-16z"></path>
                         </svg>
@@ -66,34 +66,34 @@
 
                 <div class="flex flex-wrap items-center justify-between gap-4 mt-8">
                     <div class="flex items-center">
-                        <input id="remember-me" name="_remember_me" type="checkbox" class="h-4 w-4 shrink-0 text-blue-600 focus:ring-blue-500 border-slate-300 rounded-sm" />
-                        <label for="remember-me" class="ml-3 block text-sm text-slate-900">
+                        <input id="remember-me" name="_remember_me" type="checkbox" class="h-4 w-4 shrink-0 text-[#00A9A5] focus:ring-[#84DCCF] border-gray-300 rounded-sm" />
+                        <label for="remember-me" class="ml-3 block text-sm text-[#4A4A4A]">
                             Se souvenir de moi
                         </label>
                     </div>
                     <div>
-                        <a href="#" class="text-blue-600 font-medium text-sm hover:underline">
+                        <a href="#" class="text-[#00A9A5] font-medium text-sm hover:underline">
                             Mot de passe oublié ?
                         </a>
                     </div>
                 </div>
 
                 <div class="mt-12">
-                    <button type="submit" class="w-full shadow-xl py-2.5 px-4 text-sm font-medium tracking-wide rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none cursor-pointer">
+                    <button type="submit" class="w-full shadow-xl py-2.5 px-4 text-sm font-medium tracking-wide rounded-xl text-white bg-[#00A9A5] hover:bg-[#008F8C] focus:outline-none cursor-pointer transition-colors">
                         Se connecter
                     </button>
                 </div>
 
                 <div class="my-6 flex items-center gap-4">
-                    <hr class="w-full border-slate-300" />
-                    <p class="text-sm text-slate-900 text-center whitespace-nowrap">ou continuer avec</p>
-                    <hr class="w-full border-slate-300" />
+                    <hr class="w-full border-gray-200" />
+                    <p class="text-sm text-[#4A4A4A] text-center whitespace-nowrap">ou continuer avec</p>
+                    <hr class="w-full border-gray-200" />
                 </div>
 
                 {# Bouton Google OAuth - FONCTIONNEL #}
                 <div class="flex flex-col gap-3">
                     <a href="{{ path('connect_google_start') }}" 
-                       class="flex items-center justify-center gap-3 w-full py-3 px-4 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-gray-50 transition-all">
+                       class="flex items-center justify-center gap-3 w-full py-3 px-4 border-2 border-gray-200 rounded-xl hover:border-[#00A9A5] hover:bg-[#84DCCF]/10 transition-all">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 512 512">
                             <path fill="#fbbd00" d="M120 256c0-25.367 6.989-49.13 19.131-69.477v-86.308H52.823C18.568 144.703 0 198.922 0 256s18.568 111.297 52.823 155.785h86.308v-86.308C126.989 305.13 120 281.367 120 256z"></path>
                             <path fill="#0f9d58" d="m256 392-60 60 60 60c57.079 0 111.297-18.568 155.785-52.823v-86.216h-86.216C305.044 385.147 281.181 392 256 392z"></path>
@@ -102,13 +102,13 @@
                             <path fill="#eb4132" d="M256 120V0C187.62 0 123.333 26.629 74.98 74.98a259.849 259.849 0 0 0-22.158 25.235l86.308 86.308C162.883 146.72 206.376 120 256 120z"></path>
                             <path fill="#3c79e6" d="M512 256a258.24 258.24 0 0 0-4.192-46.377l-2.251-12.299H256v120h121.452a135.385 135.385 0 0 1-51.884 55.638l86.216 86.216a260.085 260.085 0 0 0 25.235-22.158C485.371 388.667 512 324.38 512 256z"></path>
                         </svg>
-                        <span class="text-sm font-medium text-slate-700">Se connecter avec Google</span>
+                        <span class="text-sm font-medium text-[#4A4A4A]">Se connecter avec Google</span>
                     </a>
                 </div>
             </form>
         </div>
 
-        <div class="w-full h-full flex items-center bg-[#000842] rounded-xl p-8">
+        <div class="w-full h-full flex items-center bg-[#00A9A5] rounded-xl p-8">
             <img src="https://readymadeui.com/signin-image.webp" class="w-full aspect-[12/12] object-contain" alt="login-image" />
         </div>
     </div>

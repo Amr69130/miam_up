@@ -20,7 +20,6 @@ class GoogleController extends AbstractController
                 'email',
                 'profile',
             ], [
-                // Force l'affichage de l'écran de sélection de compte Google à chaque fois
                 'prompt' => 'select_account',
             ]);
     }

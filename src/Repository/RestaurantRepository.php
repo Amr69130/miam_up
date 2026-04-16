@@ -40,6 +40,15 @@ class RestaurantRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+    public function searchByNameOrAddress(string $query): array
+    {
+        return $this->createQueryBuilder('r')
+            ->where('r.nom_restaurant LIKE :q OR r.adresse_restaurant LIKE :q')
+            ->setParameter('q', '%' . $query . '%')
+            ->getQuery()
+            ->getResult();
+    }
+
     /**
      * Retourne les restaurants situés dans un rayon de $radius kilomètres
      */

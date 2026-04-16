@@ -52,7 +52,7 @@
     {# --- 2. BOUTON FLOTTANT --- #}
     <div class="fixed bottom-10 right-10 z-[90]">
         <a href="{{ path('app_evenement_new') }}"
-           class="flex items-center gap-3 bg-orange-600 hover:bg-orange-700 text-white px-8 py-4 rounded-full font-black shadow-2xl transition-all hover:scale-110 active:scale-95 border-4 border-white">
+           class="flex items-center gap-3 bg-[#FF6B6B] hover:bg-[#e55a5a] text-white px-8 py-4 rounded-full font-black shadow-2xl transition-all hover:scale-110 active:scale-95 border-4 border-white">
             <span class="text-2xl">🔥</span>
             <span class="text-white">ORGANISER UN EVENT</span>
         </a>
@@ -75,13 +75,13 @@
                                id="search-input"
                                data-action="keydown.enter->search-location#filter"
                                placeholder="Rechercher un restaurant..."
-                               class="w-full pl-10 pr-4 py-2 rounded-full border border-gray-200 focus:ring-2 focus:ring-orange-500 outline-none text-sm text-gray-900">
+                               class="w-full pl-10 pr-4 py-2 rounded-full border border-gray-200 focus:ring-2 focus:ring-[#00A9A5] outline-none text-sm text-gray-900">
                         <span class="absolute left-3 top-2 text-gray-400">🔍</span>
                     </div>
                     <button type="button"
                             id="btn-search-confirm"
                             data-action="click->search-location#filter"
-                            class="bg-gray-800 text-white px-4 py-2 rounded-full hover:bg-black transition text-sm font-bold">
+                            class="bg-[#4A4A4A] text-white px-4 py-2 rounded-full hover:bg-[#333] transition text-sm font-bold">
                         OK
                     </button>
                 </div>
@@ -92,7 +92,7 @@
                     <button data-search-location-target="button"
                             data-action="click->search-location#findMe"
                             id="btn-geoloc"
-                            class="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-bold py-2.5 px-6 rounded-full transition-all shadow-md">
+                            class="flex items-center gap-2 bg-[#00A9A5] hover:bg-[#008F8C] text-white font-bold py-2.5 px-6 rounded-full transition-all shadow-md">
                         <span data-search-location-target="label" id="btn-text">Autour de moi</span>
                     </button>
 

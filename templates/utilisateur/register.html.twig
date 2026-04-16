@@ -3,9 +3,9 @@
 {% block title %}Inscription - Miam Up{% endblock %}
 
 {% block body %}
-<div class="md:h-screen p-4">
+<div class="md:h-screen p-4 bg-[#F8F8F8]">
     <div class="flex flex-col justify-center items-center bg-white h-full">
-        <div class="grid md:grid-cols-2 items-center gap-y-8 max-w-7xl w-full [box-shadow:0_2px_13px_-6px_rgba(0,0,0,0.4)] rounded-xl relative overflow-hidden">
+        <div class="grid md:grid-cols-2 items-center gap-y-8 max-w-7xl w-full shadow-lg rounded-2xl relative overflow-hidden">
             
             {# Image côté gauche #}
             <div class="max-md:order-1 p-4 bg-gray-50 h-full">
@@ -17,19 +17,19 @@
                 <form method="POST" action="{{ path('app_utilisateur_register') }}" class="w-full">
                     
                     <div class="lg:mb-12 mb-8">
-                        <h1 class="text-blue-500 text-3xl font-bold max-md:text-center">Créer un compte</h1>
+                        <h1 class="text-[#00A9A5] text-3xl font-bold max-md:text-center">Créer un compte</h1>
                     </div>
 
                     {# Messages flash - succès #}
                     {% for message in app.flashes('success') %}
-                        <div class="mb-4 p-4 bg-green-100 border border-green-400 text-green-700 rounded-xl">
+                        <div class="mb-4 p-4 bg-[#84DCCF]/20 border border-[#84DCCF] text-[#00A9A5] rounded-xl">
                             {{ message }}
                         </div>
                     {% endfor %}
 
                     {# Messages flash - erreurs #}
                     {% for message in app.flashes('error') %}
-                        <div class="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-xl">
+                        <div class="mb-4 p-4 bg-[#FF6B6B]/10 border border-[#FF6B6B]/30 text-[#FF6B6B] rounded-xl">
                             {{ message }}
                         </div>
                     {% endfor %}
@@ -37,7 +37,7 @@
                     {# Bouton Google OAuth - Inscription rapide #}
                     <div class="mb-6">
                         <a href="{{ path('connect_google_start') }}" 
-                           class="flex items-center justify-center gap-3 w-full py-3 px-4 border-2 border-gray-200 rounded-xl hover:border-blue-500 hover:bg-gray-50 transition-all">
+                           class="flex items-center justify-center gap-3 w-full py-3 px-4 border-2 border-gray-200 rounded-xl hover:border-[#00A9A5] hover:bg-[#84DCCF]/10 transition-all">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 512 512">
                                 <path fill="#fbbd00" d="M120 256c0-25.367 6.989-49.13 19.131-69.477v-86.308H52.823C18.568 144.703 0 198.922 0 256s18.568 111.297 52.823 155.785h86.308v-86.308C126.989 305.13 120 281.367 120 256z"></path>
                                 <path fill="#0f9d58" d="m256 392-60 60 60 60c57.079 0 111.297-18.568 155.785-52.823v-86.216h-86.216C305.044 385.147 281.181 392 256 392z"></path>
@@ -46,7 +46,7 @@
                                 <path fill="#eb4132" d="M256 120V0C187.62 0 123.333 26.629 74.98 74.98a259.849 259.849 0 0 0-22.158 25.235l86.308 86.308C162.883 146.72 206.376 120 256 120z"></path>
                                 <path fill="#3c79e6" d="M512 256a258.24 258.24 0 0 0-4.192-46.377l-2.251-12.299H256v120h121.452a135.385 135.385 0 0 1-51.884 55.638l86.216 86.216a260.085 260.085 0 0 0 25.235-22.158C485.371 388.667 512 324.38 512 256z"></path>
                             </svg>
-                            <span class="text-sm font-medium text-slate-700">S'inscrire avec Google</span>
+                            <span class="text-sm font-medium text-[#4A4A4A]">S'inscrire avec Google</span>
                         </a>
                     </div>
 
@@ -59,11 +59,11 @@
 
                     {# Champ Nom #}
                     <div class="mb-4">
-                        <label class="text-slate-900 text-sm font-semibold block mb-2">Nom</label>
+                        <label class="text-[#4A4A4A] text-sm font-semibold block mb-2">Nom</label>
                         <div class="relative flex items-center">
                             <input name="nom" type="text" required 
                                 value="{{ last_nom|default('') }}"
-                                class="w-full bg-transparent text-sm text-slate-900 border-2 border-gray-200 focus:border-blue-500 pl-4 pr-12 py-3.5 outline-0 rounded-xl" 
+                                class="w-full bg-transparent text-sm text-[#4A4A4A] border-2 border-gray-200 focus:border-[#00A9A5] pl-4 pr-12 py-3.5 outline-0 rounded-xl" 
                                 placeholder="Votre nom" />
                             <svg xmlns="http://www.w3.org/2000/svg" fill="#bbb" stroke="#bbb" class="w-[18px] h-[18px] absolute right-4" viewBox="0 0 24 24">
                                 <circle cx="10" cy="7" r="6"></circle>
@@ -74,11 +74,11 @@
 
                     {# Champ Prénom #}
                     <div class="mb-4">
-                        <label class="text-slate-900 text-sm font-semibold block mb-2">Prénom</label>
+                        <label class="text-[#4A4A4A] text-sm font-semibold block mb-2">Prénom</label>
                         <div class="relative flex items-center">
                             <input name="prenom" type="text" required 
                                 value="{{ last_prenom|default('') }}"
-                                class="w-full bg-transparent text-sm text-slate-900 border-2 border-gray-200 focus:border-blue-500 pl-4 pr-12 py-3.5 outline-0 rounded-xl" 
+                                class="w-full bg-transparent text-sm text-[#4A4A4A] border-2 border-gray-200 focus:border-[#00A9A5] pl-4 pr-12 py-3.5 outline-0 rounded-xl" 
                                 placeholder="Votre prénom" />
                             <svg xmlns="http://www.w3.org/2000/svg" fill="#bbb" stroke="#bbb" class="w-[18px] h-[18px] absolute right-4" viewBox="0 0 24 24">
                                 <circle cx="10" cy="7" r="6"></circle>
@@ -89,11 +89,11 @@
 
                     {# Champ Email #}
                     <div class="mb-4">
-                        <label class="text-slate-900 text-sm font-semibold block mb-2">Email</label>
+                        <label class="text-[#4A4A4A] text-sm font-semibold block mb-2">Email</label>
                         <div class="relative flex items-center">
                             <input name="email" type="email" required 
                                 value="{{ last_email|default('') }}"
-                                class="w-full bg-transparent text-sm text-slate-900 border-2 border-gray-200 focus:border-blue-500 pl-4 pr-12 py-3.5 outline-0 rounded-xl" 
+                                class="w-full bg-transparent text-sm text-[#4A4A4A] border-2 border-gray-200 focus:border-[#00A9A5] pl-4 pr-12 py-3.5 outline-0 rounded-xl" 
                                 placeholder="votre@email.com" />
                             <svg xmlns="http://www.w3.org/2000/svg" fill="#bbb" stroke="#bbb" class="w-[18px] h-[18px] absolute right-4" viewBox="0 0 24 24">
                                 <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"></path>
@@ -103,11 +103,11 @@
 
                     {# Champ Pseudo #}
                     <div class="mb-4">
-                        <label class="text-slate-900 text-sm font-semibold block mb-2">Pseudo</label>
+                        <label class="text-[#4A4A4A] text-sm font-semibold block mb-2">Pseudo</label>
                         <div class="relative flex items-center">
                             <input name="pseudo" type="text" required 
                                 value="{{ last_pseudo|default('') }}"
-                                class="w-full bg-transparent text-sm text-slate-900 border-2 border-gray-200 focus:border-blue-500 pl-4 pr-12 py-3.5 outline-0 rounded-xl" 
+                                class="w-full bg-transparent text-sm text-[#4A4A4A] border-2 border-gray-200 focus:border-[#00A9A5] pl-4 pr-12 py-3.5 outline-0 rounded-xl" 
                                 placeholder="Votre pseudo" />
                             <svg xmlns="http://www.w3.org/2000/svg" fill="#bbb" stroke="#bbb" class="w-[18px] h-[18px] absolute right-4" viewBox="0 0 24 24">
                                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"></path>
@@ -117,11 +117,11 @@
 
                     {# Champ Téléphone #}
                     <div class="mb-4">
-                        <label class="text-slate-900 text-sm font-semibold block mb-2">Téléphone</label>
+                        <label class="text-[#4A4A4A] text-sm font-semibold block mb-2">Téléphone</label>
                         <div class="relative flex items-center">
                             <input name="telephone" type="tel" required 
                                 value="{{ last_telephone|default('') }}"
-                                class="w-full bg-transparent text-sm text-slate-900 border-2 border-gray-200 focus:border-blue-500 pl-4 pr-12 py-3.5 outline-0 rounded-xl" 
+                                class="w-full bg-transparent text-sm text-[#4A4A4A] border-2 border-gray-200 focus:border-[#00A9A5] pl-4 pr-12 py-3.5 outline-0 rounded-xl" 
                                 placeholder="06 12 34 56 78" />
                             <svg xmlns="http://www.w3.org/2000/svg" fill="#bbb" stroke="#bbb" class="w-[18px] h-[18px] absolute right-4" viewBox="0 0 24 24">
                                 <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"></path>
@@ -131,10 +131,10 @@
 
                     {# Champ Mot de passe #}
                     <div class="mb-4">
-                        <label class="text-slate-900 text-sm font-semibold block mb-2">Mot de passe</label>
+                        <label class="text-[#4A4A4A] text-sm font-semibold block mb-2">Mot de passe</label>
                         <div class="relative flex items-center">
                             <input name="password" type="password" required minlength="8"
-                                class="w-full bg-transparent text-sm text-slate-900 border-2 border-gray-200 focus:border-blue-500 pl-4 pr-12 py-3.5 outline-0 rounded-xl" 
+                                class="w-full bg-transparent text-sm text-[#4A4A4A] border-2 border-gray-200 focus:border-[#00A9A5] pl-4 pr-12 py-3.5 outline-0 rounded-xl" 
                                 placeholder="Minimum 8 caractères" />
                             <svg xmlns="http://www.w3.org/2000/svg" fill="#bbb" stroke="#bbb" class="w-[18px] h-[18px] absolute right-4" viewBox="0 0 24 24">
                                 <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v2z"></path>
@@ -144,10 +144,10 @@
 
                     {# Champ Confirmation mot de passe #}
                     <div class="mb-6">
-                        <label class="text-slate-900 text-sm font-semibold block mb-2">Confirmer le mot de passe</label>
+                        <label class="text-[#4A4A4A] text-sm font-semibold block mb-2">Confirmer le mot de passe</label>
                         <div class="relative flex items-center">
                             <input name="password_confirm" type="password" required minlength="8"
-                                class="w-full bg-transparent text-sm text-slate-900 border-2 border-gray-200 focus:border-blue-500 pl-4 pr-12 py-3.5 outline-0 rounded-xl" 
+                                class="w-full bg-transparent text-sm text-[#4A4A4A] border-2 border-gray-200 focus:border-[#00A9A5] pl-4 pr-12 py-3.5 outline-0 rounded-xl" 
                                 placeholder="Retapez votre mot de passe" />
                             <svg xmlns="http://www.w3.org/2000/svg" fill="#bbb" stroke="#bbb" class="w-[18px] h-[18px] absolute right-4" viewBox="0 0 24 24">
                                 <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1s3.1 1.39 3.1 3.1v2z"></path>
@@ -158,20 +158,20 @@
                     {# Bouton Submit #}
                     <div class="mt-6">
                         <button type="submit" 
-                            class="w-full shadow-xl py-3 px-4 text-base font-medium tracking-wide rounded-xl bg-blue-500 hover:bg-blue-600 text-white cursor-pointer focus:outline-0 transition-all">
+                            class="w-full shadow-xl py-3 px-4 text-base font-medium tracking-wide rounded-xl bg-[#00A9A5] hover:bg-[#008F8C] text-white cursor-pointer focus:outline-0 transition-colors">
                             S'inscrire
                         </button>
 
-                        <p class="text-sm text-slate-500 text-center mt-6">
+                        <p class="text-sm text-[#4A4A4A]/60 text-center mt-6">
                             Déjà un compte ? 
-                            <a href="{{ path('app_utilisateur_login') }}" class="text-blue-500 font-semibold hover:underline">Se connecter</a>
+                            <a href="{{ path('app_utilisateur_login') }}" class="text-[#00A9A5] font-semibold hover:underline">Se connecter</a>
                         </p>
                     </div>
                 </form>
             </div>
 
             {# Cercle décoratif #}
-            <div class="absolute -top-6 -right-6 w-20 h-20 rounded-full bg-blue-400 max-sm:hidden"></div>
+            <div class="absolute -top-6 -right-6 w-20 h-20 rounded-full bg-[#84DCCF] max-sm:hidden"></div>
         </div>
     </div>
 </div>

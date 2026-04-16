@@ -86,6 +86,13 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Evenement::class, mappedBy: 'createur')]
     private Collection $evenementsCrees;
 
+    /**
+     * @var Collection<int, Restaurant>
+     */
+    #[ORM\ManyToMany(targetEntity: Restaurant::class)]
+    #[ORM\JoinTable(name: 'utilisateur_favoris')]
+    private Collection $favoris;
+
     public function __construct()
     {
         $this->role = new ArrayCollection();
@@ -94,6 +101,7 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         $this->conversations = new ArrayCollection();
         $this->messages_envoyes = new ArrayCollection();
         $this->evenementsCrees = new ArrayCollection();
+        $this->favoris = new ArrayCollection();
     }
 
     // ===== UserInterface & PasswordAuthenticatedUserInterface =====
@@ -207,5 +215,29 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         }
 
         return $this;
+    }
+
+    /**
+     * @return Collection<int, Restaurant>
+     */
+    public function getFavoris(): Collection { return $this->favoris; }
+
+    public function addFavori(Restaurant $restaurant): static
+    {
+        if (!$this->favoris->contains($restaurant)) {
+            $this->favoris->add($restaurant);
+        }
+        return $this;
+    }
+
+    public function removeFavori(Restaurant $restaurant): static
+    {
+        $this->favoris->removeElement($restaurant);
+        return $this;
+    }
+
+    public function isFavori(Restaurant $restaurant): bool
+    {
+        return $this->favoris->contains($restaurant);
     }
 }

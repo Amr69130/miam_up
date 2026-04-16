@@ -1,0 +1,150 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ restaurant.nomRestaurant }} - Miam'Up{% endblock %}
+
+{% block body %}
+
+{% set fallback_img = 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=800' %}
+
+<div class="flex h-screen overflow-hidden bg-[#F8F8F8] font-['Inter',sans-serif]">
+
+    {% include 'partials/_sidebar.html.twig' with { active: 'restaurants' } %}
+
+    <div class="flex-1 overflow-y-auto">
+
+        {# ── Header image ── #}
+        <div class="relative h-64 overflow-hidden">
+            <img src="{{ restaurant.logo ? '/uploads/restaurants/' ~ restaurant.logo : fallback_img }}"
+                 alt="{{ restaurant.nomRestaurant }}"
+                 class="w-full h-full object-cover">
+            <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+            <a href="{{ path('restaurant_list') }}"
+               class="absolute top-4 left-4 w-10 h-10 bg-white/90 backdrop-blur rounded-full flex items-center justify-center hover:bg-white transition-colors shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                     stroke="#4A4A4A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M19 12H5M12 19l-7-7 7-7"/>
+                </svg>
+            </a>
+
+            {# Bouton favori #}
+            {% if app.user %}
+            <form method="POST" action="{{ path('app_favoris_toggle', {id: restaurant.id}) }}" class="absolute top-4 right-4">
+                <input type="hidden" name="_token" value="{{ csrf_token('favoris_toggle_' ~ restaurant.id) }}">
+                <button type="submit"
+                        class="w-10 h-10 bg-white/90 backdrop-blur rounded-full flex items-center justify-center hover:bg-white transition-colors shadow-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                         fill="{{ app.user.isFavori(restaurant) ? '#FF6B6B' : 'none' }}"
+                         stroke="#FF6B6B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+                    </svg>
+                </button>
+            </form>
+            {% endif %}
+        </div>
+
+        {# ── Contenu ── #}
+        <div class="p-6 md:p-8 max-w-4xl">
+
+            {# Nom + note #}
+            <div class="flex items-start justify-between mb-4">
+                <div>
+                    <h1 class="text-2xl font-bold text-[#4A4A4A]">{{ restaurant.nomRestaurant }}</h1>
+                    {% if restaurant.adresseRestaurant %}
+                        <p class="text-[#4A4A4A]/60 mt-1">{{ restaurant.adresseRestaurant }}</p>
+                    {% endif %}
+                </div>
+                {% if restaurant.noteConsommateurs %}
+                    <div class="flex items-center gap-1 bg-amber-50 px-3 py-1.5 rounded-xl">
+                        <span class="text-amber-400 text-lg">★</span>
+                        <span class="font-semibold text-[#4A4A4A]">{{ restaurant.noteConsommateurs|number_format(1) }}</span>
+                    </div>
+                {% endif %}
+            </div>
+
+            {# Tags spécialités / types #}
+            {% if restaurant.specialite|length > 0 or restaurant.type|length > 0 %}
+                <div class="flex flex-wrap gap-2 mb-6">
+                    {% for spec in restaurant.specialite %}
+                        <span class="bg-[#84DCCF]/15 text-[#00A9A5] text-xs font-medium px-3 py-1 rounded-full">{{ spec }}</span>
+                    {% endfor %}
+                    {% for t in restaurant.type %}
+                        <span class="bg-[#00A9A5]/10 text-[#00A9A5] text-xs font-medium px-3 py-1 rounded-full">{{ t }}</span>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            {# Description #}
+            {% if restaurant.descriptionRestaurant %}
+                <div class="bg-white rounded-2xl p-5 border border-gray-100 mb-6">
+                    <h2 class="font-semibold text-[#4A4A4A] mb-2">À propos</h2>
+                    <p class="text-[#4A4A4A]/70 leading-relaxed">{{ restaurant.descriptionRestaurant }}</p>
+                </div>
+            {% endif %}
+
+            {# Infos pratiques #}
+            <div class="bg-white rounded-2xl p-5 border border-gray-100 mb-6">
+                <h2 class="font-semibold text-[#4A4A4A] mb-4">Informations pratiques</h2>
+                <div class="space-y-3">
+                    {% if restaurant.numTelRestaurant %}
+                        <div class="flex items-center gap-3 text-sm">
+                            <svg class="w-4 h-4 text-[#00A9A5] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+                            </svg>
+                            <span class="text-[#4A4A4A]">{{ restaurant.numTelRestaurant }}</span>
+                        </div>
+                    {% endif %}
+                    {% if restaurant.siteWeb %}
+                        <div class="flex items-center gap-3 text-sm">
+                            <svg class="w-4 h-4 text-[#00A9A5] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9"/>
+                            </svg>
+                            <a href="{{ restaurant.siteWeb }}" target="_blank" class="text-[#00A9A5] hover:underline">{{ restaurant.siteWeb }}</a>
+                        </div>
+                    {% endif %}
+                    {% if restaurant.horaires %}
+                        <div class="flex items-center gap-3 text-sm">
+                            <svg class="w-4 h-4 text-[#00A9A5] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <span class="text-[#4A4A4A]">{{ restaurant.horaires }}</span>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            {# Régimes & Aménagements #}
+            {% if restaurant.regimes|length > 0 or restaurant.amenagements|length > 0 %}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    {% if restaurant.regimes|length > 0 %}
+                        <div class="bg-white rounded-2xl p-5 border border-gray-100">
+                            <h2 class="font-semibold text-[#4A4A4A] mb-3">Régimes</h2>
+                            <div class="flex flex-wrap gap-2">
+                                {% for regime in restaurant.regimes %}
+                                    <span class="bg-green-50 text-green-700 text-xs font-medium px-3 py-1 rounded-full">{{ regime }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+                    {% if restaurant.amenagements|length > 0 %}
+                        <div class="bg-white rounded-2xl p-5 border border-gray-100">
+                            <h2 class="font-semibold text-[#4A4A4A] mb-3">Aménagements</h2>
+                            <div class="flex flex-wrap gap-2">
+                                {% for amenagement in restaurant.amenagements %}
+                                    <span class="bg-blue-50 text-blue-700 text-xs font-medium px-3 py-1 rounded-full">{{ amenagement }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endif %}
+
+            {# Bouton retour #}
+            <a href="{{ path('restaurant_list') }}"
+               class="inline-flex items-center gap-2 text-[#00A9A5] font-medium hover:underline">
+                ← Retour à la liste
+            </a>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
