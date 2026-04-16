@@ -144,122 +144,14 @@ const MapComponent = ({ magasins: magasinsInitiaux }) => {
                         key={index}
                         position={[magasin.lat, magasin.lng]}
                         icon={getMarkerIcon(magasin.event_status)}
-                    >
-                        <Popup>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', minWidth: '200px' }}>
-                                <b style={{ fontSize: '1.1rem', color: '#1f2937' }}>
-                                    {magasin.nom} (ID: {magasin.id} | Statut: {magasin.event_status})
-                                </b>
-
-                                <span style={{ color: '#4f46e5', fontWeight: '600', fontSize: '0.85rem' }}>
-            📍 {(magasin.distance_km !== undefined && magasin.distance_km !== null)
-                                    ? `à ${Number(magasin.distance_km).toFixed(1)} km`
-                                    : 'Distance non calculée'
-                                }
-        </span>
-
-                                {/* --- SECTION ÉVÉNEMENT (Si présent) --- */}
-                                {magasin.events && magasin.events.length > 0 && (
-                                    <div style={{ borderTop: '1px solid #eee', pt: '8px', marginTop: '5px' }}>
-                                        {magasin.events.map((event) => (
-                                            <div key={event.id} style={{ marginBottom: '10px' }}>
-                                                <div style={{ fontWeight: 'bold', fontSize: '0.9rem' }}>🔥 {event.titre}</div>
-
-                                                {/* Liste des participants */}
-                                                <ul style={{ listStyle: 'none', padding: 0, margin: '5px 0', fontSize: '0.8rem' }}>
-                                                    {event.participants.map(p => (
-                                                        <li key={p.id} style={{
-                                                            display: 'flex',
-                                                            justifyContent: 'space-between',
-                                                            alignItems: 'center',
-                                                            padding: '4px 0',
-                                                            borderBottom: '1px dashed #eee'
-                                                        }}>
-                                                            {/* Gauche : Prénom et Badge Orga */}
-                                                            <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                <span style={{ fontWeight: p.is_me ? 'bold' : 'normal' }}>
-                    {p.prenom} {p.is_me && "(Moi)"}
-                </span>
-                                                                {p.id === event.createur_id && (
-                                                                    <span style={{ color: '#d97706', fontSize: '0.7rem', fontWeight: 'bold' }}>⭐ Orga</span>
-                                                                )}
-                                                            </div>
-
-                                                            {/* Droite : Logique Sociale (uniquement si ce n'est pas moi) */}
-                                                            {!p.is_me && (
-                                                                <div className="friend-action">
-                                                                    {/* On ajoute ?. pour éviter le crash si friendship est undefined */}
-                                                                    {p.friendship?.status === 'accepte' ? (
-                                                                        <span style={{ color: '#059669', fontWeight: 'bold', fontSize: '0.7rem' }}>✓ Ami</span>
-                                                                    ) : p.friendship?.status === 'en_attente' ? (
-                                                                        p.friendship?.am_i_sender ? (
-                                                                            <span style={{ color: '#6b7280', fontStyle: 'italic', fontSize: '0.7rem' }}>Attente...</span>
-                                                                        ) : (
-                                                                            <a href="/profil/amis" style={{
-                                                                                backgroundColor: '#4f46e5', color: 'white', padding: '2px 8px',
-                                                                                borderRadius: '4px', textDecoration: 'none', fontSize: '0.7rem',
-                                                                                fontWeight: 'bold'
-                                                                            }}>Répondre</a>
-                                                                        )
-                                                                    ) : (
-                                                                        /* Si p.friendship existe mais status est null, OU si p.friendship n'existe pas du tout */
-                                                                        <a href={`/ami/add/${p.id}`}
-                                                                           style={{
-                                                                               color: '#4f46e5',
-                                                                               textDecoration: 'none',
-                                                                               fontWeight: 'bold',
-                                                                               fontSize: '1.1rem',
-                                                                               padding: '0 5px'
-                                                                           }}
-                                                                           title="Ajouter en ami">+</a>
-                                                                    )}
-                                                                </div>
-                                                            )}
-                                                        </li>
-                                                    ))}
-                                                </ul>
-
-                                                {/* Bouton Rejoindre/Quitter */}
-                                                <a href={`/event/join/${event.id}`}
-                                                   style={{
-                                                       display: 'block',
-                                                       textAlign: 'center',
-                                                       padding: '4px',
-                                                       borderRadius: '4px',
-                                                       textDecoration: 'none',
-                                                       fontSize: '0.8rem',
-                                                       backgroundColor: event.is_joined ? '#fee2e2' : '#dbeafe',
-                                                       color: event.is_joined ? '#dc2626' : '#2563eb',
-                                                       fontWeight: 'bold',
-                                                       border: '1px solid currentColor'
-                                                   }}>
-                                                    {event.is_joined ? 'Quitter' : 'Rejoindre'}
-                                                </a>
-                                            </div>
-                                        ))}
-                                    </div>
-                                )}
-
-                                {/* --- BOUTON DE TON COLLÈGUE (Gardé intact) --- */}
-                                <button
-                                    onClick={() => console.log("ID envoyé :", magasin.id)}
-                                    style={{
-                                        marginTop: '5px',
-                                        backgroundColor: '#4f46e5',
-                                        color: 'white',
-                                        border: 'none',
-                                        padding: '8px',
-                                        borderRadius: '4px',
-                                        cursor: 'pointer',
-                                        textAlign: 'center',
-                                        fontWeight: 'bold'
-                                    }}
-                                >
-                                    Voir détails du Restaurant
-                                </button>
-                            </div>
-                        </Popup>
-                    </Marker>
+                        eventHandlers={{
+                            click: () => {
+                                window.dispatchEvent(new CustomEvent('open-restaurant-modal', { 
+                                    detail: { id: magasin.id, distance_km: magasin.distance_km } 
+                                }));
+                            },
+                        }}
+                    />
                 ))}
             </MapContainer>
         </div>

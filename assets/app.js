@@ -5,12 +5,14 @@ import MapComponent from './components/Map/MapComponents';
 
 import { Application } from '@hotwired/stimulus';
 import SearchLocationController from './controllers/search-location_controller';
+import RestaurantModalController from './controllers/restaurant_modal_controller';
 
 // On initialise manuellement si le bootstrap fait défaut
 if (!window.Stimulus) {
     window.Stimulus = Application.start();
 }
 window.Stimulus.register('search-location', SearchLocationController);
+window.Stimulus.register('restaurant-modal', RestaurantModalController);
 
 const mapElement = document.getElementById('react-map-root');
 
