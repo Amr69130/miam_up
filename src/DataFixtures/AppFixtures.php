@@ -11,8 +11,7 @@ use App\Entity\Specialite;
 use App\Entity\Regime;
 use App\Entity\Amenagement;
 use App\Entity\Type;
-use App\Entity\Conversation;
-use App\Entity\Message;
+use App\Entity\Amitie; // <--- AJOUTÉ
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Faker\Factory;
@@ -37,7 +36,7 @@ class AppFixtures extends Fixture
         $roleAdmin->setNomRole('Admin');
         $manager->persist($roleAdmin);
 
-        // --- Specialités ---
+        // --- Specialités, Régimes, Aménagements, Types (Ton code reste identique) ---
         $specialites = [];
         foreach (['Italien', 'Chinois', 'Français', 'Asiatique', 'Fast Food', 'Japonais', 'Burger'] as $s) {
             $spec = new Specialite();
@@ -46,7 +45,6 @@ class AppFixtures extends Fixture
             $specialites[] = $spec;
         }
 
-        // --- Régimes ---
         $regimes = [];
         foreach (['Vegan', 'Sans gluten', 'Halal', 'Végétarien', 'Cacher'] as $r) {
             $regime = new Regime();
@@ -55,7 +53,6 @@ class AppFixtures extends Fixture
             $regimes[] = $regime;
         }
 
-        // --- Aménagements ---
         $amenagements = [];
         foreach (['Espace jeux enfants', 'Rampe handicap', 'Ascenseur', 'Table à langer'] as $a) {
             $am = new Amenagement();
@@ -64,7 +61,6 @@ class AppFixtures extends Fixture
             $amenagements[] = $am;
         }
 
-        // --- Types ---
         $types = [];
         foreach (['Restaurant', 'Café', 'Bistro', 'Gastro', 'Fast-Food'] as $t) {
             $type = new Type();
@@ -73,26 +69,22 @@ class AppFixtures extends Fixture
             $types[] = $type;
         }
 
-        // --- Restaurants  ---
+        // --- Restaurants ---
         $restaurantsData = [
-            // TES ORIGINAUX (On n'y touche pas)
-            ['nom'=>'EcullyTacos', 'adresse'=>'20 Avenue des sources, 69130 Écully', 'lat'=>45.7777, 'lng'=>4.7795, 'event' => null],
-            ['nom'=>'EcullyPizza', 'adresse'=>'480 Avenue Ben Gourion, 69009 Lyon', 'lat'=>45.78828, 'lng'=>4.78720, 'event' => null],
-            ['nom'=>'Lyon9Tacos', 'adresse'=>'43 Rue du Sergent Michel Berthet, 69009 Lyon', 'lat'=>45.7809, 'lng'=>4.8049, 'event' => null],
-            ['nom'=>'Lyon9Pizza', 'adresse'=>'30 Rue du Sergent Michel Berthet, 69009 Lyon', 'lat'=>45.7813, 'lng'=>4.8038, 'event' => null],
-            ['nom'=>'RilleuxTacos', 'adresse'=>'8 Avenue des Nations, 69140 Rillieux-la-Pape', 'lat'=>45.8270, 'lng'=>4.8990, 'event' => null],
-            ['nom'=>'RilleuxPizza', 'adresse'=>'20 Avenue des Nations, 69140 Rillieux-la-Pape', 'lat'=>45.8250, 'lng'=>4.9040, 'event' => null],
-            ['nom'=>'Lyon8Tacos', 'adresse'=>'120 Avenue Paul Santy, 69008 Lyon', 'lat'=>45.7286, 'lng'=>4.8743, 'event' => null],
-            ['nom'=>'Lyon8Pizza', 'adresse'=>'130 Avenue Paul Santy, 69008 Lyon', 'lat'=>45.7285, 'lng'=>4.8766, 'event' => null],
-            ['nom'=>'VilletteTacos', 'adresse'=>'30 rue des Serventières, 38200 Villette‑de‑Vienne', 'lat'=>45.5894, 'lng'=>4.9150, 'event' => null],
-            ['nom'=>'VilettePizza', 'adresse'=>'147 route de Marennes, 38200 Villette‑de‑Vienne', 'lat'=>45.5920, 'lng'=>4.9170, 'event' => null],
-
-            // MES AJOUTS DE TEST (Pour voir les couleurs)
-            ['nom'=>'TEST_ORANGE_BURGERS', 'adresse'=>'Test Today', 'lat'=>45.7785, 'lng'=>4.7800, 'event' => null],
-            ['nom'=>'TEST_VERT_SUSHI', 'adresse'=>'Test Soon', 'lat'=>45.7820, 'lng'=>4.8060, 'event' => null],
+            ['nom'=>'EcullyTacos', 'adresse'=>'20 Avenue des sources, 69130 Écully', 'lat'=>45.7777, 'lng'=>4.7795],
+            ['nom'=>'EcullyPizza', 'adresse'=>'480 Avenue Ben Gourion, 69009 Lyon', 'lat'=>45.78828, 'lng'=>4.78720],
+            ['nom'=>'Lyon9Tacos', 'adresse'=>'43 Rue du Sergent Michel Berthet, 69009 Lyon', 'lat'=>45.7809, 'lng'=>4.8049],
+            ['nom'=>'Lyon9Pizza', 'adresse'=>'30 Rue du Sergent Michel Berthet, 69009 Lyon', 'lat'=>45.7813, 'lng'=>4.8038],
+            ['nom'=>'RilleuxTacos', 'adresse'=>'8 Avenue des Nations, 69140 Rillieux-la-Pape', 'lat'=>45.8270, 'lng'=>4.8990],
+            ['nom'=>'RilleuxPizza', 'adresse'=>'20 Avenue des Nations, 69140 Rillieux-la-Pape', 'lat'=>45.8250, 'lng'=>4.9040],
+            ['nom'=>'Lyon8Tacos', 'adresse'=>'120 Avenue Paul Santy, 69008 Lyon', 'lat'=>45.7286, 'lng'=>4.8743],
+            ['nom'=>'Lyon8Pizza', 'adresse'=>'130 Avenue Paul Santy, 69008 Lyon', 'lat'=>45.7285, 'lng'=>4.8766],
+            ['nom'=>'VilletteTacos', 'adresse'=>'30 rue des Serventières, 38200 Villette‑de‑Vienne', 'lat'=>45.5894, 'lng'=>4.9150],
+            ['nom'=>'VilettePizza', 'adresse'=>'147 route de Marennes, 38200 Villette‑de‑Vienne', 'lat'=>45.5920, 'lng'=>4.9170],
+            ['nom'=>'TEST_ORANGE_BURGERS', 'adresse'=>'Test Today', 'lat'=>45.7785, 'lng'=>4.7800],
+            ['nom'=>'TEST_VERT_SUSHI', 'adresse'=>'Test Soon', 'lat'=>45.7820, 'lng'=>4.8060],
         ];
 
-        $restaurants = [];
         foreach ($restaurantsData as $data) {
             $resto = new Restaurant();
             $resto->setNomRestaurant($data['nom']);
@@ -102,38 +94,14 @@ class AppFixtures extends Fixture
             $resto->setNumTelRestaurant($faker->phoneNumber);
             $resto->setSiret($faker->numerify('##############'));
             $resto->setDescriptionRestaurant('Restaurant spécialisé en ' . $data['nom']);
-
             foreach ($faker->randomElements($specialites, rand(1,3)) as $s) $resto->addSpecialite($s);
             foreach ($faker->randomElements($regimes, rand(1,3)) as $r) $resto->addRegime($r);
             foreach ($faker->randomElements($amenagements, rand(1,3)) as $a) $resto->addAmenagement($a);
             foreach ($faker->randomElements($types, rand(1,1)) as $t) $resto->addType($t);
-
             $manager->persist($resto);
-            $restaurants[] = $resto;
-
-            /* // --- NOUVELLE LOGIQUE D'ÉVÉNEMENT (Semaine 1) ---
-            if ($data['event'] === 'today') {
-                $ev = new Evenement();
-                $ev->setTitre("🔥 Soirée Spéciale " . $data['nom']);
-                $ev->setDescriptionEvenement("Événement test pour marqueur VERT");
-                $ev->setDateEvenement(new \DateTime('today 18:00'));
-                $ev->setDateFin(new \DateTime('today 23:59'));
-                $ev->setNombrePlaces(20);
-                $ev->setRestaurant($resto);
-                $manager->persist($ev);
-            } elseif ($data['event'] === 'soon') {
-                $ev = new Evenement();
-                $ev->setTitre("Bientôt : " . $data['nom']);
-                $ev->setDescriptionEvenement("Événement test pour marqueur BLEU");
-                $ev->setDateEvenement(new \DateTime('+3 days 12:00'));
-                $ev->setDateFin(new \DateTime('+3 days 15:00'));
-                $ev->setNombrePlaces(50);
-                $ev->setRestaurant($resto);
-                $manager->persist($ev);
-            }*/
         }
 
-        // --- Utilisateurs ---
+        // --- Utilisateurs (20 classiques) ---
         $prenoms = ['Mohamed','Sofia','Liam','Emma','Mateo','Chloé','Yara','Noah','Aaliyah','Lucas','Jade','Rayan','Fatima','Nathan','Aya','Ethan','Lea','Ibrahim','Mila','Adam'];
         $utilisateurs = [];
 
@@ -153,7 +121,7 @@ class AppFixtures extends Fixture
             $utilisateurs[] = $user;
         }
 
-        // --- Admin ---
+        // --- Admin (Sera l'utilisateur de test principal) ---
         $admin = new Utilisateur();
         $admin->setNomUtilisateur('Admin');
         $admin->setPrenomUtilisateur('Super');
@@ -164,9 +132,32 @@ class AppFixtures extends Fixture
         $admin->addRole($roleAdmin);
         $admin->addRole($roleUser);
         $manager->persist($admin);
+        // On n'oublie pas de l'ajouter au tableau pour les amitiés
         $utilisateurs[] = $admin;
 
-        // --- Paiements ---
+        // --- AMITIÉS (Semaine 4) ---
+
+        // 1. On crée 3 amitiés déjà ACCEPTÉES pour l'admin
+        // L'admin (dernier du tableau) sera ami avec les 3 premiers users
+        for ($i = 0; $i < 3; $i++) {
+            $amitie = new Amitie();
+            $amitie->setUtilisateurDemandeur($utilisateurs[$i]);
+            $amitie->setUtilisateurReceveur($admin);
+            $amitie->setStatut('accepte');
+            $manager->persist($amitie);
+        }
+
+        // 2. On crée 3 demandes EN ATTENTE pour l'admin
+        // Les users 4, 5 et 6 demandent l'admin en ami
+        for ($i = 4; $i < 7; $i++) {
+            $demande = new Amitie();
+            $demande->setUtilisateurDemandeur($utilisateurs[$i]);
+            $demande->setUtilisateurReceveur($admin);
+            $demande->setStatut('en_attente');
+            $manager->persist($demande);
+        }
+
+        // --- Paiements & Flush Final ---
         foreach ($utilisateurs as $user) {
             $paiement = new Paiement();
             $paiement->setDatePaiement($faker->dateTimeThisYear);
@@ -178,17 +169,5 @@ class AppFixtures extends Fixture
         }
 
         $manager->flush();
-
-        // --- INSCRIPTION AUX ÉVÉNEMENTS ---
-        $tousLesEvenements = $manager->getRepository(Evenement::class)->findAll();
-
-        foreach ($tousLesEvenements as $ev) {
-            $nbInscrits = rand(2, 5);
-            $inscritsAuHasard = $faker->randomElements($utilisateurs, $nbInscrits);
-
-            foreach ($inscritsAuHasard as $userInscrit) {
-                $ev->addUtilisateur($userInscrit);
-            }
-        }
     }
 }
