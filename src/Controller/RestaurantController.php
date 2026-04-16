@@ -94,7 +94,7 @@ final class RestaurantController extends AbstractController
         $restaurant = $restaurantRepository->find($id);
 
         if (!$restaurant) {
-            throw $this->createNotFoundException('Le restaurant n'existe pas.');
+            throw $this->createNotFoundException("Le restaurant n'existe pas.");
         }
 
         return $this->render('restaurant/show.html.twig', [

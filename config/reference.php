@@ -1566,11 +1566,11 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     monolog?: MonologConfig,
  *     twig_component?: TwigComponentConfig,
  *     webpack_encore?: WebpackEncoreConfig,
-* symfonycasts_tailwind?: SymfonycastsTailwindConfig,
- * knpu_oauth2_client?: KnpuOauth2ClientConfig,
- * "when@dev"?: array{
- * imports?: ImportsConfig,
- * parameters?: ParametersConfig,
+ *     symfonycasts_tailwind?: SymfonycastsTailwindConfig,
+ *     knpu_oauth2_client?: KnpuOauth2ClientConfig,
+ *     "when@dev"?: array{
+ *         imports?: ImportsConfig,
+ *         parameters?: ParametersConfig,
  *         services?: ServicesConfig,
  *         framework?: FrameworkConfig,
  *         doctrine?: DoctrineConfig,
@@ -1586,144 +1586,45 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         maker?: MakerConfig,
  *         twig_component?: TwigComponentConfig,
  *         webpack_encore?: WebpackEncoreConfig,
-* symfonycasts_tailwind?: SymfonycastsTailwindConfig,
- * knpu_oauth2_client?: KnpuOauth2ClientConfig,
- * },
- * "when@prod"?: array{
- * imports?: ImportsConfig,
- * parameters?: ParametersConfig,
- * services?: ServicesConfig,
- * framework?: FrameworkConfig,
- * doctrine?: DoctrineConfig,
- * doctrine_migrations?: DoctrineMigrationsConfig,
- * twig?: TwigConfig,
- * stimulus?: StimulusConfig,
- * turbo?: TurboConfig,
- * twig_extra?: TwigExtraConfig,
- * security?: SecurityConfig,
- * monolog?: MonologConfig,
- * twig_component?: TwigComponentConfig,
- * webpack_encore?: WebpackEncoreConfig,
- * symfonycasts_tailwind?: SymfonycastsTailwindConfig,
- * knpu_oauth2_client?: KnpuOauth2ClientConfig,
- * },
- * "when@test"?: array{
- * imports?: ImportsConfig,
- * parameters?: ParametersConfig,
- * services?: ServicesConfig,
- * framework?: FrameworkConfig,
- * doctrine?: DoctrineConfig,
- * doctrine_migrations?: DoctrineMigrationsConfig,
- * twig?: TwigConfig,
- * web_profiler?: WebProfilerConfig,
- * stimulus?: StimulusConfig,
- * turbo?: TurboConfig,
- * twig_extra?: TwigExtraConfig,
- * security?: SecurityConfig,
- * monolog?: MonologConfig,
- * twig_component?: TwigComponentConfig,
- * webpack_encore?: WebpackEncoreConfig,
- * symfonycasts_tailwind?: SymfonycastsTailwindConfig,
- * knpu_oauth2_client?: KnpuOauth2ClientConfig,
- * },
- * ...<string, ExtensionType|array{ // extra keys must follow the when@%env% pattern or match an extension alias
- * imports?: ImportsConfig,
- * parameters?: ParametersConfig,
- * services?: ServicesConfig,
- * ...<string, ExtensionType>,
- * }>
- * }
- */
-final class App
-{
-    /**
-     * @param ConfigType $config
-     *
-     * @psalm-return ConfigType
-     */
-    public static function config(array $config): array
-    {
-        return AppReference::config($config);
-    }
-}
-
-namespace Symfony\Component\Routing\Loader\Configurator;
-
-/**
- * This class provides array-shapes for configuring the routes of an application.
- *
- * Example:
- *
- * ```php
- * // config/routes.php
- * namespace Symfony\Component\Routing\Loader\Configurator;
- *
- * return Routes::config([
- * 'controllers' => [
- * 'resource' => 'routing.controllers',
- * ],
- * ]);
- * ```
- *
- * @psalm-type RouteConfig = array{
- * path: string|array<string,string>,
- * controller?: string,
- * methods?: string|list<string>,
- * requirements?: array<string,string>,
- * defaults?: array<string,mixed>,
- * options?: array<string,mixed>,
- * host?: string|array<string,string>,
- * schemes?: string|list<string>,
- * condition?: string,
- * locale?: string,
- * format?: string,
- * utf8?: bool,
- * stateless?: bool,
- * }
- * @psalm-type ImportConfig = array{
- * resource: string,
- * type?: string,
- * exclude?: string|list<string>,
- * prefix?: string|array<string,string>,
- * name_prefix?: string,
- * trailing_slash_on_root?: bool,
- * controller?: string,
- * methods?: string|list<string>,
- * requirements?: array<string,string>,
- * defaults?: array<string,mixed>,
- * options?: array<string,mixed>,
- * host?: string|array<string,string>,
- * schemes?: string|list<string>,
- * condition?: string,
- * locale?: string,
- * format?: string,
- * utf8?: bool,
- * stateless?: bool,
- * }
- * @psalm-type AliasConfig = array{
- * alias: string,
- * deprecated?: array{package:string, version:string, message?:string},
- * }
-
- * @psalm-type RoutesConfig = array{
- * "when@dev"?: array<string, RouteConfig|ImportConfig|AliasConfig>,
- * "when@prod"?: array<string, RouteConfig|ImportConfig|AliasConfig>,
- * "when@test"?: array<string, RouteConfig|ImportConfig|AliasConfig>,
- * ...<string, RouteConfig|ImportConfig|AliasConfig>
- * }
- */
-final class Routes
-{
-    /**
-     * @param RoutesConfig $config
-     *
-     * @psalm-return RoutesConfig
-     */
-    public static function config(array $config): array
-    {
-        return $config;
-    }
-}
+ *         symfonycasts_tailwind?: SymfonycastsTailwindConfig,
+ *         knpu_oauth2_client?: KnpuOauth2ClientConfig,
+ *     },
+ *     "when@prod"?: array{
+ *         imports?: ImportsConfig,
+ *         parameters?: ParametersConfig,
+ *         services?: ServicesConfig,
+ *         framework?: FrameworkConfig,
+ *         doctrine?: DoctrineConfig,
+ *         doctrine_migrations?: DoctrineMigrationsConfig,
+ *         twig?: TwigConfig,
+ *         stimulus?: StimulusConfig,
+ *         turbo?: TurboConfig,
+ *         twig_extra?: TwigExtraConfig,
+ *         security?: SecurityConfig,
+ *         monolog?: MonologConfig,
+ *         twig_component?: TwigComponentConfig,
+ *         webpack_encore?: WebpackEncoreConfig,
+ *         symfonycasts_tailwind?: SymfonycastsTailwindConfig,
+ *         knpu_oauth2_client?: KnpuOauth2ClientConfig,
+ *     },
+ *     "when@test"?: array{
+ *         imports?: ImportsConfig,
+ *         parameters?: ParametersConfig,
+ *         services?: ServicesConfig,
+ *         framework?: FrameworkConfig,
+ *         doctrine?: DoctrineConfig,
+ *         doctrine_migrations?: DoctrineMigrationsConfig,
+ *         twig?: TwigConfig,
+ *         web_profiler?: WebProfilerConfig,
+ *         stimulus?: StimulusConfig,
+ *         turbo?: TurboConfig,
+ *         twig_extra?: TwigExtraConfig,
+ *         security?: SecurityConfig,
+ *         monolog?: MonologConfig,
+ *         twig_component?: TwigComponentConfig,
+ *         webpack_encore?: WebpackEncoreConfig,
+ *         symfonycasts_tailwind?: SymfonycastsTailwindConfig,
+ *         knpu_oauth2_client?: KnpuOauth2ClientConfig,
  *     },
  *     ...<string, ExtensionType|array{ // extra keys must follow the when@%env% pattern or match an extension alias
  *         imports?: ImportsConfig,
@@ -1802,8 +1703,7 @@ namespace Symfony\Component\Routing\Loader\Configurator;
  * @psalm-type AliasConfig = array{
  *     alias: string,
  *     deprecated?: array{package:string, version:string, message?:string},
- * }
-
+ * }
  * @psalm-type RoutesConfig = array{
  *     "when@dev"?: array<string, RouteConfig|ImportConfig|AliasConfig>,
  *     "when@prod"?: array<string, RouteConfig|ImportConfig|AliasConfig>,

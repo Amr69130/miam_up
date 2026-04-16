@@ -207,18 +207,57 @@
                     </h2>
                 </div>
                 
-                <!-- Deux colonnes -->
+                <!-- Trois colonnes -->
                 <div class="flex flex-col md:flex-row text-gray-800">
-                    <!-- Colonne Gauche -->
-                    <div class="w-full md:w-1/2 p-8 md:border-r border-black flex flex-col">
+                    <!-- 1ère Colonne : Liste des participants -->
+                    <div class="w-full md:w-1/3 p-8 md:border-r border-black flex flex-col">
+                        <h3 class="text-xl font-medium text-[#4DD0E1] text-center mb-6">Liste des participants :</h3>
+                        
+                        <div class="flex-grow text-sm text-left flex flex-col">
+                            <ul class="space-y-3 mb-6 flex-grow">
+                                {% for p in evenement.utilisateurs %}
+                                    {% set is_me = app.user and app.user.id == p.id %}
+                                    <li class="flex justify-between items-center text-sm pb-3 border-b border-dashed border-gray-200 last:border-0 last:pb-0">
+                                        <div class="flex items-center gap-2">
+                                            <span class="{% if is_me %}font-bold text-gray-900{% else %}text-gray-700{% endif %}">
+                                                {{ p.prenomUtilisateur }} {% if is_me %}(Moi){% endif %}
+                                            </span>
+                                            {% if evenement.createur and p.id == evenement.createur.id %}
+                                                <span class="text-amber-600 font-bold bg-amber-50 px-1.5 py-0.5 rounded text-[10px]">⭐ Orga</span>
+                                            {% endif %}
+                                        </div>
+
+                                        {% if not is_me %}
+                                            <div class="flex items-center">
+                                                <a href="/ami/add/{{ p.id }}" class="text-[#4f46e5] hover:text-white hover:bg-[#4f46e5] rounded-full w-7 h-7 flex items-center justify-center font-bold text-lg transition-colors border border-transparent" title="Ajouter en ami">+</a>
+                                            </div>
+                                        {% endif %}
+                                    </li>
+                                {% else %}
+                                    <li class="text-gray-500 text-center italic mt-4">Aucun participant pour le moment.</li>
+                                {% endfor %}
+                            </ul>
+
+                            <div class="mt-auto pt-4">
+                                {% set is_joined = app.user and evenement.utilisateurs.contains(app.user) %}
+                                <a href="/event/join/{{ evenement.id }}"
+                                   class="block w-full text-center py-2.5 rounded-md transition-colors text-sm font-bold border shadow-sm {% if is_joined %}bg-red-50 text-red-600 border-red-200 hover:bg-red-100{% else %}bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100{% endif %}">
+                                    {{ is_joined ? 'Quitter l\'événement' : 'Rejoindre l\'événement' }}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2ème Colonne : Description (Ancienne Colonne Gauche) -->
+                    <div class="w-full md:w-1/3 p-8 md:border-r border-black flex flex-col">
                         <h3 class="text-xl font-medium text-[#4DD0E1] text-center mb-6">Description de l'événement :</h3>
                         <p class="text-sm text-justify leading-relaxed">
                             {{ evenement.descriptionEvenement|default("Aucune description pour cet événement.")|nl2br }}
                         </p>
                     </div>
                     
-                    <!-- Colonne Droite -->
-                    <div class="w-full md:w-1/2 p-8 flex flex-col items-center">
+                    <!-- 3ème Colonne : Infos pratiques (Ancienne Colonne Droite) -->
+                    <div class="w-full md:w-1/3 p-8 flex flex-col items-center">
                         <h3 class="text-xl font-medium text-[#4DD0E1] text-center mb-10">Infos pratiques :</h3>
                         
                         <div class="space-y-6 text-sm text-left w-full max-w-[280px]">
