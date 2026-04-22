@@ -88,6 +88,12 @@ class Restaurant
     #[ORM\ManyToOne(inversedBy: 'restaurants')]
     private ?Utilisateur $proprietaire = null;
 
+    /**
+     * @var Collection<int, Avis>
+     */
+    #[ORM\OneToMany(targetEntity: Avis::class, mappedBy: 'restaurant')]
+    private Collection $avis;
+
     public function __construct()
     {
         $this->evenements = new ArrayCollection();
@@ -95,6 +101,7 @@ class Restaurant
         $this->amenagements = new ArrayCollection();
         $this->regimes = new ArrayCollection();
         $this->type = new ArrayCollection();
+        $this->avis = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -406,6 +413,36 @@ class Restaurant
     public function setProprietaire(?Utilisateur $proprietaire): static
     {
         $this->proprietaire = $proprietaire;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Avis>
+     */
+    public function getAvis(): Collection
+    {
+        return $this->avis;
+    }
+
+    public function addAvi(Avis $avi): static
+    {
+        if (!$this->avis->contains($avi)) {
+            $this->avis->add($avi);
+            $avi->setRestaurant($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAvi(Avis $avi): static
+    {
+        if ($this->avis->removeElement($avi)) {
+            // set the owning side to null (unless already changed)
+            if ($avi->getRestaurant() === $this) {
+                $avi->setRestaurant(null);
+            }
+        }
 
         return $this;
     }

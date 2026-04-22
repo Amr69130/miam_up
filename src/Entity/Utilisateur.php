@@ -92,6 +92,12 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Restaurant::class, mappedBy: 'proprietaire')]
     private Collection $restaurants;
 
+    /**
+     * @var Collection<int, Avis>
+     */
+    #[ORM\OneToMany(targetEntity: Avis::class, mappedBy: 'auteur')]
+    private Collection $avis;
+
     public function __construct()
     {
         $this->role = new ArrayCollection();
@@ -101,6 +107,7 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         $this->messages_envoyes = new ArrayCollection();
         $this->evenementsCrees = new ArrayCollection();
         $this->restaurants = new ArrayCollection();
+        $this->avis = new ArrayCollection();
     }
 
     // ===== UserInterface & PasswordAuthenticatedUserInterface =====
@@ -240,6 +247,36 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($restaurant->getProprietaire() === $this) {
                 $restaurant->setProprietaire(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Avis>
+     */
+    public function getAvis(): Collection
+    {
+        return $this->avis;
+    }
+
+    public function addAvi(Avis $avi): static
+    {
+        if (!$this->avis->contains($avi)) {
+            $this->avis->add($avi);
+            $avi->setAuteur($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAvi(Avis $avi): static
+    {
+        if ($this->avis->removeElement($avi)) {
+            // set the owning side to null (unless already changed)
+            if ($avi->getAuteur() === $this) {
+                $avi->setAuteur(null);
             }
         }
 
