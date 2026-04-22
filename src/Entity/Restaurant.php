@@ -85,6 +85,9 @@ class Restaurant
     #[ORM\Column(nullable: true)]
     private ?float $longitude = null;
 
+    #[ORM\ManyToOne(inversedBy: 'restaurants')]
+    private ?Utilisateur $proprietaire = null;
+
     public function __construct()
     {
         $this->evenements = new ArrayCollection();
@@ -394,4 +397,18 @@ class Restaurant
 
         return 'standard';
     }
+
+    public function getProprietaire(): ?Utilisateur
+    {
+        return $this->proprietaire;
+    }
+
+    public function setProprietaire(?Utilisateur $proprietaire): static
+    {
+        $this->proprietaire = $proprietaire;
+
+        return $this;
+    }
+
+
 }
