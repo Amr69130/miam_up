@@ -76,26 +76,50 @@ final class RestaurantController extends AbstractController
         return $this->redirectToRoute('app_panneau_resto');
     }
 
-    #[Route('/panneau/avis', name: 'app_panneau_avis')]
+#[Route('/panneau/avis', name: 'app_panneau_avis')]
     public function avis(): Response
     {
         $user = $this->getUser();
         $restaurant = $user ? $user->getRestaurants()->first() : null;
 
-        if (!$restaurant) return $this->redirectToRoute('app_home');
+        if (!$restaurant) {
+            return $this->redirectToRoute('app_home');
+        }
 
-        // Note : On pourra calculer ici la moyenne réelle plus tard
+        // On récupère les avis de ce restaurant depuis la BDD
+        $avisCollection = $restaurant->getAvis(); 
+        $totalAvis = count($avisCollection);
+        
+        // Initialisation des compteurs pour les stats
+        $sommeNotes = 0;
+        $distribution = [5 => 0, 4 => 0, 3 => 0, 2 => 0, 1 => 0];
+        
+        // On calcule la somme et on compte les étoiles
+        foreach ($avisCollection as $avis) {
+            $sommeNotes += $avis->getNote();
+            $distribution[$avis->getNote()]++;
+        }
+
+        // Calcul de la moyenne réelle
+        $moyenne = $totalAvis > 0 ? round($sommeNotes / $totalAvis, 1) : 0;
+
+        // Préparation des pourcentages pour le graphique Twig
+        $stats = [];
+        foreach ($distribution as $etoile => $quantite) {
+            $stats[] = [
+                'etoiles' => $etoile,
+                'pourcentage' => $totalAvis > 0 ? round(($quantite / $totalAvis) * 100) : 0
+            ];
+        }
+
         return $this->render('pannel_resto/avis_clients.html.twig', [
             'active' => 'monresto',
             'active_tab' => 'avis',
             'restaurant' => $restaurant,
-            'note_moyenne' => 4.5, // Exemple statique en attendant le calcul SQL
-            'distribution' => [
-                ['etoiles' => 5, 'pourcentage' => 80],
-                ['etoiles' => 4, 'pourcentage' => 15],
-                ['etoiles' => 3, 'pourcentage' => 5],
-            ],
-            'avis_list' => [] // À lier avec une table Avis si elle existe
+            'note_moyenne' => $moyenne,
+            'total_avis' => $totalAvis,
+            'distribution' => array_reverse($stats, true), 
+            'avis_list' => $avisCollection
         ]);
     }
 
