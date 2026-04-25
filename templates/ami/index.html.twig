@@ -6,7 +6,7 @@
     <div class="max-w-4xl mx-auto p-6">
         <h1 class="text-3xl font-bold mb-8 text-indigo-700">🤝 Espace Social</h1>
 
-        {# 1. SECTION DEMANDES REÇUES (À ACCEPTER) #}
+        {# 1. SECTION DEMANDES REÇUES #}
         <div class="bg-white shadow-md rounded-lg p-6 mb-8 border-l-4 border-yellow-400">
             <h2 class="text-xl font-semibold mb-4 text-gray-800 flex items-center gap-2">
                 <span>📥</span> Demandes en attente
@@ -28,7 +28,7 @@
             {% endif %}
         </div>
 
-        {# 2. SECTION DEMANDES ENVOYÉES (EN ATTENTE DE LEUR RÉPONSE) #}
+        {# 2. SECTION DEMANDES ENVOYÉES #}
         <div class="bg-white shadow-md rounded-lg p-6 mb-8 border-l-4 border-blue-400">
             <h2 class="text-xl font-semibold mb-4 text-gray-800 flex items-center gap-2">
                 <span>📤</span> Demandes envoyées
@@ -49,14 +49,14 @@
             {% endif %}
         </div>
 
-        {# 3. SECTION MES AMIS (DÉJÀ ACCEPTÉS) #}
-        <div class="bg-white shadow-md rounded-lg p-6 border border-gray-100">
+        {# 3. SECTION MES AMIS #}
+        <div class="bg-white shadow-md rounded-lg p-6 border border-gray-100 mb-8">
             <h2 class="text-xl font-semibold mb-6 text-gray-800 flex items-center gap-2">
                 <span class="text-2xl">👥</span> Ma liste d'amis
             </h2>
 
             {% if amis is empty %}
-                <p class="text-gray-500 italic text-center py-4">Vous n'avez pas encore d'amis dans votre liste.</p>
+                <p class="text-gray-500 italic text-center py-4">Vous n'avez pas encore d'amis.</p>
             {% else %}
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                     {% for amitie in amis %}
@@ -73,5 +73,29 @@
                 </div>
             {% endif %}
         </div>
-    </div>
+
+        <hr class="my-10 border-gray-200">
+
+        {# ZONE DE TEST DU CHAT #}
+        <div class="mt-8 bg-gray-100 p-6 rounded-2xl border-2 border-dashed border-gray-300">
+            <h2 class="text-xl font-bold mb-6 text-gray-800 flex items-center gap-2">
+                <span>💬</span> Test du Chat en direct
+            </h2>
+
+            {% if amis is not empty %}
+                {% set premierAmitie = amis|first %}
+                {% set premierAmi = (premierAmitie.utilisateurDemandeur == app.user) ? premierAmitie.utilisateurReceveur : premierAmitie.utilisateurDemandeur %}
+
+                <div id="react-chat-root"
+                     data-id-ami="{{ premierAmi.id }}"
+                     data-prenom-ami="{{ premierAmi.prenomUtilisateur }}"
+                     class="max-w-md mx-auto">
+                    {# Le composant React va se charger ici #}
+                </div>
+            {% else %}
+                <p class="text-gray-500 italic text-center">Ajoutez un ami pour tester le chat.</p>
+            {% endif %}
+        </div>
+
+    </div> {# FIN DU max-w-4xl #}
 {% endblock %}
