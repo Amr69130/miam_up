@@ -37,6 +37,7 @@ class Conversation
     {
         $this->membres = new ArrayCollection();
         $this->messages = new ArrayCollection();
+        $this->date_creation = new \DateTime();
     }
 
     public function getId(): ?int

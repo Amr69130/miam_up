@@ -16,6 +16,20 @@ class ConversationRepository extends ServiceEntityRepository
         parent::__construct($registry, Conversation::class);
     }
 
+    public function findConversationBetweenTwoUsers(int $userId1, int $userId2): ?Conversation
+    {
+        return $this->createQueryBuilder('c')
+            ->join('c.membres', 'm1')
+            ->join('c.membres', 'm2')
+            ->where('m1.id = :user1')
+            ->andWhere('m2.id = :user2')
+            ->setParameter('user1', $userId1)
+            ->setParameter('user2', $userId2)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
     //    /**
     //     * @return Conversation[] Returns an array of Conversation objects
     //     */

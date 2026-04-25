@@ -29,6 +29,11 @@ class Message
     #[ORM\ManyToOne(inversedBy: 'messages_envoyes')]
     private ?Utilisateur $expediteur = null;
 
+    public function __construct()
+    {
+        $this->date_message = new \DateTime();
+        $this->status_message = 'envoyé';
+    }
     public function getId(): ?int
     {
         return $this->id;
