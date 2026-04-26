@@ -49,4 +49,29 @@ if (chatElement) {
     );
 }
 
+// Fonction pour mettre à jour la pastille de messages
+window.updateUnreadBadge = async function() {
+    try {
+        const response = await fetch('/api/chat/unread-count');
+        const data = await response.json();
+        const badge = document.getElementById('unread-badge');
+
+        if (badge) {
+            if (data.unreadCount > 0) {
+                badge.innerText = data.unreadCount;
+                badge.style.display = 'block'; // On utilise style.display au lieu de classList
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+    } catch (error) {
+        console.error("Erreur lors de la récupération des messages non lus", error);
+    }
+}
+
+// On l'exécute au chargement de la page
+updateUnreadBadge();
+
+// On vérifie toutes les 10 secondes pour que la pastille se mette à jour "en direct"
+setInterval(() => window.updateUnreadBadge(), 10000);
 console.log('Système React activé !');

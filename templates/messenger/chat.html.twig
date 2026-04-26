@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="list-group shadow-sm">
+                    <div class="list-group-item bg-light font-weight-bold">Mes conversations</div>
+                    {% for ami in liste_amis %}
+                        <a href="{{ path('app_messenger_chat', {id: ami.id}) }}"
+                           class="list-group-item list-group-item-action {{ ami.id == ami_selectionne.id ? 'active' : '' }}">
+                            {{ ami.prenomUtilisateur }}
+                            {# Optionnel : On pourrait ajouter une petite pastille ici aussi #}
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="col-md-8">
+                <div id="react-chat-root"
+                     data-id-ami="{{ ami_selectionne.id }}"
+                     data-prenom-ami="{{ ami_selectionne.prenomUtilisateur }}">
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
