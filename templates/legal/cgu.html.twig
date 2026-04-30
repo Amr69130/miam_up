@@ -1,0 +1,69 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Conditions Générales d'Utilisation - Miam Up{% endblock %}
+
+{% block body %}
+<main id="main-content" class="container mx-auto px-4 py-8 max-w-4xl bg-white shadow-md rounded-lg mt-8 mb-8" role="main">
+    <h1 class="text-3xl border-b-2 border-emerald-500 pb-2 mb-6 text-gray-800 font-bold" tabindex="0">Conditions Générales d'Utilisation (CGU)</h1>
+
+    <section class="mb-8" aria-labelledby="section-preambule">
+        <h2 id="section-preambule" class="text-2xl font-semibold mb-3 text-gray-700" tabindex="0">1. Préambule</h2>
+        <p class="text-gray-600 mb-2 leading-relaxed">
+            Les présentes conditions générales d'utilisation (ci-après les "CGU") ont pour objet l'encadrement juridique des modalités de mise à disposition du site et des services par Miam'Up et de définir les conditions d'accès et d'utilisation des services par "l'Utilisateur".
+        </p>
+    </section>
+
+    <section class="mb-8" aria-labelledby="section-acces">
+        <h2 id="section-acces" class="text-2xl font-semibold mb-3 text-gray-700" tabindex="0">2. Accès au site</h2>
+        <p class="text-gray-600 mb-2 leading-relaxed">
+            Le site Miam'Up est accessible gratuitement en tout lieu à tout Utilisateur ayant un accès à Internet. Tous les frais supportés par l'Utilisateur pour accéder au service (matériel informatique, logiciels, connexion Internet, etc.) sont à sa charge.
+        </p>
+    </section>
+
+    <section class="mb-8" aria-labelledby="section-donnees">
+        <h2 id="section-donnees" class="text-2xl font-semibold mb-3 text-gray-700" tabindex="0">3. Protection des données personnelles (RGPD)</h2>
+        <p class="text-gray-600 mb-2 leading-relaxed">
+            En conformité avec le Règlement Général sur la Protection des Données (RGPD), Miam'Up s'engage à protéger les données à caractère personnel des Utilisateurs.
+        </p>
+        <ul class="list-disc list-inside text-gray-600 mb-4 space-y-2">
+            <li><strong>Finalité du traitement :</strong> Les données collectées sont nécessaires pour la gestion des comptes, les commandes, et l'amélioration de nos services.</li>
+            <li><strong>Conservation :</strong> Les données sont conservées pour la durée de la relation commerciale augmentée des durées de prescription légales.</li>
+            <li><strong>Droits de l'utilisateur :</strong> Conformément à la réglementation applicable, vous disposez d'un droit vis-à-vis de vos données : droit d'accès, de rectification, de suppression, et d'opposition.</li>
+        </ul>
+        <p class="text-gray-600 mb-2">
+            Pour exercer ces droits, vous pouvez nous contacter par courriel à l'adresse suivante : 
+            <a href="mailto:contact@miamup.fr" class="text-emerald-600 underline font-medium hover:text-emerald-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 rounded" aria-label="Envoyer un email à contact@miamup.fr">contact@miamup.fr</a>.
+        </p>
+    </section>
+
+    <section class="mb-8" aria-labelledby="section-accessibilite">
+        <h2 id="section-accessibilite" class="text-2xl font-semibold mb-3 text-gray-700" tabindex="0">4. Accessibilité (RGAA)</h2>
+        <p class="text-gray-600 mb-2 leading-relaxed">
+            Miam'Up s'engage à rendre ses sites internet accessibles, conformément à l’article 47 de la loi n° 2005-102 du 11 février 2005. À cette fin, elle met en œuvre la stratégie et les actions nécessaires pour tendre vers une conformité totale au Référentiel Général d’Amélioration de l’Accessibilité (RGAA).
+        </p>
+        <p class="text-gray-600 mb-2 leading-relaxed">
+            Nous avons pris soin d'intégrer des contrastes suffisants (WCAG), une navigation au clavier optimisée, des balises de structuration (landmarks) pertinentes et des textes alternatifs pour les images porteuses de sens.
+        </p>
+        <p class="text-gray-600 mb-2">
+            En cas de difficulté pour naviguer ou accéder à un contenu, vous pouvez nous contacter à : 
+            <a href="mailto:accessibilite@miamup.fr" class="text-emerald-600 underline font-medium hover:text-emerald-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 rounded" aria-label="Envoyer un email à accessibilite@miamup.fr">accessibilite@miamup.fr</a>.
+        </p>
+    </section>
+
+    <section class="mb-8" aria-labelledby="section-propriete">
+        <h2 id="section-propriete" class="text-2xl font-semibold mb-3 text-gray-700" tabindex="0">5. Propriété intellectuelle</h2>
+        <p class="text-gray-600 mb-2 leading-relaxed">
+            Les marques, logos, signes ainsi que tous les contenus du site (textes, images, son...) font l'objet d'une protection par le Code de la propriété intellectuelle et plus particulièrement par le droit d'auteur.
+        </p>
+    </section>
+
+    <div class="mt-10 mb-4 text-center">
+        <a href="/" class="inline-flex items-center justify-center px-6 py-3 text-white bg-emerald-500 rounded-md hover:bg-emerald-600 focus:outline-none focus:ring-4 focus:ring-emerald-300 transition-colors font-medium text-lg" role="button" aria-label="Retourner à la page d'accueil">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Retour à l'accueil
+        </a>
+    </div>
+</main>
+{% endblock %}
