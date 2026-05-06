@@ -34,5 +34,15 @@
     </div>
     {# ------------------------------------------ #}
         {% block body %}{% endblock %}
+
+        {# --- FOOTER GLOBAL --- #}
+        <footer class="mt-auto py-6 text-center text-sm text-gray-500 w-full mb-0 md:bg-white border-t border-gray-200">
+            <p>
+                &copy; {{ 'now'|date('Y') }} Miam'Up. Tous droits réservés. |
+                <a href="{{ path('app_cgu') }}" class="text-emerald-500 hover:text-emerald-600 hover:underline transition">
+                    Conditions Générales d'Utilisation
+                </a>
+            </p>
+        </footer>
     </body>
 </html>
