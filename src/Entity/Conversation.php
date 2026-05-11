@@ -33,6 +33,10 @@ class Conversation
     #[ORM\OneToMany(targetEntity: Message::class, mappedBy: 'conversation')]
     private Collection $messages;
 
+    // --- NOUVELLE RELATION AJOUTÉE ICI ---
+    #[ORM\OneToOne(inversedBy: 'conversation', cascade: ['persist', 'remove'])]
+    private ?Evenement $evenement = null;
+
     public function __construct()
     {
         $this->membres = new ArrayCollection();
@@ -114,10 +118,27 @@ class Conversation
     public function removeMessage(Message $message): static
     {
         if ($this->messages->removeElement($message)) {
-            // set the owning side to null (unless already changed)
             if ($message->getConversation() === $this) {
                 $message->setConversation(null);
             }
+        }
+
+        return $this;
+    }
+
+    // --- NOUVEAUX GETTER ET SETTER POUR L'ÉVÉNEMENT ---
+    public function getEvenement(): ?Evenement
+    {
+        return $this->evenement;
+    }
+
+    public function setEvenement(?Evenement $evenement): static
+    {
+        $this->evenement = $evenement;
+
+        // On s'assure que l'autre côté (Evenement) est aussi au courant de la liaison
+        if ($evenement !== null && $evenement->getConversation() !== $this) {
+            $evenement->setConversation($this);
         }
 
         return $this;

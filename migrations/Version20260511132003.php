@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20260220135731 extends AbstractMigration
+final class Version20260511132003 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -21,9 +21,10 @@ final class Version20260220135731 extends AbstractMigration
     {
         // this up() migration is auto-generated, please modify it to your needs
         $this->addSql('CREATE TABLE amenagement (id INT AUTO_INCREMENT NOT NULL, nom_amenagement VARCHAR(255) NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
-        $this->addSql('CREATE TABLE conversation (id INT AUTO_INCREMENT NOT NULL, nom_conversation VARCHAR(255) DEFAULT NULL, date_creation DATETIME NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE amitie (id INT AUTO_INCREMENT NOT NULL, utilisateur_demandeur_id INT NOT NULL, utilisateur_receveur_id INT NOT NULL, statut VARCHAR(255) NOT NULL, INDEX IDX_8FF9F39CFC54CAAA (utilisateur_demandeur_id), INDEX IDX_8FF9F39C4D81EBB5 (utilisateur_receveur_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE conversation (id INT AUTO_INCREMENT NOT NULL, evenement_id INT DEFAULT NULL, nom_conversation VARCHAR(255) DEFAULT NULL, date_creation DATETIME NOT NULL, UNIQUE INDEX UNIQ_8A8E26E9FD02F13 (evenement_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE conversation_utilisateur (conversation_id INT NOT NULL, utilisateur_id INT NOT NULL, INDEX IDX_F3031EC39AC0396 (conversation_id), INDEX IDX_F3031EC3FB88E14F (utilisateur_id), PRIMARY KEY(conversation_id, utilisateur_id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
-        $this->addSql('CREATE TABLE evenement (id INT AUTO_INCREMENT NOT NULL, restaurant_id INT DEFAULT NULL, date_evenement DATETIME NOT NULL, description_evenement LONGTEXT DEFAULT NULL, nombre_places INT DEFAULT NULL, participants VARCHAR(255) DEFAULT NULL, INDEX IDX_B26681EB1E7706E (restaurant_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE evenement (id INT AUTO_INCREMENT NOT NULL, restaurant_id INT DEFAULT NULL, createur_id INT DEFAULT NULL, date_evenement DATETIME NOT NULL, description_evenement LONGTEXT DEFAULT NULL, nombre_places INT DEFAULT NULL, titre VARCHAR(255) NOT NULL, date_fin DATETIME DEFAULT NULL, INDEX IDX_B26681EB1E7706E (restaurant_id), INDEX IDX_B26681E73A201E5 (createur_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE evenement_utilisateur (evenement_id INT NOT NULL, utilisateur_id INT NOT NULL, INDEX IDX_8C897598FD02F13 (evenement_id), INDEX IDX_8C897598FB88E14F (utilisateur_id), PRIMARY KEY(evenement_id, utilisateur_id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE message (id INT AUTO_INCREMENT NOT NULL, conversation_id INT DEFAULT NULL, expediteur_id INT DEFAULT NULL, date_message DATETIME NOT NULL, contenu LONGTEXT NOT NULL, status_message VARCHAR(255) NOT NULL, INDEX IDX_B6BD307F9AC0396 (conversation_id), INDEX IDX_B6BD307F10335F61 (expediteur_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE paiement (id INT AUTO_INCREMENT NOT NULL, utilisateur_id INT DEFAULT NULL, date_paiement DATETIME NOT NULL, id_transaction VARCHAR(255) NOT NULL, montant INT NOT NULL, status_paiement VARCHAR(255) NOT NULL, INDEX IDX_B1DC7A1EFB88E14F (utilisateur_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
@@ -38,10 +39,15 @@ final class Version20260220135731 extends AbstractMigration
         $this->addSql('CREATE TABLE type (id INT AUTO_INCREMENT NOT NULL, nom_type VARCHAR(255) NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE utilisateur (id INT AUTO_INCREMENT NOT NULL, nom_utilisateur VARCHAR(255) NOT NULL, prenom_utilisateur VARCHAR(255) NOT NULL, email_utilisateur VARCHAR(255) NOT NULL, pseudo_utilisateur VARCHAR(255) NOT NULL, photo_profil VARCHAR(255) DEFAULT NULL, description_utilisateur VARCHAR(255) DEFAULT NULL, note_utilisateur VARCHAR(255) DEFAULT NULL, password VARCHAR(255) NOT NULL, num_utilisateur INT DEFAULT NULL, latitude DOUBLE PRECISION DEFAULT NULL, longitude DOUBLE PRECISION DEFAULT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE utilisateur_role (utilisateur_id INT NOT NULL, role_id INT NOT NULL, INDEX IDX_9EE8E650FB88E14F (utilisateur_id), INDEX IDX_9EE8E650D60322AC (role_id), PRIMARY KEY(utilisateur_id, role_id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
-        $this->addSql('CREATE TABLE messenger_messages (id BIGINT AUTO_INCREMENT NOT NULL, body LONGTEXT NOT NULL, headers LONGTEXT NOT NULL, queue_name VARCHAR(190) NOT NULL, created_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', available_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', delivered_at DATETIME DEFAULT NULL COMMENT \'(DC2Type:datetime_immutable)\', INDEX IDX_75EA56E0FB7336F0 (queue_name), INDEX IDX_75EA56E0E3BD61CE (available_at), INDEX IDX_75EA56E016BA31DB (delivered_at), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE utilisateur_favoris (utilisateur_id INT NOT NULL, restaurant_id INT NOT NULL, INDEX IDX_F33833A0FB88E14F (utilisateur_id), INDEX IDX_F33833A0B1E7706E (restaurant_id), PRIMARY KEY(utilisateur_id, restaurant_id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('CREATE TABLE messenger_messages (id BIGINT AUTO_INCREMENT NOT NULL, body LONGTEXT NOT NULL, headers LONGTEXT NOT NULL, queue_name VARCHAR(190) NOT NULL, created_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', available_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', delivered_at DATETIME DEFAULT NULL COMMENT \'(DC2Type:datetime_immutable)\', INDEX IDX_75EA56E0FB7336F0E3BD61CE16BA31DBBF396750 (queue_name, available_at, delivered_at, id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('ALTER TABLE amitie ADD CONSTRAINT FK_8FF9F39CFC54CAAA FOREIGN KEY (utilisateur_demandeur_id) REFERENCES utilisateur (id)');
+        $this->addSql('ALTER TABLE amitie ADD CONSTRAINT FK_8FF9F39C4D81EBB5 FOREIGN KEY (utilisateur_receveur_id) REFERENCES utilisateur (id)');
+        $this->addSql('ALTER TABLE conversation ADD CONSTRAINT FK_8A8E26E9FD02F13 FOREIGN KEY (evenement_id) REFERENCES evenement (id)');
         $this->addSql('ALTER TABLE conversation_utilisateur ADD CONSTRAINT FK_F3031EC39AC0396 FOREIGN KEY (conversation_id) REFERENCES conversation (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE conversation_utilisateur ADD CONSTRAINT FK_F3031EC3FB88E14F FOREIGN KEY (utilisateur_id) REFERENCES utilisateur (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE evenement ADD CONSTRAINT FK_B26681EB1E7706E FOREIGN KEY (restaurant_id) REFERENCES restaurant (id)');
+        $this->addSql('ALTER TABLE evenement ADD CONSTRAINT FK_B26681E73A201E5 FOREIGN KEY (createur_id) REFERENCES utilisateur (id)');
         $this->addSql('ALTER TABLE evenement_utilisateur ADD CONSTRAINT FK_8C897598FD02F13 FOREIGN KEY (evenement_id) REFERENCES evenement (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE evenement_utilisateur ADD CONSTRAINT FK_8C897598FB88E14F FOREIGN KEY (utilisateur_id) REFERENCES utilisateur (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE message ADD CONSTRAINT FK_B6BD307F9AC0396 FOREIGN KEY (conversation_id) REFERENCES conversation (id)');
@@ -57,14 +63,20 @@ final class Version20260220135731 extends AbstractMigration
         $this->addSql('ALTER TABLE restaurant_type ADD CONSTRAINT FK_4EC8C74DC54C8C93 FOREIGN KEY (type_id) REFERENCES type (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE utilisateur_role ADD CONSTRAINT FK_9EE8E650FB88E14F FOREIGN KEY (utilisateur_id) REFERENCES utilisateur (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE utilisateur_role ADD CONSTRAINT FK_9EE8E650D60322AC FOREIGN KEY (role_id) REFERENCES role (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE utilisateur_favoris ADD CONSTRAINT FK_F33833A0FB88E14F FOREIGN KEY (utilisateur_id) REFERENCES utilisateur (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE utilisateur_favoris ADD CONSTRAINT FK_F33833A0B1E7706E FOREIGN KEY (restaurant_id) REFERENCES restaurant (id) ON DELETE CASCADE');
     }
 
     public function down(Schema $schema): void
     {
         // this down() migration is auto-generated, please modify it to your needs
+        $this->addSql('ALTER TABLE amitie DROP FOREIGN KEY FK_8FF9F39CFC54CAAA');
+        $this->addSql('ALTER TABLE amitie DROP FOREIGN KEY FK_8FF9F39C4D81EBB5');
+        $this->addSql('ALTER TABLE conversation DROP FOREIGN KEY FK_8A8E26E9FD02F13');
         $this->addSql('ALTER TABLE conversation_utilisateur DROP FOREIGN KEY FK_F3031EC39AC0396');
         $this->addSql('ALTER TABLE conversation_utilisateur DROP FOREIGN KEY FK_F3031EC3FB88E14F');
         $this->addSql('ALTER TABLE evenement DROP FOREIGN KEY FK_B26681EB1E7706E');
+        $this->addSql('ALTER TABLE evenement DROP FOREIGN KEY FK_B26681E73A201E5');
         $this->addSql('ALTER TABLE evenement_utilisateur DROP FOREIGN KEY FK_8C897598FD02F13');
         $this->addSql('ALTER TABLE evenement_utilisateur DROP FOREIGN KEY FK_8C897598FB88E14F');
         $this->addSql('ALTER TABLE message DROP FOREIGN KEY FK_B6BD307F9AC0396');
@@ -80,7 +92,10 @@ final class Version20260220135731 extends AbstractMigration
         $this->addSql('ALTER TABLE restaurant_type DROP FOREIGN KEY FK_4EC8C74DC54C8C93');
         $this->addSql('ALTER TABLE utilisateur_role DROP FOREIGN KEY FK_9EE8E650FB88E14F');
         $this->addSql('ALTER TABLE utilisateur_role DROP FOREIGN KEY FK_9EE8E650D60322AC');
+        $this->addSql('ALTER TABLE utilisateur_favoris DROP FOREIGN KEY FK_F33833A0FB88E14F');
+        $this->addSql('ALTER TABLE utilisateur_favoris DROP FOREIGN KEY FK_F33833A0B1E7706E');
         $this->addSql('DROP TABLE amenagement');
+        $this->addSql('DROP TABLE amitie');
         $this->addSql('DROP TABLE conversation');
         $this->addSql('DROP TABLE conversation_utilisateur');
         $this->addSql('DROP TABLE evenement');
@@ -98,6 +113,7 @@ final class Version20260220135731 extends AbstractMigration
         $this->addSql('DROP TABLE type');
         $this->addSql('DROP TABLE utilisateur');
         $this->addSql('DROP TABLE utilisateur_role');
+        $this->addSql('DROP TABLE utilisateur_favoris');
         $this->addSql('DROP TABLE messenger_messages');
     }
 }

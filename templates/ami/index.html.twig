@@ -21,6 +21,33 @@
                 {# --- COLONNE GAUCHE (5/12) : GESTION SOCIALE --- #}
                 <div class="lg:col-span-5 space-y-8">
 
+                    {# --- NOUVEAU : TES GROUPES DE TABLE (CONVERSATIONS) --- #}
+                    <section class="bg-white shadow-md rounded-3xl border border-gray-200 overflow-hidden p-6 border-l-4 border-l-green-500">
+                        <h2 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                            <span class="text-xl">🥗</span> Mes Groupes de Table
+                        </h2>
+
+                        {% if conversations is empty %}
+                            <p class="text-gray-400 text-sm italic text-center py-4">Vous n'avez rejoint aucun événement.</p>
+                        {% else %}
+                            <div class="space-y-3">
+                                {% for conv in conversations %}
+                                    <div class="p-3 rounded-2xl bg-green-50 border border-green-100 flex items-center justify-between group hover:bg-green-100 transition-colors">
+                                        <div>
+                                            <p class="font-bold text-gray-800 text-sm">{{ conv.nomConversation }}</p>
+                                            <p class="text-[10px] text-gray-500 italic">
+                                                {{ conv.evenement.restaurant.nomRestaurant ?? 'Restaurant inconnu' }}
+                                            </p>
+                                        </div>
+                                        <span class="text-[9px] bg-green-600 text-white px-3 py-1 rounded-full font-bold shadow-sm uppercase tracking-wider">
+                                            Groupe
+                                        </span>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </section>
+
                     {# 1. DEMANDES EN ATTENTE (REÇUES & ENVOYÉES) #}
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-6">
                         {# REÇUES #}
@@ -83,8 +110,7 @@
                             <p class="text-gray-400 text-sm italic text-center py-10">Vous n'avez pas encore d'amis.</p>
                         {% else %}
                             <div class="grid grid-cols-2 gap-4">
-                                {% for amitie in amis %}
-                                    {% set ami = (amitie.utilisateurDemandeur == app.user) ? amitie.utilisateurReceveur : amitie.utilisateurDemandeur %}
+                                {% for ami in amis %}
                                     <div class="p-4 rounded-2xl bg-indigo-50/50 border border-indigo-100 flex flex-col items-center text-center group hover:bg-indigo-100 transition-all duration-300">
                                         <div class="w-12 h-12 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-lg shadow-md mb-2 group-hover:scale-110 transition-transform">
                                             {{ ami.prenomUtilisateur|slice(0,1)|upper }}
@@ -107,15 +133,15 @@
                         {# HEADER DU CHAT AVEC L'AMI ACTUEL #}
                         {% set selectedId = app.request.query.get('chatWith') %}
                         {% set amiActuel = null %}
-                        {% for amitie in amis %}
-                            {% set ami = (amitie.utilisateurDemandeur == app.user) ? amitie.utilisateurReceveur : amitie.utilisateurDemandeur %}
+
+                        {# On cherche l'ami sélectionné dans la liste simplifiée #}
+                        {% for ami in amis %}
                             {% if loop.first and selectedId is null %}{% set selectedId = ami.id %}{% endif %}
                             {% if ami.id == selectedId %}{% set amiActuel = ami %}{% endif %}
                         {% endfor %}
 
                         {% if amis is not empty and amiActuel is null %}
-                            {% set premierAmitie = amis|first %}
-                            {% set amiActuel = (premierAmitie.utilisateurDemandeur == app.user) ? premierAmitie.utilisateurReceveur : premierAmitie.utilisateurDemandeur %}
+                            {% set amiActuel = amis|first %}
                         {% endif %}
 
                         {# ZONE REACT CONTENUE DANS UN BLOC UNIQUE #}
