@@ -16,7 +16,7 @@ class ConversationRepository extends ServiceEntityRepository
         parent::__construct($registry, Conversation::class);
     }
 
-    public function findConversationBetweenTwoUsers(int $userId1, int $userId2): ?Conversation
+    /*public function findConversationBetweenTwoUsers(int $userId1, int $userId2): ?Conversation
     {
         return $this->createQueryBuilder('c')
             ->join('c.membres', 'm1')
@@ -25,6 +25,24 @@ class ConversationRepository extends ServiceEntityRepository
             ->andWhere('m2.id = :user2')
             ->setParameter('user1', $userId1)
             ->setParameter('user2', $userId2)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }*/
+    public function findConversationBetweenTwoUsers($user1Id, $user2Id)
+    {
+        return $this->createQueryBuilder('c')
+            ->join('c.membres', 'm1')
+            ->join('c.membres', 'm2')
+            ->where('m1.id = :u1')
+            ->andWhere('m2.id = :u2')
+            // On ajoute cette sous-requête pour compter le nombre total de membres
+            // Si le compte est différent de 2, ce n'est pas un chat privé !
+            ->andWhere('(SELECT COUNT(m3) FROM App\Entity\Conversation c2
+                     JOIN c2.membres m3
+                     WHERE c2.id = c.id) = 2')
+            ->setParameter('u1', $user1Id)
+            ->setParameter('u2', $user2Id)
             ->setMaxResults(1)
             ->getQuery()
             ->getOneOrNullResult();

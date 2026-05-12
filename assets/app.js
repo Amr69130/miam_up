@@ -37,14 +37,22 @@ if (mapElement) {
  */
 const chatElement = document.getElementById('react-chat-root');
 if (chatElement) {
-    // On récupère l'ID et le Prénom de l'ami passés via le Twig
+    // On récupère TOUTES les données passées par Twig (Ami OU Groupe)
     const idAmi = chatElement.getAttribute('data-id-ami');
+    const idGroupe = chatElement.getAttribute('data-id-groupe'); // Ajout
     const prenomAmi = chatElement.getAttribute('data-prenom-ami');
+    const nomGroupe = chatElement.getAttribute('data-nom-groupe'); // Ajout
 
     const root = ReactDOM.createRoot(chatElement);
     root.render(
         <React.StrictMode>
-            <Chat idAmi={idAmi} prenomAmi={prenomAmi} />
+            {/* On passe maintenant les 4 props au composant Chat */}
+            <Chat
+                idAmi={idAmi}
+                idGroupe={idGroupe}
+                prenomAmi={prenomAmi}
+                nomGroupe={nomGroupe}
+            />
         </React.StrictMode>
     );
 }
