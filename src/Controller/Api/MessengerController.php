@@ -205,9 +205,9 @@ class MessengerController extends AbstractController
         }
 
         $isImage = str_starts_with($mimeType, 'image/');
-        $uploadDir = $params->get('kernel.project_dir') . '/public/uploads/messages';
-        if (!is_dir($uploadDir)) {
-            mkdir($uploadDir, 0755, true);
+        $uploadDir = $params->get('kernel.project_dir') . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR . 'messages';
+        if (!is_dir($uploadDir) && !mkdir($uploadDir, 0775, true) && !is_dir($uploadDir)) {
+            return new JsonResponse(['error' => 'Impossible de créer le dossier d\'upload'], 500);
         }
 
         $safeName = preg_replace('/[^a-zA-Z0-9_\-]/', '_', pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));

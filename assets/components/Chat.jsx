@@ -5,6 +5,7 @@ const Chat = ({ idAmi, prenomAmi }) => {
     const [nouveauMessage, setNouveauMessage] = useState('');
     const [loading, setLoading] = useState(true);
     const [uploading, setUploading] = useState(false);
+    const [pastePreview, setPastePreview] = useState(null); // { file, url }
     const messagesEndRef = useRef(null);
     const fileInputRef = useRef(null);
 
@@ -63,11 +64,8 @@ const Chat = ({ idAmi, prenomAmi }) => {
         }
     };
 
-    // Envoyer un fichier / image
-    const handleFileUpload = async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
+    // Fonction centrale d'envoi d'un fichier (utilisée par input ET paste)
+    const uploadFile = async (file, onDone) => {
         setUploading(true);
         const formData = new FormData();
         formData.append('fichier', file);
@@ -80,15 +78,54 @@ const Chat = ({ idAmi, prenomAmi }) => {
             if (response.ok) {
                 fetchMessages();
             } else {
-                const data = await response.json();
-                alert(data.error || 'Erreur lors de l\'envoi du fichier');
+                let errMsg = 'Erreur lors de l\'envoi du fichier';
+                try { const data = await response.json(); errMsg = data.error || errMsg; } catch (_) {}
+                alert(errMsg);
             }
         } catch (error) {
             console.error("Erreur upload:", error);
+            alert('Impossible d\'envoyer le fichier. Vérifiez votre connexion.');
         } finally {
             setUploading(false);
-            e.target.value = '';
+            if (onDone) onDone();
         }
+    };
+
+    // Envoyer un fichier via le sélecteur
+    const handleFileUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        await uploadFile(file, () => { e.target.value = ''; });
+    };
+
+    // Coller une image depuis le presse-papier (Ctrl+V)
+    const handlePaste = (e) => {
+        const items = e.clipboardData?.items;
+        if (!items) return;
+        for (const item of items) {
+            if (item.type.startsWith('image/')) {
+                e.preventDefault();
+                const file = item.getAsFile();
+                if (!file) return;
+                const previewUrl = URL.createObjectURL(file);
+                setPastePreview({ file, url: previewUrl });
+                return;
+            }
+        }
+    };
+
+    // Confirmer l'envoi de l'image collée
+    const confirmPasteSend = async () => {
+        if (!pastePreview) return;
+        const file = pastePreview.file;
+        URL.revokeObjectURL(pastePreview.url);
+        setPastePreview(null);
+        await uploadFile(file);
+    };
+
+    const cancelPaste = () => {
+        if (pastePreview) URL.revokeObjectURL(pastePreview.url);
+        setPastePreview(null);
     };
 
     // Scroll automatique
@@ -182,6 +219,25 @@ const Chat = ({ idAmi, prenomAmi }) => {
                 <div ref={messagesEndRef} />
             </div>
 
+            {/* Aperçu image collée (Ctrl+V) */}
+            {pastePreview && (
+                <div className="px-4 py-3 bg-yellow-50 border-t border-yellow-200 flex items-center gap-3 shrink-0">
+                    <img src={pastePreview.url} alt="Aperçu" className="h-16 w-16 object-cover rounded-lg border border-yellow-300" />
+                    <div className="flex-1 text-sm text-yellow-800">Envoyer cette image ?</div>
+                    <button
+                        type="button"
+                        onClick={confirmPasteSend}
+                        disabled={uploading}
+                        className="bg-[#00A9A5] text-white px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-[#008F8C] disabled:opacity-50 transition-colors"
+                    >Envoyer</button>
+                    <button
+                        type="button"
+                        onClick={cancelPaste}
+                        className="text-gray-400 hover:text-gray-600 px-2 py-1.5 text-xs transition-colors"
+                    >Annuler</button>
+                </div>
+            )}
+
             {/* Formulaire d'envoi - Fixe en bas */}
             <form onSubmit={handleSend} className="p-4 bg-white border-t border-gray-100 flex gap-2 shrink-0 items-center">
                 {/* Bouton upload fichier */}
@@ -214,7 +270,8 @@ const Chat = ({ idAmi, prenomAmi }) => {
                     type="text"
                     value={nouveauMessage}
                     onChange={(e) => setNouveauMessage(e.target.value)}
-                    placeholder="Écrivez votre message..."
+                    onPaste={handlePaste}
+                    placeholder="Écrivez votre message... (Ctrl+V pour coller une image)"
                     className="flex-1 bg-[#F8F8F8] border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-[#00A9A5] focus:border-transparent text-sm transition-all"
                 />
                 <button
