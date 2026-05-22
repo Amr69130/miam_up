@@ -8,6 +8,9 @@
         <div class="md:max-w-md w-full px-4 py-4">
             <form method="POST" action="{{ path('app_utilisateur_login') }}">
                 <div class="mb-12">
+                    <a href="{{ path('app_landing') }}" class="flex items-center gap-2 mb-6">
+                        <img src="{{ asset('images/logo-miamup.png') }}" alt="Miam Up" class="h-10 w-auto object-contain">
+                    </a>
                     <h1 class="text-[#4A4A4A] text-3xl font-bold">Connexion</h1>
                     <p class="text-[15px] mt-6 text-[#4A4A4A]/70">Pas encore de compte ? 
                         <a href="{{ path('app_utilisateur_register') }}" class="text-[#00A9A5] font-medium hover:underline ml-1 whitespace-nowrap">Inscrivez-vous</a>

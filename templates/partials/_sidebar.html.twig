@@ -10,15 +10,9 @@
 
 <nav class="w-16 bg-white border-r border-[#e5e7eb] flex flex-col items-center py-4 gap-1 flex-shrink-0">
 
-    <div class="w-10 h-10 bg-[#00A9A5] rounded-[14px] flex items-center justify-center mb-6">
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
-             stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="m16 2-2.3 2.3a3 3 0 0 0 0 4.2l1.8 1.8a3 3 0 0 0 4.2 0L22 8"/>
-            <path d="M15 15 3.3 3.3a4.2 4.2 0 0 0 0 6l7.3 7.3c1.7 1.7 4.3 1.7 6 0L15 15Z"/>
-            <path d="m2 2 20 20"/>
-            <path d="m19.5 8.5-7.3 7.3"/>
-        </svg>
-    </div>
+    <a href="{{ path('app_home') }}" class="mb-6 flex items-center justify-center">
+        <img src="{{ asset('images/logo-miamup.png') }}" alt="Miam Up" class="w-10 h-10 object-contain">
+    </a>
 
     {% for item in nav_items %}
         {% set is_active = (active is defined and active == item.key) %}

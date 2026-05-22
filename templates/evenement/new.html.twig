@@ -1,62 +1,85 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Nouveau Event | Miam Up{% endblock %}
+{% block title %}Nouvel événement | Miam Up{% endblock %}
 
 {% block body %}
-    <div class="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-        <div class="max-w-2xl mx-auto bg-white rounded-xl shadow-md overflow-hidden p-8 border border-gray-100">
+<div class="flex h-screen overflow-hidden bg-[#F8F8F8] font-['Inter',sans-serif]">
 
-            <div class="mb-8 text-center">
-                <h1 class="text-3xl font-bold text-gray-900">Ajouter un événement</h1>
-                <p class="text-gray-500 mt-2 text-sm italic underline">Partagez vos bons plans avec la communauté</p>
+    {% include 'partials/_sidebar.html.twig' with { active: 'carte' } %}
+
+    <div class="flex-1 overflow-y-auto">
+        <div class="max-w-2xl mx-auto py-10 px-6">
+
+            {# Header #}
+            <div class="mb-8">
+                <a href="{{ path('app_map') }}" class="inline-flex items-center gap-2 text-sm text-[#4A4A4A]/60 hover:text-[#00A9A5] transition-colors mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                    Retour à la carte
+                </a>
+                <h1 class="text-2xl font-bold text-[#4A4A4A]">Organiser un événement</h1>
+                <p class="text-[#4A4A4A]/60 mt-1 text-sm">Partagez vos bons plans avec la communauté Miam Up</p>
             </div>
 
-            {{ form_start(form, {'attr': {'class': 'space-y-6'}}) }}
+            {# Carte du formulaire #}
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-8">
 
-            <div class="grid grid-cols-1 gap-6">
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Titre de l'événement</label>
-                    {{ form_widget(form.titre) }}
-                    <div class="text-red-500 text-xs mt-1">
-                        {{ form_errors(form.titre) }}
-                    </div>
-                </div>
+                {{ form_start(form, {'attr': {'class': 'space-y-6'}}) }}
 
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Où ça se passe ?</label>
-                    {{ form_widget(form.restaurant) }}
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 gap-6">
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Début</label>
-                        {{ form_widget(form.date_evenement) }}
+                        <label class="block text-sm font-semibold text-[#4A4A4A] mb-2">Titre de l'événement</label>
+                        {{ form_widget(form.titre, {'attr': {'class': 'w-full bg-[#F8F8F8] border border-gray-200 focus:border-[#00A9A5] focus:ring-1 focus:ring-[#00A9A5] rounded-xl px-4 py-3 text-sm text-[#4A4A4A] outline-none transition-colors'}}) }}
+                        <div class="text-[#FF6B6B] text-xs mt-1">{{ form_errors(form.titre) }}</div>
                     </div>
+
                     <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-1">Fin (optionnel)</label>
-                        {{ form_widget(form.date_fin) }}
+                        <label class="block text-sm font-semibold text-[#4A4A4A] mb-2">Restaurant</label>
+                        {{ form_widget(form.restaurant, {'attr': {'class': 'w-full bg-[#F8F8F8] border border-gray-200 focus:border-[#00A9A5] focus:ring-1 focus:ring-[#00A9A5] rounded-xl px-4 py-3 text-sm text-[#4A4A4A] outline-none transition-colors'}}) }}
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-[#4A4A4A] mb-2">Date de début</label>
+                            {{ form_widget(form.date_evenement, {'attr': {'class': 'w-full bg-[#F8F8F8] border border-gray-200 focus:border-[#00A9A5] focus:ring-1 focus:ring-[#00A9A5] rounded-xl px-4 py-3 text-sm text-[#4A4A4A] outline-none transition-colors'}}) }}
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-[#4A4A4A] mb-2">Date de fin <span class="font-normal text-[#4A4A4A]/40">(optionnel)</span></label>
+                            {{ form_widget(form.date_fin, {'attr': {'class': 'w-full bg-[#F8F8F8] border border-gray-200 focus:border-[#00A9A5] focus:ring-1 focus:ring-[#00A9A5] rounded-xl px-4 py-3 text-sm text-[#4A4A4A] outline-none transition-colors'}}) }}
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-[#4A4A4A] mb-2">Description</label>
+                        {{ form_widget(form.description_evenement, {'attr': {'class': 'w-full bg-[#F8F8F8] border border-gray-200 focus:border-[#00A9A5] focus:ring-1 focus:ring-[#00A9A5] rounded-xl px-4 py-3 text-sm text-[#4A4A4A] outline-none transition-colors', 'rows': 4}}) }}
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-[#4A4A4A] mb-2">Nombre de places</label>
+                        {{ form_widget(form.nombre_places, {'attr': {'class': 'w-full bg-[#F8F8F8] border border-gray-200 focus:border-[#00A9A5] focus:ring-1 focus:ring-[#00A9A5] rounded-xl px-4 py-3 text-sm text-[#4A4A4A] outline-none transition-colors'}}) }}
                     </div>
                 </div>
 
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Description</label>
-                    {{ form_widget(form.description_evenement) }}
+                <div class="pt-2 flex items-center justify-between gap-4">
+                    <a href="{{ path('app_map') }}" class="text-sm text-[#4A4A4A]/50 hover:text-[#4A4A4A] font-medium transition-colors">
+                        Annuler
+                    </a>
+                    <button type="submit"
+                            class="bg-[#00A9A5] hover:bg-[#008F8C] text-white font-semibold py-3 px-8 rounded-xl shadow-md hover:shadow-lg transition-all duration-200 flex items-center gap-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+                            <circle cx="12" cy="10" r="3"/>
+                        </svg>
+                        Publier sur la carte
+                    </button>
                 </div>
 
-                <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Nombre de places</label>
-                    {{ form_widget(form.nombre_places) }}
-                </div>
+                {{ form_end(form) }}
             </div>
-
-            <div class="pt-4 flex items-center justify-between gap-4">
-                <a href="{{ path('app_map') }}" class="text-gray-400 hover:text-gray-600 font-medium">Annuler</a>
-                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transform hover:scale-105 transition duration-200">
-                    Publier sur la carte
-                </button>
-            </div>
-
-            {{ form_end(form) }}
         </div>
     </div>
+</div>
 {% endblock %}
