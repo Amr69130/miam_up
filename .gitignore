@@ -18,6 +18,11 @@
 /assets/vendor/
 ###< symfony/asset-mapper ###
 
+###> uploads ###
+/public/uploads/messages/*
+!/public/uploads/messages/.gitkeep
+###< uploads ###
+
 ###> symfony/webpack-encore-bundle ###
 /node_modules/
 /public/build/
