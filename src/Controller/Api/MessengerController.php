@@ -12,6 +12,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class MessengerController extends AbstractController
 {
@@ -80,7 +81,9 @@ class MessengerController extends AbstractController
                 'contenu' => $msg->getContenu(),
                 'date' => $msg->getDateMessage()->format('d/m H:i'),
                 'expediteurId' => $msg->getExpediteur()->getId(),
-                'status' => $msg->getStatusMessage()
+                'status' => $msg->getStatusMessage(),
+                'fichier' => $msg->getFichier(),
+                'fichierType' => $msg->getFichierType(),
             ];
         }
 
@@ -168,5 +171,75 @@ class MessengerController extends AbstractController
             'success' => true,
             'nb_marques_lus' => count($messagesANettoyer)
         ]);
+    }
+
+    /**
+     * Upload d'un fichier ou d'une image dans une conversation
+     */
+    #[Route('/api/chat/upload/{idAmi}', name: 'api_chat_upload_file', methods: ['POST'])]
+    public function uploadFile(
+        int $idAmi,
+        Request $request,
+        UtilisateurRepository $userRepo,
+        ConversationRepository $convRepo,
+        EntityManagerInterface $em,
+        ParameterBagInterface $params
+    ): JsonResponse {
+        $user = $this->getUser();
+        $ami = $userRepo->find($idAmi);
+
+        if (!$user) return new JsonResponse(['error' => 'Non connecté'], 401);
+        if (!$ami) return new JsonResponse(['error' => 'Ami introuvable'], 404);
+
+        $file = $request->files->get('fichier');
+        if (!$file) return new JsonResponse(['error' => 'Aucun fichier reçu'], 400);
+
+        // Validation MIME et taille
+        $allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf', 'text/plain'];
+        $mimeType = $file->getMimeType();
+        if (!in_array($mimeType, $allowedMimes, true)) {
+            return new JsonResponse(['error' => 'Type de fichier non autorisé'], 400);
+        }
+        if ($file->getSize() > 10 * 1024 * 1024) {
+            return new JsonResponse(['error' => 'Fichier trop volumineux (max 10 Mo)'], 400);
+        }
+
+        $isImage = str_starts_with($mimeType, 'image/');
+        $uploadDir = $params->get('kernel.project_dir') . '/public/uploads/messages';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
+
+        $safeName = preg_replace('/[^a-zA-Z0-9_\-]/', '_', pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
+        $newFilename = $safeName . '_' . uniqid() . '.' . $file->guessExtension();
+        $file->move($uploadDir, $newFilename);
+
+        // Trouver ou créer la conversation
+        $conversation = $convRepo->findConversationBetweenTwoUsers($user->getId(), $ami->getId());
+        if (!$conversation) {
+            $conversation = new Conversation();
+            $conversation->addMembre($user);
+            $conversation->addMembre($ami);
+            $conversation->setNomConversation('Chat ' . $user->getPrenomUtilisateur() . ' / ' . $ami->getPrenomUtilisateur());
+            $em->persist($conversation);
+        }
+
+        $message = new Message();
+        $message->setContenu($isImage ? '📷 Image' : '📎 ' . $file->getClientOriginalName());
+        $message->setFichier('/uploads/messages/' . $newFilename);
+        $message->setFichierType($isImage ? 'image' : 'file');
+        $message->setExpediteur($user);
+        $message->setConversation($conversation);
+        $message->setDateMessage(new \DateTime());
+        $message->setStatusMessage('envoyé');
+
+        $em->persist($message);
+        $em->flush();
+
+        return new JsonResponse([
+            'status' => 'Fichier envoyé',
+            'fichier' => '/uploads/messages/' . $newFilename,
+            'fichierType' => $isImage ? 'image' : 'file',
+        ], 201);
     }
 }
