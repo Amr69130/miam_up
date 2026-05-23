@@ -242,4 +242,44 @@ class MessengerController extends AbstractController
             'nb_marques_lus' => count($messagesANettoyer)
         ]);
     }
+
+    /**
+     * NOUVEAU : Marquer comme lu les messages d'un GROUPE (Via ID de Conversation)
+     */
+    #[Route('/api/chat/group/read/{id}', name: 'api_chat_group_mark_read', methods: ['POST'])]
+    public function markGroupAsRead(
+        Conversation $conversation,
+        MessageRepository $messageRepository,
+        EntityManagerInterface $em
+    ): JsonResponse {
+        $moi = $this->getUser();
+        if (!$moi) return $this->json(['error' => 'Non connecté'], 403);
+
+        // Sécurité : on vérifie que l'utilisateur fait partie du groupe
+        if (!$conversation->getMembres()->contains($moi)) {
+            return $this->json(['error' => 'Action non autorisée'], 403);
+        }
+
+        // On récupère les messages du groupe qui ne sont pas de moi et pas encore "lus"
+        $messagesANettoyer = $messageRepository->createQueryBuilder('m')
+            ->where('m.conversation = :conv')
+            ->andWhere('m.expediteur != :moi')
+            ->andWhere('m.status_message LIKE :statut')
+            ->setParameter('conv', $conversation)
+            ->setParameter('moi', $moi)
+            ->setParameter('statut', 'envoy%')
+            ->getQuery()
+            ->getResult();
+
+        foreach ($messagesANettoyer as $msg) {
+            $msg->setStatusMessage('lu');
+        }
+
+        $em->flush();
+
+        return $this->json([
+            'success' => true,
+            'nb_marques_lus' => count($messagesANettoyer)
+        ]);
+    }
 }

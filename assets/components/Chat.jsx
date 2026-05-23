@@ -38,28 +38,25 @@ const Chat = ({ idAmi, idGroupe, prenomAmi, nomGroupe }) => {
 
 
 
-// Marquer les messages comme lus (Amis uniquement)
-
+// Marquer les messages comme lus (Gère Amis et Groupes d'événements)
     const markAsRead = async () => {
-
-        if (isGroup || !idAmi) return;
+        if (isGroup ? !idGroupe : !idAmi) return;
 
         try {
+            // Sélection dynamique de la route de nettoyage
+            const readUrl = isGroup
+                ? `/api/chat/group/read/${idGroupe}`
+                : `/api/chat/read/${idAmi}`;
 
-            await fetch(`/api/chat/read/${idAmi}`, { method: 'POST' });
+            await fetch(readUrl, { method: 'POST' });
 
+            // Met à jour instantanément la pastille rouge de la sidebar
             if (window.updateUnreadBadge) {
-
                 window.updateUnreadBadge();
-
             }
-
         } catch (error) {
-
             console.error("Erreur marquage lu:", error);
-
         }
-
     };
 
 
@@ -154,7 +151,8 @@ const Chat = ({ idAmi, idGroupe, prenomAmi, nomGroupe }) => {
     useEffect(() => {
         setLoading(true);
         fetchMessages();
-        if (!isGroup) markAsRead();
+
+        markAsRead();
 
         const interval = setInterval(fetchMessages, 4000);
         return () => clearInterval(interval);
