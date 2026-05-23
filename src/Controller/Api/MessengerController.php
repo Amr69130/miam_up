@@ -150,17 +150,20 @@ class MessengerController extends AbstractController
     }
 
     /**
-     * Compter les messages non lus globalement
+     * Compter les notifications globales (Messages non lus + Demandes d'amis reçues)
      */
     #[Route('/api/chat/unread-count', name: 'api_chat_unread_count', methods: ['GET'])]
-    public function getUnreadCount(MessageRepository $messageRepository): JsonResponse
-    {
+    public function getUnreadCount(
+        MessageRepository $messageRepository,
+        \App\Repository\AmitieRepository $amitieRepository
+    ): JsonResponse {
         $moi = $this->getUser();
         if (!$moi) return $this->json(['unreadCount' => 0]);
 
         $monId = $moi->getId();
 
-        $count = $messageRepository->createQueryBuilder('m')
+        // 1. COMPTAGE DES MESSAGES NON LUS (Ton code initial)
+        $msgCount = $messageRepository->createQueryBuilder('m')
             ->select('count(m.id)')
             ->join('m.conversation', 'c')
             ->join('c.membres', 'u')
@@ -172,8 +175,17 @@ class MessengerController extends AbstractController
             ->getQuery()
             ->getSingleScalarResult();
 
+        // 2. COMPTAGE DES DEMANDES D'AMIS REÇUES EN ATTENTE (Adapté à ton entité)
+        $amisCount = $amitieRepository->count([
+            'utilisateur_receveur' => $moi,
+            'statut' => 'en_attente'
+        ]);
+
+        // 3. FUSION DU COMPTEUR
+        $totalNotifications = (int)$msgCount + (int)$amisCount;
+
         return $this->json([
-            'unreadCount' => (int) $count
+            'unreadCount' => $totalNotifications
         ]);
     }
 
