@@ -6,6 +6,15 @@
     <div class="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
         <div class="max-w-2xl mx-auto bg-white rounded-xl shadow-md overflow-hidden p-8 border border-gray-100">
 
+            {# !!! AJOUT : AFFICHAGE DES MESSAGES FLASH (Succès/Erreur) !!! #}
+            {% for label, messages in app.flashes %}
+                {% for message in messages %}
+                    <div class="mb-4 p-4 rounded-lg {% if label == 'danger' %}bg-red-100 text-red-700 border border-red-200{% else %}bg-green-100 text-green-700 border border-green-200{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endfor %}
+
             <div class="mb-8 text-center">
                 <h1 class="text-3xl font-bold text-gray-900">Ajouter un événement</h1>
                 <p class="text-gray-500 mt-2 text-sm italic underline">Partagez vos bons plans avec la communauté</p>
@@ -13,28 +22,37 @@
 
             {{ form_start(form, {'attr': {'class': 'space-y-6'}}) }}
 
+            {# !!! AJOUT : AFFICHAGE DES ERREURS GLOBALES (Date, CSRF, etc.) !!! #}
+            {% if not form.vars.valid %}
+                <div class="p-4 mb-4 bg-red-50 border-l-4 border-red-500 text-red-700">
+                    <p class="font-bold">Attention :</p>
+                    {{ form_errors(form) }}
+                </div>
+            {% endif %}
+
             <div class="grid grid-cols-1 gap-6">
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Titre de l'événement</label>
                     {{ form_widget(form.titre) }}
-                    <div class="text-red-500 text-xs mt-1">
-                        {{ form_errors(form.titre) }}
-                    </div>
+                    <div class="text-red-500 text-xs mt-1">{{ form_errors(form.titre) }}</div>
                 </div>
 
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Où ça se passe ?</label>
                     {{ form_widget(form.restaurant) }}
+                    <div class="text-red-500 text-xs mt-1">{{ form_errors(form.restaurant) }}</div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Début</label>
                         {{ form_widget(form.date_evenement) }}
+                        <div class="text-red-500 text-xs mt-1">{{ form_errors(form.date_evenement) }}</div>
                     </div>
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-1">Fin (optionnel)</label>
                         {{ form_widget(form.date_fin) }}
+                        <div class="text-red-500 text-xs mt-1">{{ form_errors(form.date_fin) }}</div>
                     </div>
                 </div>
 
@@ -48,6 +66,9 @@
                     {{ form_widget(form.nombre_places) }}
                 </div>
             </div>
+
+            {# !!! TRÈS IMPORTANT : Le jeton de sécurité caché !!! #}
+            {{ form_rest(form) }}
 
             <div class="pt-4 flex items-center justify-between gap-4">
                 <a href="{{ path('app_map') }}" class="text-gray-400 hover:text-gray-600 font-medium">Annuler</a>

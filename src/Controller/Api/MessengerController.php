@@ -16,7 +16,7 @@ use Symfony\Component\Routing\Attribute\Route;
 class MessengerController extends AbstractController
 {
     /**
-     * Envoyer un message à un ami
+     * Envoyer un message à un ami (Chat Privé)
      */
     #[Route('/api/chat/send/{idAmi}', name: 'api_chat_send', methods: ['POST'])]
     public function sendMessage(
@@ -57,7 +57,7 @@ class MessengerController extends AbstractController
     }
 
     /**
-     * Récupérer les messages d'une conversation avec un ami
+     * Récupérer les messages d'une conversation avec un ami (Chat Privé)
      */
     #[Route('/api/chat/messages/{idAmi}', name: 'api_chat_get_messages', methods: ['GET'])]
     public function getMessages(
@@ -88,17 +88,82 @@ class MessengerController extends AbstractController
     }
 
     /**
-     * Compter les messages non lus globalement
+     * NOUVEAU : Récupérer les messages d'un GROUPE (Via ID de Conversation)
+     */
+    #[Route('/api/chat/group/messages/{id}', name: 'api_chat_group_messages', methods: ['GET'])]
+    public function getGroupMessages(Conversation $conversation): JsonResponse
+    {
+        $user = $this->getUser();
+        if (!$user) return new JsonResponse(['error' => 'Non connecté'], 401);
+
+        // Sécurité : On vérifie si l'utilisateur fait partie des membres du groupe
+        if (!$conversation->getMembres()->contains($user)) {
+            return new JsonResponse(['error' => "Vous n'avez pas accès à cette conversation"], 403);
+        }
+
+        $messagesData = [];
+        foreach ($conversation->getMessages() as $msg) {
+            $messagesData[] = [
+                'id' => $msg->getId(),
+                'contenu' => $msg->getContenu(),
+                'date' => $msg->getDateMessage()->format('d/m H:i'),
+                'expediteurId' => $msg->getExpediteur()->getId(),
+                'expediteurNom' => $msg->getExpediteur()->getPrenomUtilisateur(),
+                'status' => $msg->getStatusMessage()
+            ];
+        }
+
+        return new JsonResponse($messagesData, 200);
+    }
+
+    /**
+     * NOUVEAU : Envoyer un message dans un GROUPE
+     */
+    #[Route('/api/chat/group/send/{id}', name: 'api_chat_group_send', methods: ['POST'])]
+    public function sendGroupMessage(
+        Conversation $conversation,
+        Request $request,
+        EntityManagerInterface $em
+    ): JsonResponse {
+        $user = $this->getUser();
+        $data = json_decode($request->getContent(), true);
+
+        if (!$user) return new JsonResponse(['error' => 'Non connecté'], 401);
+        if (!isset($data['contenu'])) return new JsonResponse(['error' => 'Contenu manquant'], 400);
+
+        // Sécurité : On vérifie l'appartenance au groupe
+        if (!$conversation->getMembres()->contains($user)) {
+            return new JsonResponse(['error' => 'Action non autorisée'], 403);
+        }
+
+        $message = new Message();
+        $message->setContenu($data['contenu']);
+        $message->setExpediteur($user);
+        $message->setConversation($conversation);
+        $message->setDateMessage(new \DateTime());
+        $message->setStatusMessage('envoyé');
+
+        $em->persist($message);
+        $em->flush();
+
+        return new JsonResponse(['status' => 'Message envoyé'], 201);
+    }
+
+    /**
+     * Compter les notifications globales (Messages non lus + Demandes d'amis reçues)
      */
     #[Route('/api/chat/unread-count', name: 'api_chat_unread_count', methods: ['GET'])]
-    public function getUnreadCount(MessageRepository $messageRepository): JsonResponse
-    {
+    public function getUnreadCount(
+        MessageRepository $messageRepository,
+        \App\Repository\AmitieRepository $amitieRepository
+    ): JsonResponse {
         $moi = $this->getUser();
         if (!$moi) return $this->json(['unreadCount' => 0]);
 
         $monId = $moi->getId();
 
-        $count = $messageRepository->createQueryBuilder('m')
+        // 1. COMPTAGE DES MESSAGES NON LUS (Ton code initial)
+        $msgCount = $messageRepository->createQueryBuilder('m')
             ->select('count(m.id)')
             ->join('m.conversation', 'c')
             ->join('c.membres', 'u')
@@ -110,8 +175,17 @@ class MessengerController extends AbstractController
             ->getQuery()
             ->getSingleScalarResult();
 
+        // 2. COMPTAGE DES DEMANDES D'AMIS REÇUES EN ATTENTE (Adapté à ton entité)
+        $amisCount = $amitieRepository->count([
+            'utilisateur_receveur' => $moi,
+            'statut' => 'en_attente'
+        ]);
+
+        // 3. FUSION DU COMPTEUR
+        $totalNotifications = (int)$msgCount + (int)$amisCount;
+
         return $this->json([
-            'unreadCount' => (int) $count
+            'unreadCount' => $totalNotifications
         ]);
     }
 
@@ -147,7 +221,6 @@ class MessengerController extends AbstractController
             return $this->json(['success' => true, 'message' => 'Aucune conversation trouvée']);
         }
 
-        // On nettoie les messages de l'autre
         $messagesANettoyer = $messageRepository->createQueryBuilder('m')
             ->where('m.conversation = :conv')
             ->andWhere('m.expediteur != :moi')

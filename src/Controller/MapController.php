@@ -74,7 +74,7 @@ class MapController extends AbstractController
             'restaurants_json' => json_encode($restaurantsData)
         ]);
     }
-
+/*
     #[Route('/evenement/nouveau', name: 'app_evenement_new')]
     public function new(Request $request, EntityManagerInterface $em): Response
     {
@@ -101,5 +101,5 @@ class MapController extends AbstractController
         return $this->render('evenement/new.html.twig', [
             'form' => $form->createView(),
         ]);
-    }
+    }*/
 }

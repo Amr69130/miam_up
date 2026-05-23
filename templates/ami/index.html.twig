@@ -7,7 +7,7 @@
         <div class="max-w-7xl mx-auto p-4 md:p-6">
 
             <div class="flex items-center justify-between mb-8">
-                <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">🤝 Espace Social</h1>
+                <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">🤝 Hub Social</h1>
                 <div class="flex gap-2">
                     <span class="bg-indigo-100 text-indigo-700 px-4 py-1 rounded-full text-sm font-bold shadow-sm">
                         {{ amis|length }} Amis au total
@@ -20,6 +20,34 @@
 
                 {# --- COLONNE GAUCHE (5/12) : GESTION SOCIALE --- #}
                 <div class="lg:col-span-5 space-y-8">
+
+                    {# --- TES GROUPES DE TABLE (CONVERSATIONS) --- #}
+                    <section class="bg-white shadow-md rounded-3xl border border-gray-200 overflow-hidden p-6 border-l-4 border-l-green-500">
+                        <h2 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                            <span class="text-xl">🥗</span> Mes Conversations
+                        </h2>
+
+                        {% if conversations is empty %}
+                            <p class="text-gray-400 text-sm italic text-center py-4">Vous n'avez rejoint aucun événement.</p>
+                        {% else %}
+                            <div class="space-y-3">
+                                {% for conv in conversations %}
+                                    <a href="{{ path('app_ami_list', {'chatWithGroup': conv.id}) }}"
+                                       class="p-3 rounded-2xl bg-green-50 border border-green-100 flex items-center justify-between group hover:bg-green-600 hover:border-green-700 transition-all cursor-pointer block">
+                                        <div>
+                                            <p class="font-bold text-gray-800 text-sm group-hover:text-white">{{ conv.nomConversation }}</p>
+                                            <p class="text-[10px] text-gray-500 italic group-hover:text-green-100">
+                                                {{ conv.evenement.restaurant.nomRestaurant ?? 'Conversation privée non liée à un évenement' }}
+                                            </p>
+                                        </div>
+                                        <span class="text-[9px] bg-green-600 text-white px-3 py-1 rounded-full font-bold shadow-sm uppercase tracking-wider group-hover:bg-white group-hover:text-green-600">
+                                            Chat
+                                        </span>
+                                    </a>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </section>
 
                     {# 1. DEMANDES EN ATTENTE (REÇUES & ENVOYÉES) #}
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-6">
@@ -39,8 +67,12 @@
                                             <div class="flex items-center justify-between bg-gray-50 p-3 rounded-xl border border-gray-100">
                                                 <span class="font-bold text-gray-700 text-sm">{{ demande.utilisateurDemandeur.prenomUtilisateur }}</span>
                                                 <div class="flex gap-1">
-                                                    <a href="{{ path('app_ami_accept', {'id': demande.id}) }}" class="bg-green-600 hover:bg-green-700 text-white p-2 rounded-lg transition shadow-sm"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg></a>
-                                                    <a href="{{ path('app_ami_reject', {'id': demande.id}) }}" class="bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg transition shadow-sm"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg></a>
+                                                    <a href="{{ path('app_ami_accept', {'id': demande.id}) }}" class="bg-green-600 hover:bg-green-700 text-white p-2 rounded-lg transition shadow-sm">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+                                                    </a>
+                                                    <a href="{{ path('app_ami_reject', {'id': demande.id}) }}" class="bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg transition shadow-sm">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                                                    </a>
                                                 </div>
                                             </div>
                                         {% endfor %}
@@ -83,8 +115,7 @@
                             <p class="text-gray-400 text-sm italic text-center py-10">Vous n'avez pas encore d'amis.</p>
                         {% else %}
                             <div class="grid grid-cols-2 gap-4">
-                                {% for amitie in amis %}
-                                    {% set ami = (amitie.utilisateurDemandeur == app.user) ? amitie.utilisateurReceveur : amitie.utilisateurDemandeur %}
+                                {% for ami in amis %}
                                     <div class="p-4 rounded-2xl bg-indigo-50/50 border border-indigo-100 flex flex-col items-center text-center group hover:bg-indigo-100 transition-all duration-300">
                                         <div class="w-12 h-12 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-lg shadow-md mb-2 group-hover:scale-110 transition-transform">
                                             {{ ami.prenomUtilisateur|slice(0,1)|upper }}
@@ -104,26 +135,34 @@
                 <div class="lg:col-span-7">
                     <div class="bg-white shadow-2xl rounded-3xl overflow-hidden border border-gray-200 flex flex-col h-[750px] sticky top-6">
 
-                        {# HEADER DU CHAT AVEC L'AMI ACTUEL #}
-                        {% set selectedId = app.request.query.get('chatWith') %}
-                        {% set amiActuel = null %}
-                        {% for amitie in amis %}
-                            {% set ami = (amitie.utilisateurDemandeur == app.user) ? amitie.utilisateurReceveur : amitie.utilisateurDemandeur %}
-                            {% if loop.first and selectedId is null %}{% set selectedId = ami.id %}{% endif %}
-                            {% if ami.id == selectedId %}{% set amiActuel = ami %}{% endif %}
-                        {% endfor %}
+                        {# --- LOGIQUE DE SÉLECTION (HYBRIDE AMI/GROUPE) --- #}
+                        {% set selectedAmiId = app.request.query.get('chatWith') %}
+                        {% set selectedGroupId = app.request.query.get('chatWithGroup') %}
 
-                        {% if amis is not empty and amiActuel is null %}
-                            {% set premierAmitie = amis|first %}
-                            {% set amiActuel = (premierAmitie.utilisateurDemandeur == app.user) ? premierAmitie.utilisateurReceveur : premierAmitie.utilisateurDemandeur %}
+                        {% set amiActuel = null %}
+                        {% set groupeActuel = null %}
+
+                        {% if selectedAmiId %}
+                            {% for ami in amis %}
+                                {% if ami.id == selectedAmiId %}{% set amiActuel = ami %}{% endif %}
+                            {% endfor %}
+                        {% elseif selectedGroupId %}
+                            {% for conv in conversations %}
+                                {% if conv.id == selectedGroupId %}{% set groupeActuel = conv %}{% endif %}
+                            {% endfor %}
+                        {% elseif amis is not empty %}
+                            {# Par défaut, on affiche le premier ami si rien n'est sélectionné #}
+                            {% set amiActuel = amis|first %}
                         {% endif %}
 
                         {# ZONE REACT CONTENUE DANS UN BLOC UNIQUE #}
                         <main class="flex-1 bg-white relative flex flex-col overflow-hidden">
-                            {% if amis is not empty %}
+                            {% if amiActuel or groupeActuel %}
                                 <div id="react-chat-root"
-                                     data-id-ami="{{ amiActuel.id }}"
-                                     data-prenom-ami="{{ amiActuel.prenomUtilisateur }}"
+                                     data-id-ami="{{ amiActuel ? amiActuel.id : '' }}"
+                                     data-id-groupe="{{ groupeActuel ? groupeActuel.id : '' }}"
+                                     data-prenom-ami="{{ amiActuel ? amiActuel.prenomUtilisateur : '' }}"
+                                     data-nom-groupe="{{ groupeActuel ? groupeActuel.nomConversation : '' }}"
                                      class="absolute inset-0 w-full h-full">
                                     {# Le Chat React remplit tout l'espace #}
                                 </div>
@@ -131,7 +170,7 @@
                                 <div class="h-full flex flex-col items-center justify-center p-12 text-center bg-gray-50/50">
                                     <div class="w-24 h-24 bg-white shadow-inner rounded-full flex items-center justify-center text-4xl mb-6">💬</div>
                                     <h3 class="text-gray-900 font-extrabold text-xl">Messagerie</h3>
-                                    <p class="text-gray-500 text-sm max-w-xs mt-3">Ajoutez un ami pour débloquer le chat en direct et commencer à discuter.</p>
+                                    <p class="text-gray-500 text-sm max-w-xs mt-3">Sélectionnez un ami ou un groupe pour commencer à discuter.</p>
                                 </div>
                             {% endif %}
                         </main>
