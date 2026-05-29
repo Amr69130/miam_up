@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Evenement;
+use App\Entity\Conversation;
 use App\Form\EvenementType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -12,25 +13,39 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class EvenementController extends AbstractController
 {
-
-    #[Route('/creer-mon-event', name: 'app_evenement_test')]
+    #[Route('/evenement/nouveau', name: 'app_evenement_new')]
     public function new(Request $request, EntityManagerInterface $em): Response
     {
         $evenement = new Evenement();
         $form = $this->createForm(EvenementType::class, $evenement);
-
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Optionnel : On peut quand même noter QUI a créé l'événement
-            // si tu as un champ 'createur' dans ton entité.
+            $user = $this->getUser();
 
-            $evenement->setCreateur($this->getUser());
+            // 1. Configurer l'événement
+            $evenement->setCreateur($user);
+            $evenement->addUtilisateur($user);
 
+            // 2. Créer la conversation
+            $conversation = new Conversation();
+            $conversation->setNomConversation('Groupe : ' . $evenement->getTitre());
+
+            // 3. Lier les deux (Double liaison pour être sûr)
+            $conversation->setEvenement($evenement);
+            $evenement->setConversation($conversation);
+
+            // 4. Ajouter le créateur comme membre du chat
+            $conversation->addMembre($user);
+
+            // 5. Persister les deux objets
             $em->persist($evenement);
+            $em->persist($conversation);
+
+            // 6. Sauvegarder en base de données
             $em->flush();
 
-            $this->addFlash('success', 'Événement ajouté sur la carte !');
+            $this->addFlash('success', 'Événement et groupe de discussion créés avec succès !');
             return $this->redirectToRoute('app_map');
         }
 
@@ -40,38 +55,32 @@ class EvenementController extends AbstractController
     }
 
     #[Route('/event/join/{id}', name: 'app_event_join')]
-    public function joinEvent(Evenement $event, EntityManagerInterface $entityManager): Response
+    public function joinEvent(Evenement $event, EntityManagerInterface $em): Response
     {
-        // 1. Sécurité : Bloquer l'action si l'utilisateur n'est pas connecté
         $user = $this->getUser();
 
         if (!$user) {
-            // Redirection vers la page de connexion
-            $this->addFlash('danger', 'Vous devez être connecté pour rejoindre un événement.');
+            $this->addFlash('danger', 'Vous devez être connecté.');
             return $this->redirectToRoute('app_utilisateur_login');
         }
 
-        // 2. Vérification d'Unicité
+        $conversation = $event->getConversation();
+
         if ($event->getUtilisateurs()->contains($user)) {
-            // Cas : L'utilisateur est DÉJÀ inscrit -> on le retire
             $event->removeUtilisateur($user);
-            // On s'assure que l'autre côté de la relation est aussi au courant
-            $user->removeEvenement($event);
-
-            $this->addFlash('warning', 'Vous êtes désinscrit de l\'événement.');
+            if ($conversation) {
+                $conversation->removeMembre($user);
+            }
+            $this->addFlash('warning', 'Vous avez quitté l\'événement.');
         } else {
-            // Cas : L'utilisateur n'est PAS inscrit -> on l'ajoute
             $event->addUtilisateur($user);
-            // On s'assure que l'autre côté de la relation est aussi au courant
-            $user->addEvenement($event);
-
-            $this->addFlash('success', 'Vous êtes bien inscrit à l\'événement !');
+            if ($conversation) {
+                $conversation->addMembre($user);
+            }
+            $this->addFlash('success', 'Vous avez rejoint l\'événement et son groupe !');
         }
 
-        // 3. Persistance : On applique les changements dans la base de données
-        $entityManager->flush();
-
-        // 4. Redirection vers la carte
+        $em->flush();
         return $this->redirectToRoute('app_map');
     }
 }

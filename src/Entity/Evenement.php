@@ -20,7 +20,9 @@ class Evenement
     #[ORM\Column]
     #[Assert\NotBlank(message: "La date de l'événement est obligatoire.")]
     #[Assert\Type("\DateTimeInterface")]
-    #[Assert\GreaterThanOrEqual("today", message: "On ne peut pas créer d'événement dans une date passé.")]
+    // Conseil : on garde GreaterThanOrEqual pour la logique métier,
+        // mais on gérera le bug des secondes dans le Controller.
+    #[Assert\GreaterThanOrEqual("today", message: "On ne peut pas créer d'événement dans une date passée.")]
     private ?\DateTime $date_evenement = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
@@ -28,8 +30,6 @@ class Evenement
 
     #[ORM\Column(nullable: true)]
     private ?int $nombre_places = null;
-
-
 
     /**
      * @var Collection<int, Utilisateur>
@@ -41,7 +41,7 @@ class Evenement
     private ?Restaurant $restaurant = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank(message: "Le titre est obligatoire pour l'affichage sur la carte.")]
+    #[Assert\NotBlank(message: "Attention le titre est obligatoire pour l'affichage sur la carte.")]
     #[Assert\Length(min: 3, max: 255, minMessage: "Le titre est trop court.")]
     private ?string $titre = null;
 
@@ -50,6 +50,11 @@ class Evenement
 
     #[ORM\ManyToOne(inversedBy: 'evenementsCrees')]
     private ?Utilisateur $createur = null;
+
+    // --- NOUVELLE RELATION AJOUTÉE ICI ---
+    // mappedBy indique que le lien est défini par la propriété $evenement dans la classe Conversation
+    #[ORM\OneToOne(mappedBy: 'evenement', cascade: ['persist', 'remove'])]
+    private ?Conversation $conversation = null;
 
     public function __construct()
     {
@@ -96,7 +101,6 @@ class Evenement
 
         return $this;
     }
-
 
     /**
      * @return Collection<int, Utilisateur>
@@ -166,6 +170,28 @@ class Evenement
     public function setCreateur(?Utilisateur $createur): static
     {
         $this->createur = $createur;
+
+        return $this;
+    }
+
+    // --- NOUVEAUX GETTER ET SETTER POUR LA CONVERSATION ---
+    public function getConversation(): ?Conversation
+    {
+        return $this->conversation;
+    }
+
+    public function setConversation(?Conversation $conversation): static
+    {
+        // On gère la liaison bidirectionnelle
+        if ($conversation === null && $this->conversation !== null) {
+            $this->conversation->setEvenement(null);
+        }
+
+        if ($conversation !== null && $conversation->getEvenement() !== $this) {
+            $conversation->setEvenement($this);
+        }
+
+        $this->conversation = $conversation;
 
         return $this;
     }

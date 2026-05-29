@@ -2,22 +2,23 @@
 
 namespace App\Controller\Api;
 
-use App\Entity\Message;
 use App\Entity\Conversation;
-use App\Repository\UtilisateurRepository;
+use App\Entity\Message;
+use App\Repository\AmitieRepository;
 use App\Repository\ConversationRepository;
 use App\Repository\MessageRepository;
+use App\Repository\UtilisateurRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class MessengerController extends AbstractController
 {
     /**
-     * Envoyer un message à un ami
+     * Envoyer un message à un ami (Chat Privé)
      */
     #[Route('/api/chat/send/{idAmi}', name: 'api_chat_send', methods: ['POST'])]
     public function sendMessage(
@@ -58,7 +59,7 @@ class MessengerController extends AbstractController
     }
 
     /**
-     * Récupérer les messages d'une conversation avec un ami
+     * Récupérer les messages d'une conversation avec un ami (Chat Privé)
      */
     #[Route('/api/chat/messages/{idAmi}', name: 'api_chat_get_messages', methods: ['GET'])]
     public function getMessages(
@@ -84,6 +85,7 @@ class MessengerController extends AbstractController
                 'status' => $msg->getStatusMessage(),
                 'fichier' => $msg->getFichier(),
                 'fichierType' => $msg->getFichierType(),
+                'isMine' => $msg->getExpediteur()->getId() === $user->getId(),
             ];
         }
 
@@ -91,17 +93,82 @@ class MessengerController extends AbstractController
     }
 
     /**
-     * Compter les messages non lus globalement
+     * Récupérer les messages d'un GROUPE (Via ID de Conversation)
+     */
+    #[Route('/api/chat/group/messages/{id}', name: 'api_chat_group_messages', methods: ['GET'])]
+    public function getGroupMessages(Conversation $conversation): JsonResponse
+    {
+        $user = $this->getUser();
+        if (!$user) return new JsonResponse(['error' => 'Non connecté'], 401);
+
+        if (!$conversation->getMembres()->contains($user)) {
+            return new JsonResponse(['error' => "Vous n'avez pas accès à cette conversation"], 403);
+        }
+
+        $messagesData = [];
+        foreach ($conversation->getMessages() as $msg) {
+            $messagesData[] = [
+                'id' => $msg->getId(),
+                'contenu' => $msg->getContenu(),
+                'date' => $msg->getDateMessage()->format('d/m H:i'),
+                'expediteurId' => $msg->getExpediteur()->getId(),
+                'expediteurNom' => $msg->getExpediteur()->getPrenomUtilisateur(),
+                'status' => $msg->getStatusMessage(),
+                'fichier' => $msg->getFichier(),
+                'fichierType' => $msg->getFichierType(),
+                'isMine' => $msg->getExpediteur()->getId() === $user->getId(),
+            ];
+        }
+
+        return new JsonResponse($messagesData, 200);
+    }
+
+    /**
+     * Envoyer un message dans un GROUPE
+     */
+    #[Route('/api/chat/group/send/{id}', name: 'api_chat_group_send', methods: ['POST'])]
+    public function sendGroupMessage(
+        Conversation $conversation,
+        Request $request,
+        EntityManagerInterface $em
+    ): JsonResponse {
+        $user = $this->getUser();
+        $data = json_decode($request->getContent(), true);
+
+        if (!$user) return new JsonResponse(['error' => 'Non connecté'], 401);
+        if (!isset($data['contenu'])) return new JsonResponse(['error' => 'Contenu manquant'], 400);
+
+        if (!$conversation->getMembres()->contains($user)) {
+            return new JsonResponse(['error' => 'Action non autorisée'], 403);
+        }
+
+        $message = new Message();
+        $message->setContenu($data['contenu']);
+        $message->setExpediteur($user);
+        $message->setConversation($conversation);
+        $message->setDateMessage(new \DateTime());
+        $message->setStatusMessage('envoyé');
+
+        $em->persist($message);
+        $em->flush();
+
+        return new JsonResponse(['status' => 'Message envoyé'], 201);
+    }
+
+    /**
+     * Compter les notifications globales (Messages non lus + Demandes d'amis reçues)
      */
     #[Route('/api/chat/unread-count', name: 'api_chat_unread_count', methods: ['GET'])]
-    public function getUnreadCount(MessageRepository $messageRepository): JsonResponse
-    {
+    public function getUnreadCount(
+        MessageRepository $messageRepository,
+        AmitieRepository $amitieRepository
+    ): JsonResponse {
         $moi = $this->getUser();
         if (!$moi) return $this->json(['unreadCount' => 0]);
 
         $monId = $moi->getId();
 
-        $count = $messageRepository->createQueryBuilder('m')
+        $msgCount = $messageRepository->createQueryBuilder('m')
             ->select('count(m.id)')
             ->join('m.conversation', 'c')
             ->join('c.membres', 'u')
@@ -113,8 +180,15 @@ class MessengerController extends AbstractController
             ->getQuery()
             ->getSingleScalarResult();
 
+        $amisCount = $amitieRepository->count([
+            'utilisateur_receveur' => $moi,
+            'statut' => 'en_attente',
+        ]);
+
+        $totalNotifications = (int) $msgCount + (int) $amisCount;
+
         return $this->json([
-            'unreadCount' => (int) $count
+            'unreadCount' => $totalNotifications,
         ]);
     }
 
@@ -135,7 +209,6 @@ class MessengerController extends AbstractController
         $ami = $utilisateurRepository->find($idAmi);
         if (!$ami) return $this->json(['error' => 'Ami non trouvé'], 404);
 
-        // On cherche la conversation commune
         $conversations = $conversationRepository->findAll();
         $maConversation = null;
 
@@ -150,7 +223,6 @@ class MessengerController extends AbstractController
             return $this->json(['success' => true, 'message' => 'Aucune conversation trouvée']);
         }
 
-        // On nettoie les messages de l'autre
         $messagesANettoyer = $messageRepository->createQueryBuilder('m')
             ->where('m.conversation = :conv')
             ->andWhere('m.expediteur != :moi')
@@ -169,7 +241,45 @@ class MessengerController extends AbstractController
 
         return $this->json([
             'success' => true,
-            'nb_marques_lus' => count($messagesANettoyer)
+            'nb_marques_lus' => count($messagesANettoyer),
+        ]);
+    }
+
+    /**
+     * Marquer comme lu les messages d'un GROUPE (Via ID de Conversation)
+     */
+    #[Route('/api/chat/group/read/{id}', name: 'api_chat_group_mark_read', methods: ['POST'])]
+    public function markGroupAsRead(
+        Conversation $conversation,
+        MessageRepository $messageRepository,
+        EntityManagerInterface $em
+    ): JsonResponse {
+        $moi = $this->getUser();
+        if (!$moi) return $this->json(['error' => 'Non connecté'], 403);
+
+        if (!$conversation->getMembres()->contains($moi)) {
+            return $this->json(['error' => 'Action non autorisée'], 403);
+        }
+
+        $messagesANettoyer = $messageRepository->createQueryBuilder('m')
+            ->where('m.conversation = :conv')
+            ->andWhere('m.expediteur != :moi')
+            ->andWhere('m.status_message LIKE :statut')
+            ->setParameter('conv', $conversation)
+            ->setParameter('moi', $moi)
+            ->setParameter('statut', 'envoy%')
+            ->getQuery()
+            ->getResult();
+
+        foreach ($messagesANettoyer as $msg) {
+            $msg->setStatusMessage('lu');
+        }
+
+        $em->flush();
+
+        return $this->json([
+            'success' => true,
+            'nb_marques_lus' => count($messagesANettoyer),
         ]);
     }
 
@@ -194,7 +304,6 @@ class MessengerController extends AbstractController
         $file = $request->files->get('fichier');
         if (!$file) return new JsonResponse(['error' => 'Aucun fichier reçu'], 400);
 
-        // Validation MIME et taille
         $allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf', 'text/plain'];
         $mimeType = $file->getMimeType();
         if (!in_array($mimeType, $allowedMimes, true)) {
@@ -214,7 +323,6 @@ class MessengerController extends AbstractController
         $newFilename = $safeName . '_' . uniqid() . '.' . $file->guessExtension();
         $file->move($uploadDir, $newFilename);
 
-        // Trouver ou créer la conversation
         $conversation = $convRepo->findConversationBetweenTwoUsers($user->getId(), $ami->getId());
         if (!$conversation) {
             $conversation = new Conversation();
@@ -223,6 +331,64 @@ class MessengerController extends AbstractController
             $conversation->setNomConversation('Chat ' . $user->getPrenomUtilisateur() . ' / ' . $ami->getPrenomUtilisateur());
             $em->persist($conversation);
         }
+
+        $message = new Message();
+        $message->setContenu($isImage ? '📷 Image' : '📎 ' . $file->getClientOriginalName());
+        $message->setFichier('/uploads/messages/' . $newFilename);
+        $message->setFichierType($isImage ? 'image' : 'file');
+        $message->setExpediteur($user);
+        $message->setConversation($conversation);
+        $message->setDateMessage(new \DateTime());
+        $message->setStatusMessage('envoyé');
+
+        $em->persist($message);
+        $em->flush();
+
+        return new JsonResponse([
+            'status' => 'Fichier envoyé',
+            'fichier' => '/uploads/messages/' . $newFilename,
+            'fichierType' => $isImage ? 'image' : 'file',
+        ], 201);
+    }
+
+    /**
+     * Upload d'un fichier ou d'une image dans une conversation de groupe
+     */
+    #[Route('/api/chat/group/upload/{id}', name: 'api_chat_group_upload_file', methods: ['POST'])]
+    public function uploadGroupFile(
+        Conversation $conversation,
+        Request $request,
+        EntityManagerInterface $em,
+        ParameterBagInterface $params
+    ): JsonResponse {
+        $user = $this->getUser();
+        if (!$user) return new JsonResponse(['error' => 'Non connecté'], 401);
+
+        if (!$conversation->getMembres()->contains($user)) {
+            return new JsonResponse(['error' => 'Action non autorisée'], 403);
+        }
+
+        $file = $request->files->get('fichier');
+        if (!$file) return new JsonResponse(['error' => 'Aucun fichier reçu'], 400);
+
+        $allowedMimes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf', 'text/plain'];
+        $mimeType = $file->getMimeType();
+        if (!in_array($mimeType, $allowedMimes, true)) {
+            return new JsonResponse(['error' => 'Type de fichier non autorisé'], 400);
+        }
+        if ($file->getSize() > 10 * 1024 * 1024) {
+            return new JsonResponse(['error' => 'Fichier trop volumineux (max 10 Mo)'], 400);
+        }
+
+        $isImage = str_starts_with($mimeType, 'image/');
+        $uploadDir = $params->get('kernel.project_dir') . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'uploads' . DIRECTORY_SEPARATOR . 'messages';
+        if (!is_dir($uploadDir) && !mkdir($uploadDir, 0775, true) && !is_dir($uploadDir)) {
+            return new JsonResponse(['error' => 'Impossible de créer le dossier d\'upload'], 500);
+        }
+
+        $safeName = preg_replace('/[^a-zA-Z0-9_\-]/', '_', pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
+        $newFilename = $safeName . '_' . uniqid() . '.' . $file->guessExtension();
+        $file->move($uploadDir, $newFilename);
 
         $message = new Message();
         $message->setContenu($isImage ? '📷 Image' : '📎 ' . $file->getClientOriginalName());
