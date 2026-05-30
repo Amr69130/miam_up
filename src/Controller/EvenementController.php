@@ -13,7 +13,7 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class EvenementController extends AbstractController
 {
-    #[Route('/evenement/nouveau', name: 'app_evenement_test')]
+    #[Route('/evenement/nouveau', name: 'app_evenement_new')]
     public function new(Request $request, EntityManagerInterface $em): Response
     {
         $evenement = new Evenement();

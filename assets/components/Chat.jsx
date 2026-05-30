@@ -1,332 +1,317 @@
 import React, { useState, useEffect, useRef } from 'react';
 
-
-
 const Chat = ({ idAmi, idGroupe, prenomAmi, nomGroupe }) => {
-
     const [messages, setMessages] = useState([]);
-
     const [nouveauMessage, setNouveauMessage] = useState('');
-
     const [loading, setLoading] = useState(true);
-
-
-
+    const [uploading, setUploading] = useState(false);
+    const [pastePreview, setPastePreview] = useState(null);
     const messagesEndRef = useRef(null);
+    const fileInputRef = useRef(null);
 
-
-
-// --- LOGIQUE DES URLS ---
-
-    const isGroup = idGroupe && idGroupe !== "" && idGroupe !== "null";
-
-
-
+    const isGroup = Boolean(idGroupe && idGroupe !== '' && idGroupe !== 'null');
     const fetchUrl = isGroup
-
         ? `/api/chat/group/messages/${idGroupe}`
-
         : `/api/chat/messages/${idAmi}`;
-
-
-
     const sendUrl = isGroup
-
         ? `/api/chat/group/send/${idGroupe}`
-
         : `/api/chat/send/${idAmi}`;
+    const uploadUrl = isGroup
+        ? `/api/chat/group/upload/${idGroupe}`
+        : `/api/chat/upload/${idAmi}`;
 
-
-
-// Marquer les messages comme lus (Gère Amis et Groupes d'événements)
     const markAsRead = async () => {
         if (isGroup ? !idGroupe : !idAmi) return;
 
         try {
-            // Sélection dynamique de la route de nettoyage
             const readUrl = isGroup
                 ? `/api/chat/group/read/${idGroupe}`
                 : `/api/chat/read/${idAmi}`;
 
             await fetch(readUrl, { method: 'POST' });
 
-            // Met à jour instantanément la pastille rouge de la sidebar
             if (window.updateUnreadBadge) {
                 window.updateUnreadBadge();
             }
         } catch (error) {
-            console.error("Erreur marquage lu:", error);
+            console.error('Erreur marquage lu:', error);
         }
     };
 
-
-
-// Charger les messages
-
     const fetchMessages = async () => {
-
         try {
-
             if (!idAmi && !isGroup) return;
 
-
-
             const response = await fetch(fetchUrl);
-
             if (!response.ok) throw new Error('Erreur réseau');
 
             const data = await response.json();
-
-
-
             setMessages(data);
-
             setLoading(false);
-
         } catch (error) {
-
-            console.error("Erreur chargement:", error);
-
+            console.error('Erreur chargement:', error);
             setLoading(false);
-
         }
-
     };
-
-
-
-// Envoyer un message
 
     const handleSend = async (e) => {
-
         e.preventDefault();
-
         if (!nouveauMessage.trim()) return;
 
-
-
         try {
-
             const response = await fetch(sendUrl, {
-
                 method: 'POST',
-
                 headers: { 'Content-Type': 'application/json' },
-
-                body: JSON.stringify({ contenu: nouveauMessage })
-
+                body: JSON.stringify({ contenu: nouveauMessage }),
             });
-
-
 
             if (response.ok) {
-
                 setNouveauMessage('');
-
-// On rafraîchit immédiatement pour voir son propre message
-
                 fetchMessages();
-
             }
-
         } catch (error) {
-
-            console.error("Erreur envoi:", error);
-
+            console.error('Erreur envoi:', error);
         }
-
     };
 
+    const uploadFile = async (file, onDone) => {
+        setUploading(true);
+        const formData = new FormData();
+        formData.append('fichier', file);
 
+        try {
+            const response = await fetch(uploadUrl, {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (response.ok) {
+                fetchMessages();
+            } else {
+                let errMsg = 'Erreur lors de l\'envoi du fichier';
+                try {
+                    const data = await response.json();
+                    errMsg = data.error || errMsg;
+                } catch (error) {
+                    console.error('Erreur lecture réponse upload:', error);
+                }
+                alert(errMsg);
+            }
+        } catch (error) {
+            console.error('Erreur upload:', error);
+            alert('Impossible d\'envoyer le fichier. Vérifiez votre connexion.');
+        } finally {
+            setUploading(false);
+            if (onDone) onDone();
+        }
+    };
+
+    const handleFileUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        await uploadFile(file, () => {
+            e.target.value = '';
+        });
+    };
+
+    const handlePaste = (e) => {
+        const items = e.clipboardData?.items;
+        if (!items) return;
+
+        for (const item of items) {
+            if (item.type.startsWith('image/')) {
+                e.preventDefault();
+                const file = item.getAsFile();
+                if (!file) return;
+                const previewUrl = URL.createObjectURL(file);
+                setPastePreview({ file, url: previewUrl });
+                return;
+            }
+        }
+    };
+
+    const confirmPasteSend = async () => {
+        if (!pastePreview) return;
+        const file = pastePreview.file;
+        URL.revokeObjectURL(pastePreview.url);
+        setPastePreview(null);
+        await uploadFile(file);
+    };
+
+    const cancelPaste = () => {
+        if (pastePreview) URL.revokeObjectURL(pastePreview.url);
+        setPastePreview(null);
+    };
 
     useEffect(() => {
-        if (messagesEndRef.current) {
-            messagesEndRef.current.scrollIntoView({
-                behavior: 'smooth',
-                block: 'nearest'
-            });
-        }
-    }, [messages]); // <--- Sécurisé, refermé proprement, et écoute les nouveaux messages !
+        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, [messages]);
 
     useEffect(() => {
         setLoading(true);
         fetchMessages();
-
         markAsRead();
 
         const interval = setInterval(fetchMessages, 4000);
         return () => clearInterval(interval);
     }, [idAmi, idGroupe]);
 
-
-
-        if (loading) return (
-
-            <div className="flex items-center justify-center h-full bg-gray-50">
-
-                <div className="text-indigo-500 font-medium animate-pulse">Chargement de la conversation...</div>
-
-            </div>
-
-        );
-
-
-
+    if (loading) {
         return (
+            <div className="flex items-center justify-center h-full bg-gray-50">
+                <div className="text-indigo-500 font-medium animate-pulse">Chargement de la conversation...</div>
+            </div>
+        );
+    }
 
-            <div className="flex flex-col h-full w-full bg-white overflow-hidden">
-
-                {/* Header */}
-
-                <div className="px-6 py-4 border-b bg-white flex justify-between items-center shrink-0">
-
-                    <div>
-
-                        <h3 className="font-bold text-gray-800">
-
-                            {isGroup ? `🏠 Groupe : ${nomGroupe}` : `👤 ${prenomAmi}`}
-
-                        </h3>
-
-                        <div className="flex items-center gap-1.5">
-
-                            <span className={`w-2 h-2 ${isGroup ? 'bg-indigo-400' : 'bg-green-500'} rounded-full`}></span>
-
-                            <span className="text-[10px] text-gray-400 uppercase font-bold tracking-widest">
-
-{isGroup ? 'Chat Événement' : 'En ligne'}
-
-</span>
-
-                        </div>
-
+    return (
+        <div className="flex flex-col h-full w-full bg-white overflow-hidden">
+            <div className="px-6 py-4 border-b bg-white flex justify-between items-center shrink-0">
+                <div>
+                    <h3 className="font-bold text-gray-800">
+                        {isGroup ? `🏠 Groupe : ${nomGroupe}` : `👤 ${prenomAmi}`}
+                    </h3>
+                    <div className="flex items-center gap-1.5">
+                        <span className={`w-2 h-2 ${isGroup ? 'bg-indigo-400' : 'bg-green-500'} rounded-full`}></span>
+                        <span className="text-[10px] text-gray-400 uppercase font-bold tracking-widest">
+                            {isGroup ? 'Chat Événement' : 'En ligne'}
+                        </span>
                     </div>
-
                 </div>
-
-
-
-                {/* Zone des messages */}
-
-                <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50/30">
-
-                    {messages.length === 0 ? (
-
-                        <div className="flex flex-col items-center justify-center h-full opacity-40">
-
-                            <p className="text-sm italic">Aucun message ici.</p>
-
-                        </div>
-
-                    ) : (
-
-                        messages.map((msg) => {
-
-// LOGIQUE DE POSITIONNEMENT :
-
-// Si c'est un chat privé : msg.expediteurId === idAmi => c'est l'autre (gauche)
-
-// Si c'est un chat de groupe : Symfony doit renvoyer un flag 'isMine' ou on compare avec l'utilisateur
-
-// Ici on part du principe que si l'ID expéditeur est celui de l'ami, c'est à gauche.
-
-// Sinon, si on est en groupe, on regarde si le nom de l'expéditeur est différent du nôtre.
-
-
-
-                            const isMe = isGroup
-
-                                ? msg.isMine // Idéalement envoyé par ton API
-
-                                : msg.expediteurId !== parseInt(idAmi);
-
-
-
-                            return (
-
-                                <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
-
-                                    <div className={`max-w-[80%] px-4 py-2.5 rounded-2xl shadow-sm ${
-
-                                        isMe
-
-                                            ? 'bg-indigo-600 text-white rounded-tr-none shadow-indigo-100'
-
-                                            : 'bg-white text-gray-800 rounded-tl-none border border-gray-100'
-
-                                    }`}>
-
-                                        {isGroup && !isMe && (
-
-                                            <p className="text-[10px] font-bold mb-1 text-indigo-400">
-
-                                                {msg.expediteurNom}
-
-                                            </p>
-
-                                        )}
-
-                                        <p className="text-sm leading-relaxed">{msg.contenu}</p>
-
-                                        <p className={`text-[9px] mt-1 text-right font-medium opacity-60`}>
-
-                                            {msg.date}
-
-                                        </p>
-
-                                    </div>
-
-                                </div>
-
-                            );
-
-                        })
-
-                    )}
-
-                    <div ref={messagesEndRef} />
-
-                </div>
-
-
-
-                {/* Formulaire */}
-
-                <form onSubmit={handleSend} className="p-4 bg-white border-t border-gray-100 flex gap-2 shrink-0">
-
-                    <input
-
-                        type="text"
-
-                        value={nouveauMessage}
-
-                        onChange={(e) => setNouveauMessage(e.target.value)}
-
-                        placeholder="Écrivez votre message..."
-
-                        className="flex-1 bg-gray-100 border-none rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500 text-sm transition-all"
-
-                    />
-
-                    <button type="submit" className="bg-indigo-600 text-white p-3 rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-100 transition-all active:scale-95">
-
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 rotate-90" viewBox="0 0 20 20" fill="currentColor">
-
-                            <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
-
-                        </svg>
-
-                    </button>
-
-                </form>
-
             </div>
 
-        );
+            <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50/30">
+                {messages.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center h-full opacity-40">
+                        <p className="text-sm italic">Aucun message ici.</p>
+                    </div>
+                ) : (
+                    messages.map((msg) => {
+                        const isMe = typeof msg.isMine === 'boolean'
+                            ? msg.isMine
+                            : (!isGroup && msg.expediteurId !== parseInt(idAmi, 10));
 
-    };
+                        return (
+                            <div key={msg.id} className={`flex ${isMe ? 'justify-end' : 'justify-start'}`}>
+                                <div className={`max-w-[80%] px-4 py-2.5 rounded-2xl shadow-sm ${
+                                    isMe
+                                        ? 'bg-indigo-600 text-white rounded-tr-none shadow-indigo-100'
+                                        : 'bg-white text-gray-800 rounded-tl-none border border-gray-100'
+                                }`}>
+                                    {isGroup && !isMe && msg.expediteurNom && (
+                                        <p className="text-[10px] font-bold mb-1 text-indigo-400">
+                                            {msg.expediteurNom}
+                                        </p>
+                                    )}
 
+                                    {msg.fichierType === 'image' && msg.fichier && (
+                                        <a href={msg.fichier} target="_blank" rel="noopener noreferrer">
+                                            <img
+                                                src={msg.fichier}
+                                                alt="Image partagée"
+                                                className="max-w-full rounded-xl mb-1 max-h-48 object-cover cursor-pointer hover:opacity-90 transition-opacity"
+                                            />
+                                        </a>
+                                    )}
 
+                                    {msg.fichierType === 'file' && msg.fichier && (
+                                        <a
+                                            href={msg.fichier}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className={`flex items-center gap-2 text-sm mb-1 underline ${isMe ? 'text-white/90' : 'text-[#00A9A5]'}`}
+                                        >
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                                            </svg>
+                                            {msg.contenu.replace(/^📎\s*/, '')}
+                                        </a>
+                                    )}
 
-    export default Chat;
+                                    {!msg.fichierType && (
+                                        <p className="text-sm leading-relaxed">{msg.contenu}</p>
+                                    )}
 
+                                    <p className={`text-[9px] mt-1 text-right font-medium ${isMe ? 'opacity-60' : 'text-gray-400'}`}>
+                                        {msg.date}
+                                    </p>
+                                </div>
+                            </div>
+                        );
+                    })
+                )}
+                <div ref={messagesEndRef} />
+            </div>
+
+            {pastePreview && (
+                <div className="px-4 py-3 bg-yellow-50 border-t border-yellow-200 flex items-center gap-3 shrink-0">
+                    <img src={pastePreview.url} alt="Aperçu" className="h-16 w-16 object-cover rounded-lg border border-yellow-300" />
+                    <div className="flex-1 text-sm text-yellow-800">Envoyer cette image ?</div>
+                    <button
+                        type="button"
+                        onClick={confirmPasteSend}
+                        disabled={uploading}
+                        className="bg-[#00A9A5] text-white px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-[#008F8C] disabled:opacity-50 transition-colors"
+                    >
+                        Envoyer
+                    </button>
+                    <button
+                        type="button"
+                        onClick={cancelPaste}
+                        className="text-gray-400 hover:text-gray-600 px-2 py-1.5 text-xs transition-colors"
+                    >
+                        Annuler
+                    </button>
+                </div>
+            )}
+
+            <form onSubmit={handleSend} className="p-4 bg-white border-t border-gray-100 flex gap-2 shrink-0 items-center">
+                <>
+                    <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/*,.pdf,.txt"
+                        className="hidden"
+                        onChange={handleFileUpload}
+                    />
+                    <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={uploading}
+                        title="Envoyer une image ou un fichier"
+                        className="text-[#00A9A5] p-2.5 rounded-xl hover:bg-[#84DCCF]/20 transition-colors flex-shrink-0 disabled:opacity-50"
+                    >
+                        {uploading ? (
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                        ) : (
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                            </svg>
+                        )}
+                    </button>
+                </>
+
+                <input
+                    type="text"
+                    value={nouveauMessage}
+                    onChange={(e) => setNouveauMessage(e.target.value)}
+                    onPaste={handlePaste}
+                    placeholder={'Écrivez votre message... (Ctrl+V pour coller une image)'}
+                    className="flex-1 bg-[#F8F8F8] border border-gray-200 rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-[#00A9A5] focus:border-transparent text-sm transition-all"
+                />
+                <button
+                    type="submit"
+                    className="bg-[#00A9A5] text-white p-3 rounded-xl hover:bg-[#008F8C] transition-transform active:scale-95 shadow-lg shadow-[#00A9A5]/20 flex-shrink-0"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 rotate-90" viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
+                    </svg>
+                </button>
+            </form>
+        </div>
+    );
+};
+
+export default Chat;

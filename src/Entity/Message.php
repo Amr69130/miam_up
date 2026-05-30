@@ -23,6 +23,12 @@ class Message
     #[ORM\Column(length: 255)]
     private ?string $status_message = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $fichier = null;
+
+    #[ORM\Column(length: 50, nullable: true)]
+    private ?string $fichier_type = null;
+
     #[ORM\ManyToOne(inversedBy: 'messages')]
     private ?Conversation $conversation = null;
 
@@ -95,6 +101,30 @@ class Message
     public function setExpediteur(?Utilisateur $expediteur): static
     {
         $this->expediteur = $expediteur;
+
+        return $this;
+    }
+
+    public function getFichier(): ?string
+    {
+        return $this->fichier;
+    }
+
+    public function setFichier(?string $fichier): static
+    {
+        $this->fichier = $fichier;
+
+        return $this;
+    }
+
+    public function getFichierType(): ?string
+    {
+        return $this->fichier_type;
+    }
+
+    public function setFichierType(?string $fichier_type): static
+    {
+        $this->fichier_type = $fichier_type;
 
         return $this;
     }

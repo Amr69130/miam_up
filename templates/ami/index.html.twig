@@ -1,35 +1,34 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Espace Social{% endblock %}
+{% block title %}Espace Social - Miam Up{% endblock %}
 
 {% block body %}
-    <div class="bg-gray-50 min-h-screen pb-12">
-        <div class="max-w-7xl mx-auto p-4 md:p-6">
+<div class="flex h-screen overflow-hidden bg-[#F8F8F8] font-['Inter',sans-serif]">
+
+    {% include 'partials/_sidebar.html.twig' with { active: 'messages' } %}
+
+    <div class="flex-1 overflow-y-auto">
+        <div class="max-w-7xl mx-auto p-6">
 
             <div class="flex items-center justify-between mb-8">
-                <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">🤝 Hub Social</h1>
-                <div class="flex gap-2">
-                    <span class="bg-indigo-100 text-indigo-700 px-4 py-1 rounded-full text-sm font-bold shadow-sm">
-                        {{ amis|length }} Amis au total
-                    </span>
+                <div>
+                    <h1 class="text-2xl font-bold text-[#4A4A4A]">Espace Social</h1>
+                    <p class="text-sm text-[#4A4A4A]/60 mt-0.5">Gérez vos amis, groupes et échangez en direct</p>
                 </div>
+                <span class="bg-[#84DCCF]/20 text-[#00A9A5] px-4 py-1.5 rounded-full text-sm font-semibold">
+                    {{ amis|length }} ami{{ amis|length > 1 ? 's' : '' }}
+                </span>
             </div>
 
-            {# --- GRILLE PRINCIPALE --- #}
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                <div class="lg:col-span-5 space-y-6">
 
-                {# --- COLONNE GAUCHE (5/12) : GESTION SOCIALE --- #}
-                <div class="lg:col-span-5 space-y-8">
+                    {% if conversations is defined and conversations is not empty %}
+                        <section class="bg-white shadow-md rounded-3xl border border-gray-200 overflow-hidden p-6 border-l-4 border-l-green-500">
+                            <h2 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                                <span class="text-xl">🥗</span> Mes Conversations
+                            </h2>
 
-                    {# --- TES GROUPES DE TABLE (CONVERSATIONS) --- #}
-                    <section class="bg-white shadow-md rounded-3xl border border-gray-200 overflow-hidden p-6 border-l-4 border-l-green-500">
-                        <h2 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
-                            <span class="text-xl">🥗</span> Mes Conversations
-                        </h2>
-
-                        {% if conversations is empty %}
-                            <p class="text-gray-400 text-sm italic text-center py-4">Vous n'avez rejoint aucun événement.</p>
-                        {% else %}
                             <div class="space-y-3">
                                 {% for conv in conversations %}
                                     <a href="{{ path('app_ami_list', {'chatWithGroup': conv.id}) }}"
@@ -37,7 +36,7 @@
                                         <div>
                                             <p class="font-bold text-gray-800 text-sm group-hover:text-white">{{ conv.nomConversation }}</p>
                                             <p class="text-[10px] text-gray-500 italic group-hover:text-green-100">
-                                                {{ conv.evenement.restaurant.nomRestaurant ?? 'Conversation privée non liée à un évenement' }}
+                                                {{ conv.evenement.restaurant.nomRestaurant ?? 'Conversation privée non liée à un événement' }}
                                             </p>
                                         </div>
                                         <span class="text-[9px] bg-green-600 text-white px-3 py-1 rounded-full font-bold shadow-sm uppercase tracking-wider group-hover:bg-white group-hover:text-green-600">
@@ -46,117 +45,109 @@
                                     </a>
                                 {% endfor %}
                             </div>
-                        {% endif %}
+                        </section>
+                    {% endif %}
+
+                    <section class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                        <div class="p-4 border-b border-gray-100 bg-[#FF6B6B]/5">
+                            <h2 class="text-xs font-bold text-[#FF6B6B] uppercase tracking-widest flex items-center gap-2">
+                                <span>📥</span> Demandes reçues
+                            </h2>
+                        </div>
+                        <div class="p-4">
+                            {% if demandes_recues is empty %}
+                                <p class="text-[#4A4A4A]/40 text-sm italic text-center py-2">Aucune demande en attente.</p>
+                            {% else %}
+                                <div class="space-y-3">
+                                    {% for demande in demandes_recues %}
+                                        <div class="flex items-center justify-between bg-[#F8F8F8] p-3 rounded-xl border border-gray-100">
+                                            <span class="font-semibold text-[#4A4A4A] text-sm">{{ demande.utilisateurDemandeur.prenomUtilisateur }}</span>
+                                            <div class="flex gap-1">
+                                                <a href="{{ path('app_ami_accept', {'id': demande.id}) }}" class="bg-[#00A9A5] hover:bg-[#008F8C] text-white p-2 rounded-lg transition shadow-sm">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+                                                </a>
+                                                <a href="{{ path('app_ami_reject', {'id': demande.id}) }}" class="bg-[#FF6B6B] hover:bg-[#e55a5a] text-white p-2 rounded-lg transition shadow-sm">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
                     </section>
 
-                    {# 1. DEMANDES EN ATTENTE (REÇUES & ENVOYÉES) #}
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-6">
-                        {# REÇUES #}
-                        <section class="bg-white shadow-sm rounded-2xl border border-gray-200 overflow-hidden">
-                            <div class="p-4 border-b border-gray-100 bg-orange-50/50">
-                                <h2 class="text-xs font-bold text-orange-800 uppercase tracking-widest flex items-center gap-2">
-                                    <span>📥</span> Demandes reçues
-                                </h2>
-                            </div>
-                            <div class="p-4">
-                                {% if demandes_recues is empty %}
-                                    <p class="text-gray-400 text-sm italic text-center">Aucune demande.</p>
-                                {% else %}
-                                    <div class="space-y-3">
-                                        {% for demande in demandes_recues %}
-                                            <div class="flex items-center justify-between bg-gray-50 p-3 rounded-xl border border-gray-100">
-                                                <span class="font-bold text-gray-700 text-sm">{{ demande.utilisateurDemandeur.prenomUtilisateur }}</span>
-                                                <div class="flex gap-1">
-                                                    <a href="{{ path('app_ami_accept', {'id': demande.id}) }}" class="bg-green-600 hover:bg-green-700 text-white p-2 rounded-lg transition shadow-sm">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
-                                                    </a>
-                                                    <a href="{{ path('app_ami_reject', {'id': demande.id}) }}" class="bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg transition shadow-sm">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" /></svg>
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        {% endfor %}
-                                    </div>
-                                {% endif %}
-                            </div>
-                        </section>
+                    <section class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+                        <div class="p-4 border-b border-gray-100 bg-[#84DCCF]/10">
+                            <h2 class="text-xs font-bold text-[#00A9A5] uppercase tracking-widest flex items-center gap-2">
+                                <span>📤</span> Demandes envoyées
+                            </h2>
+                        </div>
+                        <div class="p-4">
+                            {% if demandes_envoyees is empty %}
+                                <p class="text-[#4A4A4A]/40 text-sm italic text-center py-2">Aucune demande envoyée.</p>
+                            {% else %}
+                                <div class="space-y-2">
+                                    {% for envoi in demandes_envoyees %}
+                                        <div class="flex items-center justify-between text-xs bg-[#F8F8F8] p-2.5 rounded-xl">
+                                            <span class="text-[#4A4A4A]/70">Pour <strong class="text-[#4A4A4A]">{{ envoi.utilisateurReceveur.prenomUtilisateur }}</strong></span>
+                                            <span class="px-2 py-0.5 bg-[#84DCCF]/20 text-[#00A9A5] rounded-full font-bold uppercase text-[9px]">En attente</span>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </section>
 
-                        {# ENVOYÉES #}
-                        <section class="bg-white shadow-sm rounded-2xl border border-gray-200 overflow-hidden">
-                            <div class="p-4 border-b border-gray-100 bg-blue-50/50">
-                                <h2 class="text-xs font-bold text-blue-800 uppercase tracking-widest flex items-center gap-2">
-                                    <span>📤</span> Demandes envoyées
-                                </h2>
-                            </div>
-                            <div class="p-4">
-                                {% if demandes_envoyees is empty %}
-                                    <p class="text-gray-400 text-sm italic text-center">Aucun envoi.</p>
-                                {% else %}
-                                    <div class="space-y-2">
-                                        {% for envoi in demandes_envoyees %}
-                                            <div class="flex items-center justify-between text-xs bg-gray-50 p-2 rounded-lg">
-                                                <span class="text-gray-600">Pour <strong class="text-gray-900">{{ envoi.utilisateurReceveur.prenomUtilisateur }}</strong></span>
-                                                <span class="px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full font-bold uppercase text-[9px]">Attente</span>
-                                            </div>
-                                        {% endfor %}
-                                    </div>
-                                {% endif %}
-                            </div>
-                        </section>
-                    </div>
-
-                    {# 2. MA LISTE D'AMIS COMPLÈTE (GRILLE) #}
-                    <section class="bg-white shadow-md rounded-3xl border border-gray-200 overflow-hidden p-6">
-                        <h2 class="text-lg font-bold text-gray-800 mb-6 flex items-center gap-2">
-                            <span class="text-xl">👥</span> Liste de mes amis
+                    <section class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden p-5">
+                        <h2 class="text-sm font-bold text-[#4A4A4A] mb-4 flex items-center gap-2">
+                            <span>👥</span> Mes amis
                         </h2>
-
                         {% if amis is empty %}
-                            <p class="text-gray-400 text-sm italic text-center py-10">Vous n'avez pas encore d'amis.</p>
+                            <p class="text-[#4A4A4A]/40 text-sm italic text-center py-8">Vous n'avez pas encore d'amis.</p>
                         {% else %}
-                            <div class="grid grid-cols-2 gap-4">
+                            <div class="grid grid-cols-2 gap-3">
                                 {% for ami in amis %}
-                                    <div class="p-4 rounded-2xl bg-indigo-50/50 border border-indigo-100 flex flex-col items-center text-center group hover:bg-indigo-100 transition-all duration-300">
-                                        <div class="w-12 h-12 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-lg shadow-md mb-2 group-hover:scale-110 transition-transform">
+                                    <a href="{{ path('app_ami_list', {'chatWith': ami.id}) }}"
+                                       class="p-4 rounded-2xl bg-[#84DCCF]/10 border border-[#84DCCF]/20 flex flex-col items-center text-center group hover:bg-[#84DCCF]/20 hover:border-[#00A9A5]/30 transition-all duration-200">
+                                        <div class="w-11 h-11 rounded-full bg-[#00A9A5] text-white flex items-center justify-center font-bold text-base shadow-sm mb-2 group-hover:scale-110 transition-transform">
                                             {{ ami.prenomUtilisateur|slice(0,1)|upper }}
                                         </div>
-                                        <p class="font-bold text-gray-800 text-sm mb-2">{{ ami.prenomUtilisateur }}</p>
-                                        <a href="{{ path('app_ami_list', {'chatWith': ami.id}) }}" class="text-[10px] bg-white text-indigo-600 px-3 py-1 rounded-full font-bold shadow-sm hover:shadow-md transition-all">
-                                            VOIR CHAT
-                                        </a>
-                                    </div>
+                                        <p class="font-semibold text-[#4A4A4A] text-sm mb-1.5">{{ ami.prenomUtilisateur }}</p>
+                                        <span class="text-[10px] bg-white text-[#00A9A5] px-3 py-0.5 rounded-full font-bold shadow-sm border border-[#84DCCF]/30">
+                                            Ouvrir le chat
+                                        </span>
+                                    </a>
                                 {% endfor %}
                             </div>
                         {% endif %}
                     </section>
                 </div>
 
-                {# --- COLONNE DROITE (7/12) : MESSAGERIE --- #}
                 <div class="lg:col-span-7">
-                    <div class="bg-white shadow-2xl rounded-3xl overflow-hidden border border-gray-200 flex flex-col h-[750px] sticky top-6">
-
-                        {# --- LOGIQUE DE SÉLECTION (HYBRIDE AMI/GROUPE) --- #}
+                    <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col h-[750px] sticky top-6">
                         {% set selectedAmiId = app.request.query.get('chatWith') %}
                         {% set selectedGroupId = app.request.query.get('chatWithGroup') %}
-
                         {% set amiActuel = null %}
                         {% set groupeActuel = null %}
 
                         {% if selectedAmiId %}
                             {% for ami in amis %}
-                                {% if ami.id == selectedAmiId %}{% set amiActuel = ami %}{% endif %}
+                                {% if ami.id == selectedAmiId %}
+                                    {% set amiActuel = ami %}
+                                {% endif %}
                             {% endfor %}
-                        {% elseif selectedGroupId %}
+                        {% elseif selectedGroupId and conversations is defined %}
                             {% for conv in conversations %}
-                                {% if conv.id == selectedGroupId %}{% set groupeActuel = conv %}{% endif %}
+                                {% if conv.id == selectedGroupId %}
+                                    {% set groupeActuel = conv %}
+                                {% endif %}
                             {% endfor %}
                         {% elseif amis is not empty %}
-                            {# Par défaut, on affiche le premier ami si rien n'est sélectionné #}
                             {% set amiActuel = amis|first %}
                         {% endif %}
 
-                        {# ZONE REACT CONTENUE DANS UN BLOC UNIQUE #}
-                        <main class="flex-1 bg-white relative flex flex-col overflow-hidden">
+                        <main class="flex-1 relative flex flex-col overflow-hidden">
                             {% if amiActuel or groupeActuel %}
                                 <div id="react-chat-root"
                                      data-id-ami="{{ amiActuel ? amiActuel.id : '' }}"
@@ -164,20 +155,19 @@
                                      data-prenom-ami="{{ amiActuel ? amiActuel.prenomUtilisateur : '' }}"
                                      data-nom-groupe="{{ groupeActuel ? groupeActuel.nomConversation : '' }}"
                                      class="absolute inset-0 w-full h-full">
-                                    {# Le Chat React remplit tout l'espace #}
                                 </div>
                             {% else %}
-                                <div class="h-full flex flex-col items-center justify-center p-12 text-center bg-gray-50/50">
-                                    <div class="w-24 h-24 bg-white shadow-inner rounded-full flex items-center justify-center text-4xl mb-6">💬</div>
-                                    <h3 class="text-gray-900 font-extrabold text-xl">Messagerie</h3>
-                                    <p class="text-gray-500 text-sm max-w-xs mt-3">Sélectionnez un ami ou un groupe pour commencer à discuter.</p>
+                                <div class="h-full flex flex-col items-center justify-center p-12 text-center bg-[#F8F8F8]/50">
+                                    <div class="w-20 h-20 bg-[#84DCCF]/15 rounded-2xl flex items-center justify-center text-4xl mb-5">💬</div>
+                                    <h3 class="text-[#4A4A4A] font-bold text-lg">Messagerie</h3>
+                                    <p class="text-[#4A4A4A]/50 text-sm max-w-xs mt-2">Sélectionnez un ami ou un groupe pour commencer à discuter.</p>
                                 </div>
                             {% endif %}
                         </main>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
+</div>
 {% endblock %}

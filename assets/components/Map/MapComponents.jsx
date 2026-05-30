@@ -93,7 +93,7 @@ const MapComponent = ({ magasins: magasinsInitiaux }) => {
         : [45.78, 4.83];
 
     return (
-        <div style={{ position: 'relative', width: '100%', height: '500px' }}>
+        <div style={{ position: 'relative', width: '100%', height: '100%' }}>
 
             {/* BOUTON INFO FLOTTANT */}
             <button

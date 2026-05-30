@@ -1,4 +1,4 @@
-{% extends 'base.html.twig' %}
+﻿{% extends 'base.html.twig' %}
 
 {% block title %}Carte Miam'Up{% endblock %}
 
@@ -10,106 +10,184 @@
 {% block javascripts %}
     {{ parent() }}
     {{ encore_entry_script_tags('app') }}
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            setTimeout(() => {
-                const flashMessages = document.querySelectorAll('.flash-message-container');
-                const geolocMessage = document.getElementById('geoloc-message');
-
-                const fadeOut = (el) => {
-                    if (el && !el.classList.contains('hidden')) {
-                        el.style.transition = "opacity 0.6s ease, transform 0.6s ease";
-                        el.style.opacity = "0";
-                        el.style.transform = "translateY(-10px)";
-                        setTimeout(() => el.classList.add('hidden'), 600);
-                    }
-                };
-
-                flashMessages.forEach(msg => fadeOut(msg));
-                if (geolocMessage && !geolocMessage.classList.contains('text-red-600')) {
-                    fadeOut(geolocMessage);
-                }
-            }, 5000);
-        });
-    </script>
 {% endblock %}
 
 {% block body %}
-    {# --- 1. MESSAGES FLASH (FORÇAGE DU TEXTE EN BLANC) --- #}
-    {% for message in app.flashes('success') %}
-        <div class="flash-message-container fixed top-6 right-6 z-[100] animate-bounce">
-            <div class="bg-green-600 p-5 rounded-2xl shadow-2xl flex items-center gap-3 border-b-4 border-green-800">
-                {# On utilise un emoji simple au cas où le SVG beugue #}
-                <span class="text-2xl">✅</span>
-                <span class="font-black text-white text-lg drop-shadow-sm">
-                    {{ message|raw }}
-                </span>
-            </div>
-        </div>
-    {% endfor %}
-
-    {# --- 2. BOUTON FLOTTANT --- #}
+<div class="flex h-screen overflow-hidden bg-[#F8F8F8] font-['Inter',sans-serif]">
     <div class="fixed bottom-10 right-10 z-[90]">
-        <a href="{{ path('app_evenement_test') }}"
+        <a href="{{ path('app_evenement_new') }}"
            class="flex items-center gap-3 bg-[#FF6B6B] hover:bg-[#e55a5a] text-white px-8 py-4 rounded-full font-black shadow-2xl transition-all hover:scale-110 active:scale-95 border-4 border-white">
             <span class="text-2xl">🔥</span>
             <span class="text-white">ORGANISER UN EVENT</span>
         </a>
     </div>
 
-    <div class="container mx-auto px-4 py-8">
+    {# Sidebar #}
+    {% include 'partials/_sidebar.html.twig' with { active: 'carte' } %}
 
-        {# MODAL CONTAINER FOR RESTAURANT DETAILS #}
+    {# Zone carte plein écran avec overlay #}
+    <div class="flex-1 relative overflow-hidden">
+
+        {# Modal restaurant (Stimulus) #}
         <div data-controller="restaurant-modal">
             <div data-restaurant-modal-target="container"></div>
         </div>
 
-        {# BLOC RECHERCHE ET GEOLOC #}
-        <div class="max-w-4xl mx-auto mb-10 text-center" data-controller="search-location">
-            <div class="flex flex-col md:flex-row items-center justify-center gap-4 bg-white p-4 rounded-2xl shadow-sm border border-gray-200">
+        {# Flash messages #}
+        {% for message in app.flashes('success') %}
+            <div class="flash-message-container absolute top-20 left-1/2 -translate-x-1/2 z-[500] pointer-events-none">
+                <div class="bg-green-600 px-5 py-3 rounded-xl shadow-xl flex items-center gap-3">
+                    <span class="text-xl">�o.</span>
+                    <span class="font-semibold text-white">{{ message|raw }}</span>
+                </div>
+            </div>
+        {% endfor %}
 
-                <div class="relative w-full md:w-80 flex gap-2">
-                    <div class="relative flex-grow">
-                        <input type="text"
-                               id="search-input"
-                               data-action="keydown.enter->search-location#filter"
-                               placeholder="Rechercher un restaurant..."
-                               class="w-full pl-10 pr-4 py-2 rounded-full border border-gray-200 focus:ring-2 focus:ring-[#00A9A5] outline-none text-sm text-gray-900">
-                        <span class="absolute left-3 top-2 text-gray-400">🔍</span>
-                    </div>
+        {# �"?�"? Overlay flottant : barre de recherche + filtres �"?�"? #}
+        <div class="absolute top-4 left-4 right-4 z-[1000] pointer-events-none">
+            <div class="pointer-events-auto max-w-3xl mx-auto space-y-2" data-controller="search-location">
+
+                {# Barre de recherche #}
+                <div class="flex items-center gap-2 bg-white rounded-2xl shadow-lg px-4 py-3 border border-gray-100">
+                    <svg class="w-5 h-5 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                    <input type="text"
+                           id="search-input"
+                           placeholder="Rechercher des restaurants, cuisines ou lieux..."
+                           class="flex-1 bg-transparent outline-none text-sm text-[#4A4A4A] placeholder-gray-400">
                     <button type="button"
                             id="btn-search-confirm"
-                            data-action="click->search-location#filter"
-                            class="bg-[#4A4A4A] text-white px-4 py-2 rounded-full hover:bg-[#333] transition text-sm font-bold">
-                        OK
+                            class="text-gray-400 hover:text-[#00A9A5] transition-colors p-1 flex-shrink-0">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 010 2H4a1 1 0 01-1-1zm3 5a1 1 0 011-1h10a1 1 0 010 2H7a1 1 0 01-1-1zm3 5a1 1 0 011-1h4a1 1 0 010 2h-4a1 1 0 01-1-1z"/>
+                        </svg>
                     </button>
-                </div>
-
-                <span class="hidden md:block text-gray-300">|</span>
-
-                <div class="relative">
+                    <div class="w-px h-5 bg-gray-200 flex-shrink-0"></div>
                     <button data-search-location-target="button"
                             data-action="click->search-location#findMe"
-                            id="btn-geoloc"
-                            class="flex items-center gap-2 bg-[#00A9A5] hover:bg-[#008F8C] text-white font-bold py-2.5 px-6 rounded-full transition-all shadow-md">
-                        <span data-search-location-target="label" id="btn-text">Autour de moi</span>
+                            title="Autour de moi"
+                            class="text-[#00A9A5] hover:text-[#008F8C] transition-colors p-1 flex-shrink-0">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+                        </svg>
+                    </button>
+                </div>
+
+                {# Feedback géoloc #}
+                <div data-search-location-target="message"
+                     id="geoloc-message"
+                     class="hidden px-4 py-2 bg-white rounded-xl shadow text-xs text-gray-700 border border-gray-100 w-fit mx-auto">
+                </div>
+
+                {# Chips de filtres #}
+                <div class="flex items-center gap-2 flex-wrap">
+                    {# Chip géoloc / événements à proximité #}
+                    <button id="chip-events"
+                            data-filter="today,soon"
+                            class="chip-filter flex items-center gap-1.5 bg-[#00A9A5] text-white px-3.5 py-1.5 rounded-full text-xs font-semibold shadow-sm hover:bg-[#008F8C] transition-colors active-chip">
+                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+                        </svg>
+                        Événements à proximité
                     </button>
 
-                    {# Message de feedback géo (Forçage texte noir) #}
-                    <div data-search-location-target="message"
-                         id="geoloc-message"
-                         class="hidden absolute top-full left-1/2 -translate-x-1/2 mt-2 w-max max-w-xs p-3 rounded-lg border bg-white shadow-xl z-50 text-gray-900 font-bold">
-                    </div>
+                    <button id="chip-today"
+                            data-filter="today"
+                            class="chip-filter bg-white text-[#4A4A4A] px-3.5 py-1.5 rounded-full text-xs font-semibold shadow-sm hover:border-[#00A9A5] hover:text-[#00A9A5] border border-gray-200 transition-colors">
+                        Ouvert ce soir
+                    </button>
+
+                    <button id="chip-soon"
+                            data-filter="soon"
+                            class="chip-filter bg-white text-[#4A4A4A] px-3.5 py-1.5 rounded-full text-xs font-semibold shadow-sm hover:border-[#00A9A5] hover:text-[#00A9A5] border border-gray-200 transition-colors">
+                        Événement demain
+                    </button>
+
+                    <button id="chip-all"
+                            data-filter="all"
+                            class="chip-filter bg-white text-[#4A4A4A] px-3.5 py-1.5 rounded-full text-xs font-semibold shadow-sm hover:border-[#00A9A5] hover:text-[#00A9A5] border border-gray-200 transition-colors">
+                        Tous les restaurants
+                    </button>
+
+                    {# Séparateur #}
+                    <div class="w-px h-5 bg-white/60 mx-1"></div>
+
+                    <a href="{{ path('app_evenement_new') }}"
+                       class="flex items-center gap-1.5 bg-[#FF6B6B] hover:bg-[#e55a5a] text-white px-3.5 py-1.5 rounded-full text-xs font-semibold shadow-sm transition-colors">
+                        🔥 Organiser un événement
+                    </a>
                 </div>
+
             </div>
         </div>
 
-        {# 3. POINT D'ENTRÉE REACT #}
+        {# React map root - plein écran #}
         <div id="react-map-root"
-             class="rounded-3xl overflow-hidden shadow-2xl border-4 border-white min-h-[600px] bg-gray-200"
-             data-items="{{ restaurants_json }}">
+             class="absolute inset-0 z-0" data-items="{{ restaurants_json }}">
         </div>
 
     </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Auto-disparition des flash
+    setTimeout(() => {
+        document.querySelectorAll('.flash-message-container').forEach(el => {
+            el.style.transition = 'opacity 0.6s ease';
+            el.style.opacity = '0';
+            setTimeout(() => el.remove(), 600);
+        });
+    }, 4000);
+
+    const mapRoot = document.getElementById('react-map-root');
+    if (!mapRoot) return;
+    const allRestaurants = JSON.parse(mapRoot.dataset.items);
+
+    let activeChipFilter = 'today,soon'; // filtre initial
+
+    function applyFilters() {
+        const query = (document.getElementById('search-input')?.value || '').toLowerCase().trim();
+
+        const filtered = allRestaurants.filter(r => {
+            const matchName = !query || r.nom.toLowerCase().includes(query);
+            let matchChip = true;
+            if (activeChipFilter === 'today') {
+                matchChip = r.event_status === 'today';
+            } else if (activeChipFilter === 'soon') {
+                matchChip = r.event_status === 'soon';
+            } else if (activeChipFilter === 'today,soon') {
+                matchChip = r.event_status === 'today' || r.event_status === 'soon';
+            }
+            // 'all' �?' pas de filtre statut
+            return matchName && matchChip;
+        });
+
+        window.dispatchEvent(new CustomEvent('restaurants-updated', { detail: { restaurants: filtered } }));
+    }
+
+    // Chips
+    document.querySelectorAll('.chip-filter').forEach(chip => {
+        chip.addEventListener('click', () => {
+            // Reset styles
+            document.querySelectorAll('.chip-filter').forEach(c => {
+                c.classList.remove('bg-[#00A9A5]', 'text-white');
+                c.classList.add('bg-white', 'text-[#4A4A4A]', 'border', 'border-gray-200');
+            });
+            // Activer le chip cliqué
+            chip.classList.add('bg-[#00A9A5]', 'text-white');
+            chip.classList.remove('bg-white', 'text-[#4A4A4A]', 'border', 'border-gray-200');
+            activeChipFilter = chip.dataset.filter;
+            applyFilters();
+        });
+    });
+
+    // Recherche texte
+    document.getElementById('search-input')?.addEventListener('keydown', e => {
+        if (e.key === 'Enter') applyFilters();
+    });
+    document.getElementById('btn-search-confirm')?.addEventListener('click', applyFilters);
+});
+</script>
 {% endblock %}
