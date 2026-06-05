@@ -132,4 +132,52 @@ class UtilisateurController extends AbstractController
     {
         throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
     }
+
+    #[Route('/profil', name: 'app_profil')]
+    public function profil(): Response
+    {
+        $user = $this->getUser();
+
+        if (!$user) {
+            return $this->redirectToRoute('app_utilisateur_login'); // Correction ici
+        }
+
+        return $this->render('utilisateur/profil.html.twig', [
+            'user' => $user,
+            'active' => 'profil'
+        ]);
+    }
+
+    #[Route('/profil/update', name: 'app_profil_update', methods: ['POST'])]
+    public function updateProfil(Request $request, EntityManagerInterface $em): Response
+    {
+        $user = $this->getUser();
+        
+        if (!$user) {
+            return $this->redirectToRoute('app_utilisateur_login');
+        }
+
+        $field = $request->request->get('field');
+        $value = trim($request->request->get('value'));
+
+        switch ($field) {
+            case 'prenom':
+                $user->setPrenomUtilisateur($value);
+                break;
+            case 'nom':
+                $user->setNomUtilisateur($value);
+                break;
+            case 'email':
+                $user->setEmailUtilisateur($value);
+                break;
+            default:
+                $this->addFlash('danger', 'Modification impossible : champ inconnu.');
+                return $this->redirectToRoute('app_profil');
+        }
+
+        $em->flush();
+
+        $this->addFlash('success', 'Vos informations ont été mises à jour !');
+        return $this->redirectToRoute('app_profil');
+    }
 }

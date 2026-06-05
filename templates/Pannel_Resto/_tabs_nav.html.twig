@@ -17,9 +17,9 @@
       Mon restaurant
     </a>
 
-    {# Avis clients (Modifié temporairement avec #) #}
+    {# Avis clients #}
     {% set is_active = (active_tab is defined and active_tab == 'avis') %}
-    <a href="#"
+    <a href="{{ path('app_panneau_avis') }}"
        class="flex items-center gap-2 px-4 py-4 text-sm font-medium border-b-2 transition-colors {{ is_active ? 'border-[#00A9A5] text-[#00A9A5]' : 'border-transparent text-[#4A4A4A] hover:text-[#00A9A5] hover:border-gray-300' }}">
       <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
         <path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
@@ -27,9 +27,9 @@
       Avis clients
     </a>
 
-    {# Événements (Modifié temporairement avec #) #}
+    {# Événements #}
     {% set is_active = (active_tab is defined and active_tab == 'evenements') %}
-    <a href="#"
+    <a href="{{ path('app_panneau_evenements') }}"
        class="flex items-center gap-2 px-4 py-4 text-sm font-medium border-b-2 transition-colors {{ is_active ? 'border-[#00A9A5] text-[#00A9A5]' : 'border-transparent text-[#4A4A4A] hover:text-[#00A9A5] hover:border-gray-300' }}">
       <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
         <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
@@ -37,9 +37,9 @@
       Événements
     </a>
 
-    {# Localisation (Modifié temporairement avec #) #}
+    {# Localisation #}
     {% set is_active = (active_tab is defined and active_tab == 'localisation') %}
-    <a href="#"
+    <a href="{{ path('app_panneau_localisation') }}"
        class="flex items-center gap-2 px-4 py-4 text-sm font-medium border-b-2 transition-colors {{ is_active ? 'border-[#00A9A5] text-[#00A9A5]' : 'border-transparent text-[#4A4A4A] hover:text-[#00A9A5] hover:border-gray-300' }}">
       <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
         <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
