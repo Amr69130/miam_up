@@ -3,17 +3,17 @@
 {% block title %}Inscription - Miam Up{% endblock %}
 
 {% block body %}
-<div class="md:h-screen p-4 bg-[#F8F8F8]">
-    <div class="flex flex-col justify-center items-center bg-white h-full">
-        <div class="grid md:grid-cols-2 items-center gap-y-8 max-w-7xl w-full shadow-lg rounded-2xl relative overflow-hidden">
+<div class="min-h-screen py-8 px-4 bg-[#F8F8F8]">
+    <div class="flex flex-col justify-center items-center">
+        <div class="grid md:grid-cols-2 max-w-7xl w-full shadow-lg rounded-2xl relative overflow-hidden bg-white">
             
-            {# Image côté gauche #}
-            <div class="max-md:order-1 p-4 bg-gray-50 h-full">
-                <img src="https://readymadeui.com/signin-image.webp" class="max-w-[90%] w-full h-full object-contain block mx-auto" alt="inscription-image" />
+            {# Image côté gauche - sticky pour rester visible pendant le scroll #}
+            <div class="max-md:order-1 p-4 bg-gray-50 md:sticky md:top-8 md:self-start md:max-h-[calc(100vh-4rem)]">
+                <img src="https://readymadeui.com/signin-image.webp" class="max-w-[90%] w-full object-contain block mx-auto" alt="inscription-image" />
             </div>
 
             {# Formulaire côté droit #}
-            <div class="flex items-center p-6 max-w-md w-full h-full mx-auto">
+            <div class="flex items-start p-6 max-w-md w-full mx-auto">
                 <form method="POST" action="{{ path('app_utilisateur_register') }}" class="w-full">
                     
                     <div class="lg:mb-12 mb-8">

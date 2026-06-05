@@ -2,6 +2,15 @@
 
 {% block title %}Connexion - Miam Up{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        #login-password::-ms-reveal,
+        #login-password::-ms-clear { display: none; }
+        #login-password::-webkit-credentials-auto-fill-button { visibility: hidden; pointer-events: none; }
+    </style>
+{% endblock %}
+
 {% block body %}
 <div class="min-h-screen flex flex-col items-center justify-center p-4 bg-[#F8F8F8]">
     <div class="grid md:grid-cols-2 items-center gap-4 max-md:gap-8 max-w-6xl max-md:max-w-lg w-full p-4 shadow-lg rounded-2xl bg-white overflow-hidden">
@@ -60,10 +69,17 @@
                 <div class="mt-8">
                     <label class="text-[#4A4A4A] text-[13px] font-medium block mb-2">Mot de passe</label>
                     <div class="relative flex items-center">
-                        <input name="_password" type="password" required autocomplete="current-password" class="w-full text-[#4A4A4A] text-sm border-b border-gray-300 focus:border-[#00A9A5] pl-2 pr-8 py-3 outline-none" placeholder="Entrez votre mot de passe" />
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="#bbb" stroke="#bbb" class="w-[18px] h-[18px] absolute right-2 cursor-pointer" viewBox="0 0 128 128">
-                            <path d="M64 104C22.127 104 1.367 67.496.504 65.943a4 4 0 0 1 0-3.887C1.367 60.504 22.127 24 64 24s62.633 36.504 63.496 38.057a4 4 0 0 1 0 3.887C126.633 67.496 105.873 104 64 104zM8.707 63.994C13.465 71.205 32.146 96 64 96c31.955 0 50.553-24.775 55.293-31.994C114.535 56.795 95.854 32 64 32 32.045 32 13.447 56.775 8.707 63.994zM64 88c-13.234 0-24-10.766-24-24s10.766-24 24-24 24 10.766 24 24-10.766 24-24 24zm0-40c-8.822 0-16 7.178-16 16s7.178 16 16 16 16-7.178 16-16-7.178-16-16-16z"></path>
-                        </svg>
+                        <input id="login-password" name="_password" type="password" required autocomplete="current-password" class="w-full text-[#4A4A4A] text-sm border-b border-gray-300 focus:border-[#00A9A5] pl-2 pr-8 py-3 outline-none" placeholder="Entrez votre mot de passe" />
+                        <button type="button" onclick="(function(){var i=document.getElementById('login-password'),s=document.getElementById('login-eye-show'),h=document.getElementById('login-eye-hide');if(i.type==='password'){i.type='text';s.classList.add('hidden');h.classList.remove('hidden');}else{i.type='password';s.classList.remove('hidden');h.classList.add('hidden');}})()" class="absolute right-2 text-gray-400 hover:text-[#00A9A5] transition-colors" tabindex="-1" aria-label="Afficher/masquer le mot de passe">
+                            {# Œil ouvert (état : masqué) #}
+                            <svg id="login-eye-show" xmlns="http://www.w3.org/2000/svg" class="w-[18px] h-[18px]" fill="currentColor" viewBox="0 0 128 128">
+                                <path d="M64 104C22.127 104 1.367 67.496.504 65.943a4 4 0 0 1 0-3.887C1.367 60.504 22.127 24 64 24s62.633 36.504 63.496 38.057a4 4 0 0 1 0 3.887C126.633 67.496 105.873 104 64 104zM8.707 63.994C13.465 71.205 32.146 96 64 96c31.955 0 50.553-24.775 55.293-31.994C114.535 56.795 95.854 32 64 32 32.045 32 13.447 56.775 8.707 63.994zM64 88c-13.234 0-24-10.766-24-24s10.766-24 24-24 24 10.766 24 24-10.766 24-24 24zm0-40c-8.822 0-16 7.178-16 16s7.178 16 16 16 16-7.178 16-16-7.178-16-16-16z"/>
+                            </svg>
+                            {# Œil barré (état : visible) #}
+                            <svg id="login-eye-hide" xmlns="http://www.w3.org/2000/svg" class="w-[18px] h-[18px] hidden" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24M1 1l22 22" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>
+                            </svg>
+                        </button>
                     </div>
                 </div>
 
