@@ -109,7 +109,7 @@ export default class extends Controller {
         this.buttonTarget.disabled = isLoading;
         if (this.hasIconTarget) this.iconTarget.classList.toggle('hidden', isLoading);
         if (this.hasSpinnerTarget) this.spinnerTarget.classList.toggle('hidden', !isLoading);
-        this.labelTarget.textContent = isLoading ? "Recherche..." : "Autour de moi";
+        if (this.hasLabelTarget) this.labelTarget.textContent = isLoading ? "Recherche..." : "Autour de moi";
     }
 
     showMessage(text, type) {
