@@ -85,14 +85,18 @@ class RestaurantSearchController extends AbstractController
                 // Définition de la couleur du marqueur selon la date
                 if ($eventDate === $today) {
                     $status = 'today';
-                } elseif ($eventDate === $tomorrow && $status !== 'today') {
+                } elseif ($eventDate > $today && $status !== 'today') {
                     $status = 'soon';
                 }
             }
 
+            $types = $restaurant->getType()->map(fn($t) => $t->getNomType())->toArray();
+
             $data[] = [
                 'id'          => $restaurant->getId(),
                 'nom'         => $restaurant->getNomRestaurant(),
+                'note'        => $restaurant->getNoteConsommateurs(),
+                'type'        => implode(', ', array_slice($types, 0, 2)),
                 'adresse'     => $restaurant->getAdresseRestaurant(),
                 'lat'         => (float)$restaurant->getLatitude(),
                 'lng'         => (float)$restaurant->getLongitude(),
