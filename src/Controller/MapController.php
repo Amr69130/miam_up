@@ -34,7 +34,7 @@ class MapController extends AbstractController
                     // Gestion du status pour la couleur du marqueur
                     if ($eventDate === $today) {
                         $status = 'today';
-                    } elseif ($eventDate === $tomorrow && $status !== 'today') {
+                    } elseif ($eventDate > $today && $status !== 'today') {
                         $status = 'soon';
                     }
 
@@ -59,9 +59,13 @@ class MapController extends AbstractController
                     ];
                 }
 
+                $types = $resto->getType()->map(fn($t) => $t->getNomType())->toArray();
+
                 $restaurantsData[] = [
                     'id'   => $resto->getId(),
                     'nom'  => $resto->getNomRestaurant(),
+                    'note' => $resto->getNoteConsommateurs(),
+                    'type' => implode(', ', array_slice($types, 0, 2)),
                     'lat'  => $resto->getLatitude(),
                     'lng'  => $resto->getLongitude(),
                     'event_status' => $status,

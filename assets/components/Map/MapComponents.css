@@ -11,3 +11,27 @@ body {
     border-radius: 10px;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
+
+/* ── Tooltips Google Maps style ── */
+.map-tooltip.leaflet-tooltip {
+    background: white;
+    border: 1px solid #F1F1F1;
+    border-radius: 8px;
+    padding: 6px 10px;
+    box-shadow: 0 6px 18px -6px rgba(17, 24, 39, 0.25);
+    font-family: 'Inter', sans-serif;
+    white-space: nowrap;
+    pointer-events: none;
+}
+
+/* Supprime la flèche/tige */
+.map-tooltip.leaflet-tooltip::before {
+    display: none;
+}
+
+/* Tooltip position utilisateur */
+.user-tooltip.leaflet-tooltip {
+    font-size: 12px;
+    font-weight: 600;
+    color: #4A4A4A;
+}
