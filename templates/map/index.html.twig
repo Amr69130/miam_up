@@ -1,4 +1,4 @@
-﻿{% extends 'base.html.twig' %}
+{% extends 'base.html.twig' %}
 
 {% block title %}Carte Miam'Up{% endblock %}
 
@@ -15,11 +15,12 @@
 {% block body %}
 <div class="flex h-screen overflow-hidden bg-[#F8F8F8] font-['Inter',sans-serif]">
     <div class="fixed bottom-10 right-10 z-[90]">
-        <a href="{{ path('app_evenement_new') }}"
-           class="flex items-center gap-3 bg-[#FF6B6B] hover:bg-[#e55a5a] text-white px-8 py-4 rounded-full font-black shadow-2xl transition-all hover:scale-110 active:scale-95 border-4 border-white">
+        <button type="button"
+                onclick="openEventModal()"
+                class="flex items-center gap-3 bg-[#FF6B6B] hover:bg-[#e55a5a] text-white px-8 py-4 rounded-full font-black shadow-2xl transition-all hover:scale-110 active:scale-95 border-4 border-white">
             <span class="text-2xl">🔥</span>
             <span class="text-white">ORGANISER UN EVENT</span>
-        </a>
+        </button>
     </div>
 
     {# Sidebar #}
@@ -37,13 +38,29 @@
         {% for message in app.flashes('success') %}
             <div class="flash-message-container absolute top-20 left-1/2 -translate-x-1/2 z-[500] pointer-events-none">
                 <div class="bg-green-600 px-5 py-3 rounded-xl shadow-xl flex items-center gap-3">
-                    <span class="text-xl">�o.</span>
+                    <span class="text-xl">✅</span>
+                    <span class="font-semibold text-white">{{ message|raw }}</span>
+                </div>
+            </div>
+        {% endfor %}
+        {% for message in app.flashes('danger') %}
+            <div class="flash-message-container absolute top-20 left-1/2 -translate-x-1/2 z-[500] pointer-events-none">
+                <div class="bg-red-600 px-5 py-3 rounded-xl shadow-xl flex items-center gap-3">
+                    <span class="text-xl">❌</span>
+                    <span class="font-semibold text-white">{{ message|raw }}</span>
+                </div>
+            </div>
+        {% endfor %}
+        {% for message in app.flashes('warning') %}
+            <div class="flash-message-container absolute top-20 left-1/2 -translate-x-1/2 z-[500] pointer-events-none">
+                <div class="bg-yellow-500 px-5 py-3 rounded-xl shadow-xl flex items-center gap-3">
+                    <span class="text-xl">⚠️</span>
                     <span class="font-semibold text-white">{{ message|raw }}</span>
                 </div>
             </div>
         {% endfor %}
 
-        {# �"?�"? Overlay flottant : barre de recherche + filtres �"?�"? #}
+        {# Overlay flottant : barre de recherche + filtres #}
         <div class="absolute top-4 left-4 right-4 z-[1000] pointer-events-none">
             <div class="pointer-events-auto max-w-3xl mx-auto space-y-2" data-controller="search-location">
 
@@ -113,10 +130,11 @@
                     {# Séparateur #}
                     <div class="w-px h-5 bg-white/60 mx-1"></div>
 
-                    <a href="{{ path('app_evenement_new') }}"
-                       class="flex items-center gap-1.5 bg-[#FF6B6B] hover:bg-[#e55a5a] text-white px-3.5 py-1.5 rounded-full text-xs font-semibold shadow-sm transition-colors">
+                    <button type="button"
+                            onclick="openEventModal()"
+                            class="flex items-center gap-1.5 bg-[#FF6B6B] hover:bg-[#e55a5a] text-white px-3.5 py-1.5 rounded-full text-xs font-semibold shadow-sm transition-colors">
                         🔥 Organiser un événement
-                    </a>
+                    </button>
                 </div>
 
             </div>
@@ -130,7 +148,102 @@
     </div>
 </div>
 
+{# ===== MODALE — Créer un événement (style moderne du collègue) ===== #}
+<div id="modal-event-create" class="hidden fixed inset-0 z-[2000] flex items-center justify-center bg-black/40 px-4">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+    <div class="flex items-center justify-between px-6 pt-6 pb-4 border-b border-gray-100">
+      <h3 class="font-bold text-[#4A4A4A] text-lg">🔥 Organiser un événement</h3>
+      <button type="button" onclick="closeEventModal()" class="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-gray-100 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <form id="form-event-create" method="POST" action="{{ path('app_evenement_new') }}" class="px-6 py-5 space-y-4">
+
+      <div>
+        <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+          Titre de l'événement <span class="text-[#FF6B6B]">*</span>
+        </label>
+        <input id="evt-map-titre" name="titre" type="text" required minlength="3"
+               placeholder="Ex : Soirée Dégustation Vins & Fromages"
+               class="w-full border border-gray-200 focus:border-[#00A9A5] rounded-xl px-4 py-2.5 text-sm text-[#4A4A4A] outline-none transition-colors placeholder-gray-300">
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+          Restaurant <span class="text-[#FF6B6B]">*</span>
+        </label>
+        <select id="evt-map-restaurant" name="restaurant" required
+                class="w-full border border-gray-200 focus:border-[#00A9A5] rounded-xl px-4 py-2.5 text-sm text-[#4A4A4A] outline-none transition-colors bg-white">
+          <option value="">— Choisir un restaurant —</option>
+          {% for resto in restaurants_list %}
+            <option value="{{ resto.id }}">{{ resto.nomRestaurant }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+            Date de début <span class="text-[#FF6B6B]">*</span>
+          </label>
+          <input id="evt-map-date" name="date_evenement" type="datetime-local" required
+                 class="w-full border border-gray-200 focus:border-[#00A9A5] rounded-xl px-3 py-2.5 text-sm text-[#4A4A4A] outline-none transition-colors">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+            Date de fin <span class="text-gray-400 normal-case font-normal">(optionnel)</span>
+          </label>
+          <input id="evt-map-date-fin" name="date_fin" type="datetime-local"
+                 class="w-full border border-gray-200 focus:border-[#00A9A5] rounded-xl px-3 py-2.5 text-sm text-[#4A4A4A] outline-none transition-colors">
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+          Nombre de places <span class="text-gray-400 normal-case font-normal">(optionnel)</span>
+        </label>
+        <input id="evt-map-places" name="nombre_places" type="number" min="1"
+               placeholder="20"
+               class="w-full border border-gray-200 focus:border-[#00A9A5] rounded-xl px-4 py-2.5 text-sm text-[#4A4A4A] outline-none transition-colors placeholder-gray-300">
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">Description</label>
+        <textarea id="evt-map-description" name="description_evenement" rows="3"
+                  placeholder="Décrivez votre événement..."
+                  class="w-full border border-gray-200 focus:border-[#00A9A5] rounded-xl px-4 py-2.5 text-sm text-[#4A4A4A] outline-none resize-none transition-colors placeholder-gray-300"></textarea>
+      </div>
+
+      <p class="text-xs text-gray-400">Les champs marqués <span class="text-[#FF6B6B]">*</span> sont obligatoires.</p>
+
+      <div class="flex items-center justify-end gap-3 pt-2 border-t border-gray-100">
+        <button type="button" onclick="closeEventModal()"
+                class="px-4 py-2 text-sm font-medium text-[#4A4A4A] border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors">Annuler</button>
+        <button type="submit"
+                class="flex items-center gap-2 px-5 py-2 text-sm font-semibold text-white bg-[#FF6B6B] hover:bg-[#e55a5a] rounded-xl shadow-sm transition-colors">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+          Publier sur la carte
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <script>
+// --- Modale événement ---
+function openEventModal() {
+  document.getElementById('modal-event-create').classList.remove('hidden');
+}
+function closeEventModal() {
+  document.getElementById('modal-event-create').classList.add('hidden');
+  // Reset du formulaire
+  document.getElementById('form-event-create').reset();
+}
+// Fermer en cliquant sur le fond
+document.getElementById('modal-event-create').addEventListener('click', function(e) {
+  if (e.target === this) closeEventModal();
+});
+
 document.addEventListener('DOMContentLoaded', () => {
     // Auto-disparition des flash
     setTimeout(() => {
@@ -160,7 +273,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (activeChipFilter === 'today,soon') {
                 matchChip = r.event_status === 'today' || r.event_status === 'soon';
             }
-            // 'all' �?' pas de filtre statut
+            // 'all' → pas de filtre statut
             return matchName && matchChip;
         });
 
