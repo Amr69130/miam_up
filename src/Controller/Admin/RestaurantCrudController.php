@@ -54,6 +54,9 @@ class RestaurantCrudController extends AbstractCrudController
             // GÉOLOCALISATION
             NumberField::new('latitude')->hideOnIndex(),
             NumberField::new('longitude')->hideOnIndex(),
+
+            // PROPRIÉTAIRE
+            AssociationField::new('proprietaire', 'Propriétaire')->hideOnIndex(),
         ];
     }
 }
