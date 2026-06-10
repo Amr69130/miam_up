@@ -2,7 +2,10 @@
 
 namespace App\Controller;
 
+use App\Entity\DemandeLocalisation;
+use App\Mail\LocalisationDemandeMail;
 use App\Repository\RestaurantRepository;
+use App\Repository\DemandeLocalisationRepository;
 use App\Entity\Restaurant;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -166,12 +169,36 @@ final class RestaurantController extends AbstractController
     }
 
     #[Route('/panneau/localisation', name: 'app_panneau_localisation')]
-    public function localisation(): Response
+    public function localisation(DemandeLocalisationRepository $demandeRepository): Response
     {
         $user = $this->getUser();
         $restaurant = $user ? $user->getRestaurants()->first() : null;
 
         if (!$restaurant) return $this->redirectToRoute('app_home');
+
+        $demandes = $demandeRepository->findBy(['restaurant' => $restaurant], ['dateDemande' => 'DESC']);
+        
+        $historique = [];
+        $demandeEnAttente = false;
+
+        foreach ($demandes as $demande) {
+            if ($demande->getStatut() === 'en_attente') {
+                $demandeEnAttente = true;
+            }
+
+            $ancienneLat = $demande->getAncienneLatitude() ?: 'N/A';
+            $ancienneLng = $demande->getAncienneLongitude() ?: 'N/A';
+            $nouvelleLat = $demande->getNouvelleLatitude() ?: $ancienneLat;
+            $nouvelleLng = $demande->getNouvelleLongitude() ?: $ancienneLng;
+
+            $historique[] = [
+                'champ' => 'Coordonnées GPS',
+                'ancienne_valeur' => $ancienneLat . ', ' . $ancienneLng,
+                'nouvelle_valeur' => $nouvelleLat . ', ' . $nouvelleLng,
+                'date' => $demande->getDateDemande()->format('d/m/Y à H:i'),
+                'statut' => $demande->getStatut()
+            ];
+        }
 
         return $this->render('pannel_resto/localisation.html.twig', [
             'active' => 'monresto',
@@ -181,8 +208,8 @@ final class RestaurantController extends AbstractController
                 'latitude' => $restaurant->getLatitude(), 
                 'longitude' => $restaurant->getLongitude()
             ],
-            'demande_en_attente' => false,
-            'historique' => []
+            'demande_en_attente' => $demandeEnAttente,
+            'historique' => $historique
         ]);
     }
 
@@ -305,8 +332,64 @@ final class RestaurantController extends AbstractController
     // --- ROUTES VIDES POUR LES LIENS ENCORE NON DÉVELOPPÉS ---
     #[Route('/panneau/avis/repondre/{id}', name: 'panneau_repondre_avis')]
     #[Route('/panneau/update-horaires', name: 'panneau_update_horaires')]
-    #[Route('/panneau/localisation-demande', name: 'panneau_localisation_demande')]
     public function voidRoute(): Response { return $this->redirectToRoute('app_panneau_resto'); }
+
+    #[Route('/panneau/localisation-demande', name: 'panneau_localisation_demande', methods: ['POST'])]
+    public function localisationDemande(Request $request, LocalisationDemandeMail $mailer, EntityManagerInterface $em, DemandeLocalisationRepository $demandeRepository): Response
+    {
+        $user = $this->getUser();
+        $restaurant = $user ? $user->getRestaurants()->first() : null;
+
+        if (!$restaurant) {
+            return $this->redirectToRoute('app_home');
+        }
+
+        // Vérifier si une demande est déjà en attente
+        $pendingDemande = $demandeRepository->findOneBy(['restaurant' => $restaurant, 'statut' => 'en_attente']);
+        if ($pendingDemande) {
+            $this->addFlash('error', 'Vous avez déjà une demande en attente de validation.');
+            return $this->redirectToRoute('app_panneau_localisation');
+        }
+
+        if ($this->isCsrfTokenValid('localisation_demande', $request->request->get('_token'))) {
+            $nouvelleLatitude = trim($request->request->get('nouvelle_latitude', ''));
+            $nouvelleLongitude = trim($request->request->get('nouvelle_longitude', ''));
+
+            // Si les deux champs sont vides, on refuse
+            if ($nouvelleLatitude === '' && $nouvelleLongitude === '') {
+                $this->addFlash('error', 'Veuillez saisir au moins une nouvelle coordonnée (latitude ou longitude).');
+                return $this->redirectToRoute('app_panneau_localisation');
+            }
+
+            // Si un seul champ est rempli, on garde l'ancienne valeur pour l'autre
+            $nouvelleLatitude = $nouvelleLatitude !== '' ? $nouvelleLatitude : $restaurant->getLatitude();
+            $nouvelleLongitude = $nouvelleLongitude !== '' ? $nouvelleLongitude : $restaurant->getLongitude();
+
+            // Si les coordonnées sont exactement les mêmes que les actuelles
+            if ($nouvelleLatitude == $restaurant->getLatitude() && $nouvelleLongitude == $restaurant->getLongitude()) {
+                $this->addFlash('error', 'Les nouvelles coordonnées sont identiques aux coordonnées actuelles.');
+                return $this->redirectToRoute('app_panneau_localisation');
+            }
+
+            $demande = new DemandeLocalisation();
+            $demande->setRestaurant($restaurant);
+            $demande->setAncienneLatitude($restaurant->getLatitude());
+            $demande->setAncienneLongitude($restaurant->getLongitude());
+            $demande->setNouvelleLatitude($nouvelleLatitude);
+            $demande->setNouvelleLongitude($nouvelleLongitude);
+
+            $em->persist($demande);
+            $em->flush();
+
+            $mailer->sendRequest($demande);
+            
+            $this->addFlash('success', 'Votre demande de modification de localisation a été envoyée à l\'administrateur avec succès.');
+        } else {
+            $this->addFlash('error', 'Token de sécurité invalide. Veuillez réessayer.');
+        }
+
+        return $this->redirectToRoute('app_panneau_localisation');
+    }
 
     #[Route('/panneau/update-field', name: 'panneau_update_field', methods: ['POST'])]
     public function updateField(Request $request, EntityManagerInterface $em): Response
