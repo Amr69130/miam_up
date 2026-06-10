@@ -62,4 +62,31 @@
             <span class="text-[9px] leading-[13.5px]">{{ item.label }}</span>
         </a>
     {% endfor %}
+
+    {# Lien Mon Resto — visible uniquement si l'utilisateur est propriétaire d'un restaurant #}
+    {% if app.user and app.user.restaurants is defined and app.user.restaurants|length > 0 %}
+        {% set is_active = (active is defined and active == 'monresto') %}
+        <a href="{{ path('app_panneau_resto') }}"
+           class="w-12 h-12 rounded-[14px] flex flex-col items-center justify-center gap-0.5 transition-colors
+                  {{ is_active ? 'bg-[#84DCCF]/15 text-[#00A9A5]' : 'text-[#99A1AF] hover:text-[#4A4A4A] hover:bg-gray-50' }}">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 2v7c0 1.1.9 2 2 2s2-.9 2-2V2M7 2v20M21 15V2a5 5 0 00-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/>
+            </svg>
+            <span class="text-[9px] leading-[13.5px]">MonResto</span>
+        </a>
+    {% endif %}
+
+    {# Lien Profil — toujours visible en bas #}
+    {% if app.user %}
+        {% set is_active = (active is defined and active == 'profil') %}
+        <a href="{{ path('app_profil') }}"
+           class="mt-auto w-12 h-12 rounded-[14px] flex flex-col items-center justify-center gap-0.5 transition-colors
+                  {{ is_active ? 'bg-[#84DCCF]/15 text-[#00A9A5]' : 'text-[#99A1AF] hover:text-[#4A4A4A] hover:bg-gray-50' }}">
+            <div class="w-7 h-7 rounded-full bg-[#00A9A5] text-white flex items-center justify-center font-bold text-xs">
+                {{ app.user.prenomUtilisateur|first|upper }}{{ app.user.nomUtilisateur|first|upper }}
+            </div>
+            <span class="text-[9px] leading-[13.5px]">Profil</span>
+        </a>
+    {% endif %}
 </nav>
