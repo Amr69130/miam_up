@@ -186,11 +186,161 @@ final class RestaurantController extends AbstractController
         ]);
     }
 
+    // --- CRÉATION D'UN ÉVÉNEMENT DEPUIS LE PANNEAU ---
+    #[Route('/panneau/evenement/create', name: 'panneau_evenement_create', methods: ['POST'])]
+    public function createEvenement(Request $request, EntityManagerInterface $em): Response
+    {
+        $user = $this->getUser();
+        $restaurant = $user ? $user->getRestaurants()->first() : null;
+        if (!$restaurant) return $this->redirectToRoute('app_home');
+
+        $titre       = trim($request->request->get('titre', ''));
+        $dateStr     = $request->request->get('date_evenement', '');
+        $description = $request->request->get('description_evenement', '');
+        $places      = $request->request->get('nombre_places');
+
+        if (empty($titre) || strlen($titre) < 3) {
+            $this->addFlash('danger', 'Le titre est obligatoire (min 3 caractères).');
+            return $this->redirectToRoute('app_panneau_evenements');
+        }
+        if (empty($dateStr)) {
+            $this->addFlash('danger', 'La date et l\'heure sont obligatoires.');
+            return $this->redirectToRoute('app_panneau_evenements');
+        }
+
+        $evenement = new \App\Entity\Evenement();
+        $evenement->setTitre($titre);
+        $evenement->setDateEvenement(new \DateTime($dateStr));
+        $evenement->setRestaurant($restaurant);
+        $evenement->setCreateur($user);
+        $evenement->addUtilisateur($user);
+
+        if (!empty($description)) {
+            $evenement->setDescriptionEvenement($description);
+        }
+        if (!empty($places)) {
+            $evenement->setNombrePlaces((int) $places);
+        }
+
+        // Créer la conversation/groupe associé
+        $conversation = new \App\Entity\Conversation();
+        $conversation->setNomConversation('Groupe : ' . $evenement->getTitre());
+        $conversation->setEvenement($evenement);
+        $evenement->setConversation($conversation);
+        $conversation->addMembre($user);
+
+        $em->persist($evenement);
+        $em->persist($conversation);
+        $em->flush();
+
+        $this->addFlash('success', 'Événement créé avec succès !');
+        return $this->redirectToRoute('app_panneau_evenements');
+    }
+
+    // --- MODIFICATION D'UN ÉVÉNEMENT ---
+    #[Route('/panneau/evenement/update/{id}', name: 'panneau_evenement_update', methods: ['POST'])]
+    public function updateEvenement(int $id, Request $request, EntityManagerInterface $em): Response
+    {
+        $user = $this->getUser();
+        $restaurant = $user ? $user->getRestaurants()->first() : null;
+        if (!$restaurant) return $this->redirectToRoute('app_home');
+
+        $evenement = $em->getRepository(\App\Entity\Evenement::class)->find($id);
+        if (!$evenement || $evenement->getRestaurant() !== $restaurant) {
+            $this->addFlash('danger', 'Événement introuvable.');
+            return $this->redirectToRoute('app_panneau_evenements');
+        }
+
+        $method = $request->request->get('_method', 'POST');
+
+        // --- Suppression ---
+        if (strtoupper($method) === 'DELETE') {
+            // Supprimer la conversation liée si elle existe
+            $conversation = $evenement->getConversation();
+            if ($conversation) {
+                $em->remove($conversation);
+            }
+            $em->remove($evenement);
+            $em->flush();
+            $this->addFlash('success', 'Événement supprimé.');
+            return $this->redirectToRoute('app_panneau_evenements');
+        }
+
+        // --- Mise à jour ---
+        $titre       = trim($request->request->get('titre', ''));
+        $dateStr     = $request->request->get('date_evenement', '');
+        $description = $request->request->get('description_evenement', '');
+        $places      = $request->request->get('nombre_places');
+
+        if (!empty($titre) && strlen($titre) >= 3) {
+            $evenement->setTitre($titre);
+        }
+        if (!empty($dateStr)) {
+            $newDate = new \DateTime($dateStr);
+            $today = new \DateTime('today');
+            if ($newDate >= $today) {
+                $evenement->setDateEvenement($newDate);
+            }
+        }
+        if ($description !== null) {
+            $evenement->setDescriptionEvenement($description);
+        }
+        if (!empty($places)) {
+            $nbParticipants = $evenement->getUtilisateurs()->count();
+            $newPlaces = max((int) $places, $nbParticipants);
+            $evenement->setNombrePlaces($newPlaces);
+        }
+
+        // Mettre à jour le nom de la conversation si le titre a changé
+        $conversation = $evenement->getConversation();
+        if ($conversation) {
+            $conversation->setNomConversation('Groupe : ' . $evenement->getTitre());
+        }
+
+        $em->flush();
+        $this->addFlash('success', 'Événement modifié avec succès !');
+        return $this->redirectToRoute('app_panneau_evenements');
+    }
+
     // --- ROUTES VIDES POUR LES LIENS ENCORE NON DÉVELOPPÉS ---
-    #[Route('/panneau/evenement/create', name: 'panneau_evenement_create')]
-    #[Route('/panneau/evenement/update/{id}', name: 'panneau_evenement_update')]
     #[Route('/panneau/avis/repondre/{id}', name: 'panneau_repondre_avis')]
     #[Route('/panneau/update-horaires', name: 'panneau_update_horaires')]
     #[Route('/panneau/localisation-demande', name: 'panneau_localisation_demande')]
     public function voidRoute(): Response { return $this->redirectToRoute('app_panneau_resto'); }
+
+    #[Route('/panneau/update-field', name: 'panneau_update_field', methods: ['POST'])]
+    public function updateField(Request $request, EntityManagerInterface $em): Response
+    {
+        $user = $this->getUser();
+        $restaurant = $user?->getRestaurants()->first() ?: null;
+
+        if (!$restaurant) {
+            return $this->redirectToRoute('app_home');
+        }
+
+        $field = $request->request->get('field');
+        $value = trim($request->request->get('value', ''));
+
+        match ($field) {
+            'nom_restaurant'         => $restaurant->setNomRestaurant($value),
+            'description_restaurant' => $restaurant->setDescriptionRestaurant(strip_tags(html_entity_decode($value))),
+            'num_tel_restaurant'     => $restaurant->setNumTelRestaurant($value),
+            'site_web'               => $restaurant->setSiteWeb($value),
+            'adresse_restaurant'     => $restaurant->setAdresseRestaurant($value),
+            'carte_menu'             => $restaurant->setCarteMenu($value),
+            'logo'                   => $restaurant->setLogo($value),
+            // Legacy keys (au cas où)
+            'nom'         => $restaurant->setNomRestaurant($value),
+            'description' => $restaurant->setDescriptionRestaurant(strip_tags(html_entity_decode($value))),
+            'telephone'   => $restaurant->setNumTelRestaurant($value),
+            'siteWeb'     => $restaurant->setSiteWeb($value),
+            'adresse'     => $restaurant->setAdresseRestaurant($value),
+            default       => null,
+        };
+
+        $em->flush();
+        $this->addFlash('success', 'Modification enregistrée.');
+
+        return $this->redirectToRoute('app_panneau_resto');
+    }
 }

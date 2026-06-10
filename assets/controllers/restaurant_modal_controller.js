@@ -51,11 +51,13 @@ export default class extends Controller {
 
         // Réinitialiser le style de tous les onglets
         this.element.querySelectorAll('[data-tab]').forEach(el => {
-            el.className = "text-gray-700 font-medium text-sm hover:text-gray-900 pb-3 -mb-[13px] border-b-2 border-transparent transition-colors cursor-pointer";
+            el.classList.remove('text-[#00A9A5]', 'border-[#00A9A5]', 'text-[#20B2AA]', 'border-[#20B2AA]');
+            el.classList.add('text-gray-500', 'border-transparent', 'hover:text-gray-800');
         });
 
         // Appliquer le style actif
-        event.currentTarget.className = "text-[#20B2AA] font-medium text-sm border-b-2 border-[#20B2AA] pb-3 -mb-[13px] transition-colors cursor-pointer";
+        event.currentTarget.classList.remove('text-gray-500', 'border-transparent', 'hover:text-gray-800');
+        event.currentTarget.classList.add('text-[#00A9A5]', 'border-[#00A9A5]');
     }
 
     openEventModal(event) {
