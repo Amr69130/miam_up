@@ -59,13 +59,13 @@
 
         {# ── Onglets ── #}
         <div class="border-b border-gray-200 px-5">
-            <nav class="flex gap-6">
+            <nav class="flex w-full">
                 <button data-action="click->restaurant-modal#switchTab" data-tab="presentation"
-                        class="text-[#00A9A5] font-medium text-sm pb-3 border-b-2 border-[#00A9A5] transition-colors cursor-pointer whitespace-nowrap">À propos</button>
+                        class="flex-1 text-center text-[#00A9A5] font-medium text-sm pb-3 border-b-2 border-[#00A9A5] transition-colors cursor-pointer whitespace-nowrap">À propos</button>
                 <button data-action="click->restaurant-modal#switchTab" data-tab="menu"
-                        class="text-gray-500 font-medium text-sm pb-3 border-b-2 border-transparent hover:text-gray-800 transition-colors cursor-pointer">Menu</button>
+                        class="flex-1 text-center text-gray-500 font-medium text-sm pb-3 border-b-2 border-transparent hover:text-gray-800 transition-colors cursor-pointer whitespace-nowrap">Menu</button>
                 <button data-action="click->restaurant-modal#switchTab" data-tab="events"
-                        class="text-gray-500 font-medium text-sm pb-3 border-b-2 border-transparent hover:text-gray-800 transition-colors cursor-pointer">Événements</button>
+                        class="flex-1 text-center text-gray-500 font-medium text-sm pb-3 border-b-2 border-transparent hover:text-gray-800 transition-colors cursor-pointer whitespace-nowrap">Événements</button>
             </nav>
         </div>
 
@@ -75,7 +75,7 @@
             {# À propos #}
             <div data-tab-content="presentation" class="block space-y-7">
                 {% if restaurant.descriptionRestaurant %}
-                <p class="text-sm text-gray-600 leading-relaxed pt-1">{{ restaurant.descriptionRestaurant|nl2br }}</p>
+                <p class="text-sm text-gray-600 leading-relaxed pt-1">{{ restaurant.descriptionRestaurant|striptags|nl2br }}</p>
                 {% endif %}
                 {% if restaurant.specialite is not empty %}
                 <div>

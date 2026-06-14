@@ -6,7 +6,7 @@
 <div class="flex min-h-screen bg-[#F8F8F8]">
 
   {# La fameuse sidebar #}
-  {% include 'pannel_resto/_sidebar.html.twig' with { active: 'profil' } %}
+  {% include 'partials/_sidebar.html.twig' with { active: 'profil' } %}
 
   <div class="ml-16 flex-1 flex flex-col min-h-screen">
 
@@ -86,10 +86,10 @@
             Type de compte
           </div>
           <p class="text-[#4A4A4A] text-sm font-medium">
-            {% if 'ROLE_RESTAURATEUR' in user.roles %}
-              Restaurateur 🍳
+            {% if 'ROLE_RESTAURATEUR' in user.roles or (user.restaurants is defined and user.restaurants is not empty) %}
+              Restaurateur
             {% else %}
-              Consommateur 🍕
+              Consommateur
             {% endif %}
           </p>
         </div>

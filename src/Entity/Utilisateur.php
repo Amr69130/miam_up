@@ -93,6 +93,12 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\JoinTable(name: 'utilisateur_favoris')]
     private Collection $favoris;
 
+    /**
+     * @var Collection<int, Restaurant>
+     */
+    #[ORM\OneToMany(targetEntity: Restaurant::class, mappedBy: 'proprietaire')]
+    private Collection $restaurants;
+
     public function __construct()
     {
         $this->role = new ArrayCollection();
@@ -102,12 +108,18 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
         $this->messages_envoyes = new ArrayCollection();
         $this->evenementsCrees = new ArrayCollection();
         $this->favoris = new ArrayCollection();
+        $this->restaurants = new ArrayCollection();
     }
 
     // ===== UserInterface & PasswordAuthenticatedUserInterface =====
     public function getUserIdentifier(): string
     {
         return (string) $this->emailUtilisateur;
+    }
+
+    public function __toString(): string
+    {
+        return trim($this->prenomUtilisateur . ' ' . $this->nomUtilisateur) ?: $this->emailUtilisateur;
     }
 
     public function getRoles(): array
@@ -221,6 +233,9 @@ class Utilisateur implements UserInterface, PasswordAuthenticatedUserInterface
      * @return Collection<int, Restaurant>
      */
     public function getFavoris(): Collection { return $this->favoris; }
+
+    /** @return Collection<int, Restaurant> */
+    public function getRestaurants(): Collection { return $this->restaurants; }
 
     public function addFavori(Restaurant $restaurant): static
     {

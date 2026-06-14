@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Evenement;
 use App\Entity\Conversation;
 use App\Form\EvenementType;
+use App\Repository\RestaurantRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -13,15 +14,56 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class EvenementController extends AbstractController
 {
-    #[Route('/evenement/nouveau', name: 'app_evenement_new')]
-    public function new(Request $request, EntityManagerInterface $em): Response
+    #[Route('/evenement/nouveau', name: 'app_evenement_new', methods: ['GET', 'POST'])]
+    public function new(Request $request, EntityManagerInterface $em, RestaurantRepository $restaurantRepo): Response
     {
-        $evenement = new Evenement();
-        $form = $this->createForm(EvenementType::class, $evenement);
-        $form->handleRequest($request);
+        $user = $this->getUser();
+        if (!$user) {
+            $this->addFlash('danger', 'Vous devez être connecté.');
+            return $this->redirectToRoute('app_utilisateur_login');
+        }
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $user = $this->getUser();
+        // --- Traitement POST depuis la modale ---
+        if ($request->isMethod('POST')) {
+            $titre       = trim($request->request->get('titre', ''));
+            $dateStr     = $request->request->get('date_evenement', '');
+            $dateFin     = $request->request->get('date_fin', '');
+            $description = $request->request->get('description_evenement', '');
+            $places      = $request->request->get('nombre_places');
+            $restaurantId = $request->request->get('restaurant');
+
+            // Validation basique
+            if (empty($titre) || strlen($titre) < 3) {
+                $this->addFlash('danger', 'Le titre est obligatoire (min 3 caractères).');
+                return $this->redirectToRoute('app_map');
+            }
+            if (empty($dateStr)) {
+                $this->addFlash('danger', 'La date de l\'événement est obligatoire.');
+                return $this->redirectToRoute('app_map');
+            }
+
+            // Créer l'événement
+            $evenement = new Evenement();
+            $evenement->setTitre($titre);
+            $evenement->setDateEvenement(new \DateTime($dateStr));
+
+            if (!empty($dateFin)) {
+                $evenement->setDateFin(new \DateTime($dateFin));
+            }
+            if (!empty($description)) {
+                $evenement->setDescriptionEvenement($description);
+            }
+            if (!empty($places)) {
+                $evenement->setNombrePlaces((int) $places);
+            }
+
+            // Lier au restaurant
+            if (!empty($restaurantId)) {
+                $restaurant = $restaurantRepo->find($restaurantId);
+                if ($restaurant) {
+                    $evenement->setRestaurant($restaurant);
+                }
+            }
 
             // 1. Configurer l'événement
             $evenement->setCreateur($user);
@@ -43,6 +85,29 @@ class EvenementController extends AbstractController
             $em->persist($conversation);
 
             // 6. Sauvegarder en base de données
+            $em->flush();
+
+            $this->addFlash('success', 'Événement et groupe de discussion créés avec succès !');
+            return $this->redirectToRoute('app_map');
+        }
+
+        // --- GET : ancien formulaire Symfony (fallback) ---
+        $evenement = new Evenement();
+        $form = $this->createForm(EvenementType::class, $evenement);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $evenement->setCreateur($user);
+            $evenement->addUtilisateur($user);
+
+            $conversation = new Conversation();
+            $conversation->setNomConversation('Groupe : ' . $evenement->getTitre());
+            $conversation->setEvenement($evenement);
+            $evenement->setConversation($conversation);
+            $conversation->addMembre($user);
+
+            $em->persist($evenement);
+            $em->persist($conversation);
             $em->flush();
 
             $this->addFlash('success', 'Événement et groupe de discussion créés avec succès !');

@@ -5,6 +5,7 @@ namespace App\EntityListener;
 use App\Entity\Restaurant;
 use App\Service\GeocodingService;
 use Doctrine\Persistence\Event\LifecycleEventArgs;
+use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsEntityListener;
 use Doctrine\ORM\Events;
 
@@ -35,9 +36,13 @@ class RestaurantListener
     /**
      * Ca se déclenche lors de la modification d'un restaurant existant
      */
-    public function preUpdate(Restaurant $restaurant, LifecycleEventArgs $event): void
+    public function preUpdate(Restaurant $restaurant, PreUpdateEventArgs $event): void
     {
-        $this->updateCoordinates($restaurant);
+        // On ne recalcule les coordonnées automatiques QUE si l'adresse a été modifiée.
+        // Cela permet de modifier manuellement la latitude/longitude (ex: via la modération) sans qu'elles soient écrasées.
+        if ($event->hasChangedField('adresse_restaurant')) {
+            $this->updateCoordinates($restaurant);
+        }
     }
 
     /**
