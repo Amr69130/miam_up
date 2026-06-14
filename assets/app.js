@@ -1,4 +1,5 @@
 import './styles/app.css';
+import '@hotwired/turbo';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import MapComponent from './components/Map/MapComponents';
@@ -16,45 +17,77 @@ if (!window.Stimulus) {
 window.Stimulus.register('search-location', SearchLocationController);
 window.Stimulus.register('restaurant-modal', RestaurantModalController);
 
-/**
- * COMPOSANT : CARTE (MAP)
- */
-const mapElement = document.getElementById('react-map-root');
-if (mapElement) {
-    const data = mapElement.getAttribute('data-items');
-    const restaurants = data ? JSON.parse(data) : [];
+// Turbo Drive : on stocke les racines React pour le montage/démontage entre navigations
+let mapRoot = null;
+let chatRoot = null;
+let unreadInterval = null;
 
-    const root = ReactDOM.createRoot(mapElement);
-    root.render(
-        <React.StrictMode>
-            <MapComponent magasins={restaurants} />
-        </React.StrictMode>
-    );
+/**
+ * Fonction d'initialisation appelée à chaque navigation Turbo
+ */
+function initReactComponents() {
+
+    /**
+     * COMPOSANT : CARTE (MAP)
+     */
+    const mapElement = document.getElementById('react-map-root');
+    if (mapElement) {
+        const data = mapElement.getAttribute('data-items');
+        const restaurants = data ? JSON.parse(data) : [];
+
+        mapRoot = ReactDOM.createRoot(mapElement);
+        mapRoot.render(
+            <React.StrictMode>
+                <MapComponent magasins={restaurants} />
+            </React.StrictMode>
+        );
+    }
+
+    /**
+     * COMPOSANT : CHAT MESSENGER
+     */
+    const chatElement = document.getElementById('react-chat-root');
+    if (chatElement) {
+        // On récupère TOUTES les données passées par Twig (Ami OU Groupe)
+        const idAmi = chatElement.getAttribute('data-id-ami');
+        const idGroupe = chatElement.getAttribute('data-id-groupe');
+        const prenomAmi = chatElement.getAttribute('data-prenom-ami');
+        const nomGroupe = chatElement.getAttribute('data-nom-groupe');
+
+        chatRoot = ReactDOM.createRoot(chatElement);
+        chatRoot.render(
+            <React.StrictMode>
+                <Chat
+                    idAmi={idAmi}
+                    idGroupe={idGroupe}
+                    prenomAmi={prenomAmi}
+                    nomGroupe={nomGroupe}
+                />
+            </React.StrictMode>
+        );
+    }
+
+    // Pastille de messages non lus
+    window.updateUnreadBadge();
+    unreadInterval = setInterval(() => window.updateUnreadBadge(), 10000);
 }
 
 /**
- * COMPOSANT : CHAT MESSENGER
+ * Nettoyage avant chaque navigation Turbo (évite les fuites mémoire)
  */
-const chatElement = document.getElementById('react-chat-root');
-if (chatElement) {
-    // On récupère TOUTES les données passées par Twig (Ami OU Groupe)
-    const idAmi = chatElement.getAttribute('data-id-ami');
-    const idGroupe = chatElement.getAttribute('data-id-groupe'); // Ajout
-    const prenomAmi = chatElement.getAttribute('data-prenom-ami');
-    const nomGroupe = chatElement.getAttribute('data-nom-groupe'); // Ajout
-
-    const root = ReactDOM.createRoot(chatElement);
-    root.render(
-        <React.StrictMode>
-            {/* On passe maintenant les 4 props au composant Chat */}
-            <Chat
-                idAmi={idAmi}
-                idGroupe={idGroupe}
-                prenomAmi={prenomAmi}
-                nomGroupe={nomGroupe}
-            />
-        </React.StrictMode>
-    );
+function cleanupReactComponents() {
+    if (mapRoot) {
+        mapRoot.unmount();
+        mapRoot = null;
+    }
+    if (chatRoot) {
+        chatRoot.unmount();
+        chatRoot = null;
+    }
+    if (unreadInterval) {
+        clearInterval(unreadInterval);
+        unreadInterval = null;
+    }
 }
 
 // Fonction pour mettre à jour la pastille de messages
@@ -67,7 +100,7 @@ window.updateUnreadBadge = async function() {
         if (badge) {
             if (data.unreadCount > 0) {
                 badge.innerText = data.unreadCount;
-                badge.style.display = 'block'; // On utilise style.display au lieu de classList
+                badge.style.display = 'block';
             } else {
                 badge.style.display = 'none';
             }
@@ -77,9 +110,12 @@ window.updateUnreadBadge = async function() {
     }
 }
 
-// On l'exécute au chargement de la page
-updateUnreadBadge();
+// Turbo : init des composants React à chaque navigation (y compris le premier chargement)
+document.addEventListener('turbo:load', () => {
+    initReactComponents();
+});
 
-// On vérifie toutes les 10 secondes pour que la pastille se mette à jour "en direct"
-setInterval(() => window.updateUnreadBadge(), 10000);
-console.log('Système React activé !');
+// Turbo : nettoyage avant de quitter la page
+document.addEventListener('turbo:before-visit', () => {
+    cleanupReactComponents();
+});
