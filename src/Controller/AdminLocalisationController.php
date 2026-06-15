@@ -37,7 +37,7 @@ class AdminLocalisationController extends AbstractController
         
         $em->flush();
 
-        return new Response('<html><body style="font-family: sans-serif; text-align: center; padding: 50px;"><h2>✅ La demande a été acceptée avec succès.</h2><p>La localisation du restaurant a été mise à jour.</p></body></html>');
+        return new Response('<html><body style="font-family: sans-serif; text-align: center; padding: 50px;"><h2>La demande a été acceptée avec succès.</h2><p>La localisation du restaurant a été mise à jour.</p></body></html>');
     }
 
     #[Route('/admin/localisation/demande/{token}/refuser', name: 'admin_localisation_refuser')]
@@ -57,6 +57,6 @@ class AdminLocalisationController extends AbstractController
         
         $em->flush();
 
-        return new Response('<html><body style="font-family: sans-serif; text-align: center; padding: 50px;"><h2>❌ La demande a été refusée.</h2><p>Le statut a été mis à jour.</p></body></html>');
+        return new Response('<html><body style="font-family: sans-serif; text-align: center; padding: 50px;"><h2>La demande a été refusée.</h2><p>Le statut a été mis à jour.</p></body></html>');
     }
 }
