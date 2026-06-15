@@ -39,7 +39,7 @@ class RestaurantListener
     public function preUpdate(Restaurant $restaurant, PreUpdateEventArgs $event): void
     {
         // On ne recalcule les coordonnées automatiques QUE si l'adresse a été modifiée.
-        // Cela permet de modifier manuellement la latitude/longitude (ex: via la modération) sans qu'elles soient écrasées.
+        // Cela permet de modifier manuellement la latitude/longitude sans qu'elles soient écrasées.
         if ($event->hasChangedField('adresse_restaurant')) {
             $this->updateCoordinates($restaurant);
         }
